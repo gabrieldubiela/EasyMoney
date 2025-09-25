@@ -14,7 +14,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login realizado com sucesso.');
-      
+
     } catch (firebaseError) {
       setError(firebaseError.message);
       console.error('Erro ao fazer login:', firebaseError.message);
@@ -41,7 +41,8 @@ const Login = () => {
         />
         <button type="submit">Entrar</button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {/* Removido style inline */}
+      {error && <p>{error}</p>}
     </div>
   );
 };

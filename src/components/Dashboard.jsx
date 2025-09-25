@@ -1,49 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../firebase/firebaseConfig';
-import { collection, addDoc, onSnapshot, doc, getDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { db } from '../firebase/firebaseConfig';
+import { collection, onSnapshot } from 'firebase/firestore';
+// NOVO: Importa o hook customizado
+import { useHousehold } from '../context/HouseholdContext'; 
+import AddExpenseForm from './AddExpenseForm'; 
+import ExpenseList from './ExpenseList'; 
 
 const Dashboard = () => {
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [fornecedor, setFornecedor] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [data, setData] = useState('');
-  const [tipo, setTipo] = useState('');
+  // NOVO: Obtém os dados do Context API. 
+  // O estado de autenticação e busca de ID não estão mais aqui.
+  const { householdId, currentUserName } = useHousehold(); 
   
   const [expenses, setExpenses] = useState([]);
-  const [householdId, setHouseholdId] = useState(null);
-
-  // Efeito para encontrar o ID da família do usuário
+  
+  // REMOVIDO: const [householdId, setHouseholdId] = useState(null);
+  // REMOVIDO: const [currentUserName, setCurrentUserName] = useState(''); 
+  
+  // REMOVIDO: O useEffect de onAuthStateChanged (primeiro useEffect)
+  //          Foi movido para o HouseholdContext.jsx
+  
+  // Efeito para escutar as despesas em tempo real (Mantém)
+  // Este useEffect agora depende da variável householdId que vem do Context
   useEffect(() => {
-    // onAuthStateChanged é um observador que detecta mudanças no estado do usuário
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Busca o documento do usuário na coleção 'users'
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+    if (!householdId) return; // Se o ID ainda não carregou ou não existe, sai
 
-        if (userDocSnap.exists() && userDocSnap.data().householdId) {
-          // Se o documento existe e tem um householdId, ele é salvo no estado
-          setHouseholdId(userDocSnap.data().householdId);
-        } else {
-          console.error("ID da família não encontrado no documento do usuário.");
-        }
-      }
-    });
-
-    // Retorna a função de limpeza do observador
-    return () => unsubscribeAuth();
-  }, []);
-
-  // Efeito para escutar as despesas em tempo real
-  useEffect(() => {
-    if (!householdId) return;
-
-    // A referência agora aponta para a coleção da família
     const expensesCollectionRef = collection(db, `households/${householdId}/expenses`);
-    
-    // onSnapshot cria um observador que atualiza a lista de despesas em tempo real
     const unsubscribe = onSnapshot(expensesCollectionRef, (snapshot) => {
       const expenseList = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -52,91 +33,22 @@ const Dashboard = () => {
       setExpenses(expenseList);
     });
 
-    // Limpa o observador quando o componente é desmontado
     return () => unsubscribe();
   }, [householdId]);
 
-  // Função para adicionar uma nova despesa
-  const handleAddExpense = async (e) => {
-    e.preventDefault();
-    if (!description || !amount || !householdId) return;
-
-    try {
-      const expensesCollectionRef = collection(db, `households/${householdId}/expenses`);
-      await addDoc(expensesCollectionRef, {
-        description,
-        amount: parseFloat(amount),
-        fornecedor,
-        categoria,
-        data,
-        tipo,
-        createdAt: new Date(),
-        userId: auth.currentUser.uid // Salva o ID do usuário que criou a despesa
-      });
-      setDescription('');
-      setAmount('');
-      setFornecedor('');
-      setCategoria('');
-      setData('');
-      setTipo('');
-    } catch (error) {
-      console.error('Erro ao adicionar despesa:', error);
-    }
-  };
-
   return (
     <div>
-      <h2>Adicionar Nova Despesa</h2>
-      <form onSubmit={handleAddExpense}>
-        <input
-          type="text"
-          value={fornecedor}
-          onChange={(e) => setFornecedor(e.target.value)}
-          placeholder="Fornecedor"
-        />
-        <input
-          type="text"
-          value={categoria}
-          onChange={(e) => setCategoria(e.target.value)}
-          placeholder="Categoria"
-        />
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descrição"
-          required
-        />
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="Valor"
-          required
-        />
-        <input
-          type="date"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-          placeholder="Data"
-        />
-        <input
-          type="text"
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
-          placeholder="Tipo"
-        />
-        <button type="submit">Adicionar</button>
-      </form>
+      {/* Passando props do Contexto para o formulário */}
+      <AddExpenseForm 
+        householdId={householdId} 
+        currentUserName={currentUserName} 
+      />
 
       <h2>Minhas Despesas</h2>
-      <ul>
-        {expenses.map((expense) => (
-          <li key={expense.id}>
-            {expense.description}: R${expense.amount.toFixed(2)}
-          </li>
-        ))}
-      </ul>
+      
+      {/* Não passamos onDelete, pois a lógica está no ExpenseItem agora */}
+      <ExpenseList expenses={expenses} /> 
+      
     </div>
   );
 };
