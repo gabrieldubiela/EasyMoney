@@ -12,10 +12,9 @@ const Login = () => {
     setError('');
 
     try {
-      // Tenta fazer o login com email e senha
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login realizado com sucesso!');
-      // Futuramente, redirecione o usuário para a tela principal
+      console.log('Login realizado com sucesso.');
+      
     } catch (firebaseError) {
       setError(firebaseError.message);
       console.error('Erro ao fazer login:', firebaseError.message);
