@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
 // NOVO: Importa o hook customizado
-import { useHousehold } from '../context/HouseholdContext'; 
+import { useHousehold } from '../context/useHousehold'; 
 import AddExpenseForm from './AddExpenseForm'; 
 import ExpenseList from './ExpenseList'; 
 

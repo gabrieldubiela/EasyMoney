@@ -2,7 +2,7 @@
 
 import React from 'react';
 // NOVO: Importa o hook do contexto e as funções do Firestore
-import { useHousehold } from '../context/HouseholdContext';
+import { useHousehold } from '../context/useHousehold';
 import { db } from '../firebase/firebaseConfig';
 import { doc, deleteDoc } from 'firebase/firestore';
 
