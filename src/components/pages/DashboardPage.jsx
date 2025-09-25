@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/firebaseConfig';
+import { db } from '../../firebase/firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
 // NOVO: Importa o hook customizado
-import { useHousehold } from '../context/useHousehold'; 
-import AddExpenseForm from './AddExpenseForm'; 
-import ExpenseList from './ExpenseList'; 
+import { useHousehold } from '../../context/useHousehold'; 
+import AddExpenseForm from '../ui/AddExpenseForm'; 
+import ExpenseList from '../ui/ExpenseList'; 
 
-const Dashboard = () => {
+const DashboardPage = () => {
   // NOVO: Obtém os dados do Context API. 
   // O estado de autenticação e busca de ID não estão mais aqui.
   const { householdId, currentUserName } = useHousehold(); 
@@ -53,4 +53,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

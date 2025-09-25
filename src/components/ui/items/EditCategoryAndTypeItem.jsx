@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { db } from '../firebase/firebaseConfig';
+import { db } from '../../../firebase/firebaseConfig';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore'; // Importado updateDoc
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../../../context/useHousehold';
 
-const CategoryItem = ({ category }) => {
+const EditCategoryAndTypeItem  = ({ category }) => {
   const { householdId } = useHousehold();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -84,4 +84,4 @@ const CategoryItem = ({ category }) => {
   );
 };
 
-export default CategoryItem;
+export default EditCategoryAndTypeItem ;

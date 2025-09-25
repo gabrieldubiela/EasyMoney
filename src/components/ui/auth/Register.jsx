@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase/firebaseConfig';
+import { auth, db } from '../../../firebase/firebaseConfig';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 // Importado serverTimestamp para datas de criação (boa prática)
 
