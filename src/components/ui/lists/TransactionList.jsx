@@ -1,4 +1,4 @@
-// src/components/ui/ExpenseList.jsx (COMPLETO E REFATORADO)
+// src/components/ui/TransactionList.jsx (COMPLETO E REFATORADO)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebase/firebaseConfig';
@@ -13,15 +13,15 @@ import {
     getDocs // Usaremos getDocs para paginação, e onSnapshot para metadados
 } from 'firebase/firestore'; 
 import { useHousehold } from '../../../context/useHousehold';
-import ExpenseItem from '../items/ExpenseItem';
+import TransactionItem from '../items/TransactionItem';
 
 // Limite de despesas por carga
 const PAGE_SIZE = 15; 
 
 // Aceita filtros como prop
-const ExpenseList = ({ filters }) => {
+const TransactionList = ({ filters }) => {
     const { householdId, users } = useHousehold(); 
-    const [expenses, setExpenses] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [categories, setCategories] = useState({});
     const [types, setTypes] = useState({});
     const [loading, setLoading] = useState(true);
@@ -49,13 +49,13 @@ const ExpenseList = ({ filters }) => {
     }, [householdId]);
     
     // 2. Lógica de Busca de Despesas com Filtro e Paginação
-    const fetchExpenses = useCallback(async (isInitialLoad, startDoc = null) => {
+    const fetchTransactions = useCallback(async (isInitialLoad, startDoc = null) => {
         if (!householdId) return;
 
         setLoading(true);
         
         // 1. Constrói a Query (Adiciona filtros)
-        let q = collection(db, `households/${householdId}/expenses`);
+        let q = collection(db, `households/${householdId}/transactions`);
         let baseQuery = [];
         let totalSum = 0; // Acumulador do valor total
 
@@ -80,7 +80,7 @@ const ExpenseList = ({ filters }) => {
 
         try {
             const snapshot = await getDocs(q);
-            const newExpenses = snapshot.docs.map(doc => ({
+            const newTransactions = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
@@ -88,13 +88,13 @@ const ExpenseList = ({ filters }) => {
             // 2. Lógica de Paginação
             const last = snapshot.docs[snapshot.docs.length - 1];
             setLastVisible(last || null);
-            setHasMore(newExpenses.length === PAGE_SIZE); // Se o tamanho for menor que o limite, não há mais
+            setHasMore(newTransactions.length === PAGE_SIZE); // Se o tamanho for menor que o limite, não há mais
             
             // 3. Atualiza a lista (Adiciona ou substitui)
             if (isInitialLoad) {
-                setExpenses(newExpenses);
+                setTransactions(newTransactions);
             } else {
-                setExpenses(prev => [...prev, ...newExpenses]);
+                setTransactions(prev => [...prev, ...newTransactions]);
             }
             
             // 4. Cálculo do Valor Total (Soma de todas as despesas filtradas)
@@ -103,16 +103,16 @@ const ExpenseList = ({ filters }) => {
             // despesas *atualmente carregadas/filtradas* na tela.
             
             // Filtro final para Fornecedor/Descrição (Client-side, menos eficiente)
-            const filteredExpenses = (isInitialLoad ? newExpenses : [...expenses, ...newExpenses])
-                .filter(expense => {
+            const filteredTransactions = (isInitialLoad ? newTransactions : [...transactions, ...newTransactions])
+                .filter(transaction => {
                     const term = filters.searchTerm.toLowerCase();
                     if (!term) return true;
                     // Filtro de texto (Fornecedor OU Descrição)
-                    return expense.supplier?.toLowerCase().includes(term) || expense.description?.toLowerCase().includes(term);
+                    return transaction.supplier?.toLowerCase().includes(term) || transaction.description?.toLowerCase().includes(term);
                 });
             
             // Soma o valor total
-            totalSum = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            totalSum = filteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
             setTotalAmount(totalSum);
 
         } catch (error) {
@@ -125,17 +125,17 @@ const ExpenseList = ({ filters }) => {
     // Chama a função de busca sempre que os filtros mudam
     useEffect(() => {
         // Zera a lista e começa do zero (isInitialLoad = true)
-        setExpenses([]);
+        setTransactions([]);
         setLastVisible(null);
         setHasMore(true);
-        fetchExpenses(true);
-    }, [filters, fetchExpenses]);
+        fetchTransactions(true);
+    }, [filters, fetchTransactions]);
 
 
     // 3. Função para carregar a próxima página
     const loadMore = () => {
         if (!hasMore || loading) return;
-        fetchExpenses(false, lastVisible);
+        fetchTransactions(false, lastVisible);
     };
 
     // Mapeamento de usuários (igual ao anterior)
@@ -149,16 +149,16 @@ const ExpenseList = ({ filters }) => {
             {/* NOVO: Display do Valor Total */}
             <h3>Total do Filtro: R$ {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h3>
 
-            {expenses.length === 0 && !loading && <div>Nenhuma despesa encontrada com os filtros aplicados.</div>}
+            {transactions.length === 0 && !loading && <div>Nenhuma despesa encontrada com os filtros aplicados.</div>}
 
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                {expenses.map(expense => (
-                    <ExpenseItem 
-                        key={expense.id} 
-                        expense={expense} 
-                        categoryName={categories[expense.category_id] || 'N/A'} 
-                        typeName={types[expense.type_id] || 'N/A'}
-                        userName={getUserName(expense.user_id)} 
+                {transactions.map(transaction => (
+                    <TransactionItem 
+                        key={transaction.id} 
+                        transaction={transaction} 
+                        categoryName={categories[transaction.category_id] || 'N/A'} 
+                        typeName={types[transaction.type_id] || 'N/A'}
+                        userName={getUserName(transaction.user_id)} 
                     />
                 ))}
             </div>
@@ -175,4 +175,4 @@ const ExpenseList = ({ filters }) => {
     );
 };
 
-export default ExpenseList;
+export default TransactionList;

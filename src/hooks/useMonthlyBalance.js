@@ -10,14 +10,14 @@ const useMonthlyBalance = (year, month) => {
     
     // Dados
     const [availableFunds, setAvailableFunds] = useState(0);
-    const [effectiveExpenses, setEffectiveExpenses] = useState([]);
-    const [plannedExpenses, setPlannedExpenses] = useState([]);  
+    const [effectiveTransactions, setEffectiveTransactions] = useState([]);
+    const [plannedTransactions, setPlannedTransactions] = useState([]);  
     const [categories, setCategories] = useState({});
     const [types, setTypes] = useState({});
     const [loading, setLoading] = useState(true);
 
     // Fetch principal
-    const fetchExpensesForPeriod = useCallback(async () => {
+    const fetchTransactionsForPeriod = useCallback(async () => {
         if (!householdId) {
             setLoading(false);
             return;
@@ -30,25 +30,25 @@ const useMonthlyBalance = (year, month) => {
         const endTimestamp = Timestamp.fromDate(endOfMonth);
 
         try {
-            // --- Fetch Despesas Efetivas ('expenses') ---
+            // --- Fetch Despesas Efetivas ('Transactions') ---
             const effectiveQuery = query(
-                collection(db, `households/${householdId}/expenses`),
+                collection(db, `households/${householdId}/transactions`),
                 where('date', '>=', startTimestamp),
                 where('date', '<=', endTimestamp),
                 orderBy('date', 'asc')
             );
             const effectiveSnapshot = await getDocs(effectiveQuery);
-            setEffectiveExpenses(effectiveSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            setEffectiveTransactions(effectiveSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-            // --- Fetch Despesas Planejadas ('plannedExpenses') ---
+            // --- Fetch Despesas Planejadas ('plannedTransactions') ---
             const plannedQuery = query(
-                collection(db, `households/${householdId}/plannedExpenses`),
+                collection(db, `households/${householdId}/plannedTransactions`),
                 where('paymentDate', '>=', startTimestamp),
                 where('paymentDate', '<=', endTimestamp),
                 orderBy('paymentDate', 'asc')
             );
             const plannedSnapshot = await getDocs(plannedQuery);
-            setPlannedExpenses(plannedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            setPlannedTransactions(plannedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             
         } catch(error) {
             console.error("Erro ao carregar despesas do balanço:", error);
@@ -58,8 +58,8 @@ const useMonthlyBalance = (year, month) => {
     }, [householdId, year, month]);
 
     useEffect(() => {
-        fetchExpensesForPeriod();
-    }, [fetchExpensesForPeriod]);
+        fetchTransactionsForPeriod();
+    }, [fetchTransactionsForPeriod]);
     
     // Lógica para o fetch de Categorias/Tipos (poderia estar em outro hook, mas mantemos aqui por simplicidade)
     useEffect(() => {
@@ -67,18 +67,18 @@ const useMonthlyBalance = (year, month) => {
     }, [householdId]);
 
 
-    const totalEffective = effectiveExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const totalPlanned = plannedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const totalEffective = effectiveTransactions.reduce((sum, exp) => sum + exp.amount, 0);
+    const totalPlanned = plannedTransactions.reduce((sum, exp) => sum + exp.amount, 0);
     const balance = availableFunds - totalEffective - totalPlanned;
 
     return {
         availableFunds, setAvailableFunds,
-        effectiveExpenses, totalEffective,
-        plannedExpenses, totalPlanned,
+        effectiveTransactions, totalEffective,
+        plannedTransactions, totalPlanned,
         balance,
         categories, types,
         loading,
-        refetch: fetchExpensesForPeriod // Função para forçar a atualização após uma conversão/adição
+        refetch: fetchTransactionsForPeriod // Função para forçar a atualização após uma conversão/adição
     };
 };
 

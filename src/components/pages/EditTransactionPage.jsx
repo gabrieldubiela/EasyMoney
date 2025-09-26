@@ -1,18 +1,18 @@
-// src/components/pages/EditExpensePage.jsx
+// src/components/pages/EditTransactionPage.jsx
 
 import React from 'react';
-import ExpenseForm from '../ui/ExpenseForm'; 
+import TransactionForm from '../ui/TransactionForm'; 
 import { useHousehold } from '../../context/useHousehold';
 
 // Simulando a obtenção do ID da URL (necessário React Router no futuro)
-const EditExpensePage = ({ expenseId }) => { 
+const EditTransactionPage = ({ transactionId }) => { 
     const { householdName } = useHousehold();
     
     // Se estivéssemos usando React Router, faríamos:
     // const { id } = useParams(); 
-    // const expenseId = id; 
+    // const transactionId = id; 
 
-    if (!expenseId) {
+    if (!transactionId) {
         return <div>Erro: ID da despesa não fornecido.</div>;
     }
 
@@ -20,9 +20,9 @@ const EditExpensePage = ({ expenseId }) => {
         <div>
             <h1>Editar Despesa (Família: {householdName})</h1>
             {/* Passa o ID para o formulário para que ele carregue os dados */}
-            <ExpenseForm expenseId={expenseId} />
+            <TransactionForm transactionId={transactionId} />
         </div>
     );
 };
 
-export default EditExpensePage;
+export default EditTransactionPage;

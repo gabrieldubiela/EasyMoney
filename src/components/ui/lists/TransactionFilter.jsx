@@ -1,4 +1,4 @@
-// src/components/ui/ExpenseFilters.jsx
+// src/components/ui/TransactionFilters.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebase/firebaseConfig';
@@ -6,7 +6,7 @@ import { collection, query, limit, getDocs } from 'firebase/firestore';
 import { useHousehold } from '../../../context/useHousehold';
 
 // O componente recebe os IDs de categorias/tipos para popular os dropdowns
-const ExpenseFilters = ({ categories, types, onFilterChange }) => {
+const TransactionFilters = ({ categories, types, onFilterChange }) => {
     const { householdId } = useHousehold();
     
     // Estados dos Filtros
@@ -25,7 +25,7 @@ const ExpenseFilters = ({ categories, types, onFilterChange }) => {
         if (!householdId || term.length < 2) return [];
 
         const q = query(
-            collection(db, `households/${householdId}/expenses`),
+            collection(db, `households/${householdId}/transactions`),
             // Busca despesas onde o campo começa com o termo de busca
             // NOTE: Firestore não tem 'LIKE'. Isso é uma simulação básica de prefixo.
             // Para produção, é recomendado usar ElasticSearch/Algolia.
@@ -72,7 +72,7 @@ const ExpenseFilters = ({ categories, types, onFilterChange }) => {
     }, [searchTerm, fetchSuggestions]);
 
 
-    // 3. Efeito para notificar o componente pai (ExpenseList) sobre a mudança
+    // 3. Efeito para notificar o componente pai (TransactionList) sobre a mudança
     useEffect(() => {
         const filters = {
             category: selectedCategory,
@@ -81,7 +81,7 @@ const ExpenseFilters = ({ categories, types, onFilterChange }) => {
             minDate,
             maxDate,
         };
-        // Chama a prop para atualizar a lista no ExpenseList
+        // Chama a prop para atualizar a lista no TransactionList
         onFilterChange(filters);
     }, [selectedCategory, selectedType, searchTerm, minDate, maxDate, onFilterChange]);
 
@@ -134,4 +134,4 @@ const ExpenseFilters = ({ categories, types, onFilterChange }) => {
     );
 };
 
-export default ExpenseFilters;
+export default TransactionFilters;

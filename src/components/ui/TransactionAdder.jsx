@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-// Importa o formulário principal, agora renomeado para ExpenseForm
-import ExpenseForm from './forms/ExpenseForm'; 
+// Importa o formulário principal, agora renomeado para TransactionForm
+import TransactionForm from './forms/TransactionForm'; 
 
-const ExpenseAdder = () => {
+const TransactionAdder = () => {
     // Estado para controlar se o formulário está visível
     const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -11,7 +11,7 @@ const ExpenseAdder = () => {
         setIsFormVisible(!isFormVisible);
     };
     
-    // Função chamada pelo ExpenseForm quando uma adição é bem-sucedida.
+    // Função chamada pelo TransactionForm quando uma adição é bem-sucedida.
     const handleSaveSuccess = () => {
         // Fechamos o formulário após um breve atraso para que o usuário veja a confirmação de sucesso
         setTimeout(() => {
@@ -25,9 +25,9 @@ const ExpenseAdder = () => {
                 <>
                     {/* Renderiza o formulário de adição */}
                     {/* Passamos onSaveSuccess para que ele feche após o sucesso */}
-                    <ExpenseForm 
+                    <TransactionForm 
                         onSaveSuccess={handleSaveSuccess} 
-                        expenseId={null} // Indica que é o modo de Adição
+                        transactionId={null} // Indica que é o modo de Adição
                     /> 
                     
                     {/* Botão para fechar o formulário */}
@@ -49,4 +49,4 @@ const ExpenseAdder = () => {
     );
 };
 
-export default ExpenseAdder;
+export default TransactionAdder;

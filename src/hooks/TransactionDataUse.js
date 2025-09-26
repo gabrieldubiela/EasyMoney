@@ -1,4 +1,4 @@
-// src/hooks/ExpenseDataUse.js
+// src/hooks/TransactionDataUse.js
 
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../firebase/firebaseConfig';
@@ -6,7 +6,7 @@ import { collection, onSnapshot, getDoc, doc } from 'firebase/firestore';
 import { useHousehold } from '../context/useHousehold';
 
 // O hook recebe o ID da despesa
-const ExpenseDataUse = (expenseId) => {
+const TransactionDataUse = (transactionId) => {
     const { householdId } = useHousehold();
     
     // Estados do Formulário
@@ -50,14 +50,14 @@ const ExpenseDataUse = (expenseId) => {
 
     // 2. Efeito para carregar a despesa (APENAS SE ESTIVERMOS EDITANDO)
     useEffect(() => {
-        if (!expenseId || !householdId) {
+        if (!transactionId || !householdId) {
             setLoading(false);
             return;
         }
 
-        const fetchExpense = async () => {
-            const expenseDocRef = doc(db, `households/${householdId}/expenses`, expenseId);
-            const docSnap = await getDoc(expenseDocRef);
+        const fetchTransaction = async () => {
+            const transactionDocRef = doc(db, `households/${householdId}/transactions`, transactionId);
+            const docSnap = await getDoc(transactionDocRef);
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -69,8 +69,8 @@ const ExpenseDataUse = (expenseId) => {
                 setAmount(originalAmount.toFixed(2)); 
                 setCategory(data.category_id);
                 setType(data.type_id);
-                const expenseDate = data.date.toDate().toISOString().substring(0, 10);
-                setDate(expenseDate); 
+                const transactionDate = data.date.toDate().toISOString().substring(0, 10);
+                setDate(transactionDate); 
                 setInstallments(data.installments_total);
                 setTransactionId(data.transactionId || data.id); // NOVO: Usa o ID do grupo ou o próprio ID (se não for parcelado)
             } else {
@@ -79,8 +79,8 @@ const ExpenseDataUse = (expenseId) => {
             setLoading(false);
         };
 
-        fetchExpense();
-    }, [expenseId, householdId]);
+        fetchTransaction();
+    }, [transactionId, householdId]);
     
     // Retorna todos os estados e setters necessários
     return {
@@ -101,4 +101,4 @@ const ExpenseDataUse = (expenseId) => {
     };
 };
 
-export default ExpenseDataUse;
+export default TransactionDataUse;

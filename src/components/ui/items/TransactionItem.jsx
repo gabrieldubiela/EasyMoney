@@ -1,4 +1,4 @@
-// src/components/ui/ExpenseItem.jsx (ATUALIZADO)
+// src/components/ui/TransactionItem.jsx (ATUALIZADO)
 
 import React from 'react';
 import { useHousehold } from '../../../context/useHousehold';
@@ -8,19 +8,19 @@ import { doc, deleteDoc } from 'firebase/firestore';
 // import { useNavigate } from 'react-router-dom'; 
 
 // Aceita os novos props com os nomes já mapeados e prontos para exibição
-const ExpenseItem = ({ expense, userName, categoryName, typeName }) => {
+const TransactionItem = ({ transaction, userName, categoryName, typeName }) => {
     // const navigate = useNavigate(); // Descomentar ao instalar o React Router
     const { householdId } = useHousehold(); 
     
     // Lógica para Formatação de Data: Agora usamos o objeto Date do Firestore
-    const expenseDate = expense.date?.toDate().toLocaleDateString('pt-BR', {
+    const transactionDate = transaction.date?.toDate().toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
     }) || 'Data Desconhecida';
 
     // Lógica de Formatação de Valor (igual à sua)
-    const formattedAmount = (expense.amount || 0).toLocaleString('pt-BR', {
+    const formattedAmount = (transaction.amount || 0).toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
     });
@@ -30,22 +30,22 @@ const ExpenseItem = ({ expense, userName, categoryName, typeName }) => {
         // Impede que o clique no botão de Excluir também edite
         if (e.target.tagName === 'BUTTON') return; 
         
-        // No futuro, isso seria: navigate(`/expenses/${expense.id}`);
-        alert(`Simulando Navegação para Edição da Parcela ${expense.installments_current}/${expense.installments_total} (ID: ${expense.id})`);
+        // No futuro, isso seria: navigate(`/transactions/${transaction.id}`);
+        alert(`Simulando Navegação para Edição da Parcela ${transaction.installments_current}/${transaction.installments_total} (ID: ${transaction.id})`);
     };
 
     // Função de exclusão (idêntica à sua, que está excelente!)
     const handleDelete = async () => {
-        if (!householdId || !expense.id) {
-            console.error("Household ID ou Expense ID faltando para a exclusão.");
+        if (!householdId || !transaction.id) {
+            console.error("Household ID ou transaction ID faltando para a exclusão.");
             return;
         }
         
         if (window.confirm("Tem certeza que deseja excluir esta despesa?")) {
             try {
-                const expenseDocRef = doc(db, `households/${householdId}/expenses`, expense.id);
-                await deleteDoc(expenseDocRef);
-                console.log(`Despesa ${expense.id} excluída com sucesso!`);
+                const transactionDocRef = doc(db, `households/${householdId}/transactions`, transaction.id);
+                await deleteDoc(transactionDocRef);
+                console.log(`Despesa ${transaction.id} excluída com sucesso!`);
             } catch (error) {
                 console.error('Erro ao excluir despesa:', error);
                 alert('Erro ao excluir despesa. Tente novamente.');
@@ -60,17 +60,17 @@ const ExpenseItem = ({ expense, userName, categoryName, typeName }) => {
             
             {/* Linha 1: Descrição e Fornecedor */}
             <p>
-                <strong>{expense.description}</strong> 
-                {expense.supplier && <small> ({expense.supplier})</small>}
+                <strong>{transaction.description}</strong> 
+                {transaction.supplier && <small> ({transaction.supplier})</small>}
             </p>
 
             {/* Linha 2: Valor e Data/Parcela */}
             <p>
                 <span>{formattedAmount}</span>
                 {' | '}
-                <span>{expenseDate}</span>
-                {expense.installments_total > 1 && (
-                    <small> (Parc. {expense.installments_current}/{expense.installments_total})</small>
+                <span>{transactionDate}</span>
+                {transaction.installments_total > 1 && (
+                    <small> (Parc. {transaction.installments_current}/{transaction.installments_total})</small>
                 )}
             </p>
             
@@ -95,4 +95,4 @@ const ExpenseItem = ({ expense, userName, categoryName, typeName }) => {
     );
 };
 
-export default ExpenseItem;
+export default TransactionItem;

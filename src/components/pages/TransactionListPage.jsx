@@ -1,21 +1,21 @@
-// src/components/pages/ExpenseListPage.jsx
+// src/components/pages/TransactionListPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import ExpenseList from '../ui/lists/ExpenseList';
-import ExpenseAdder from '../ui/ExpenseAdder';
-import ExpenseFilters from '../ui/ExpenseFilters';
+import TransactionList from '../ui/lists/TransactionList';
+import TransactionAdder from '../ui/TransactionAdder';
+import TransactionFilters from '../ui/TransactionFilters';
 import { useHousehold } from '../../context/useHousehold';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 
-const ExpenseListPage = () => {
+const TransactionListPage = () => {
     const { householdId } = useHousehold();
     // Estado que será passado do Filtro para a Lista
     const [filters, setFilters] = useState({}); 
     const [categories, setCategories] = useState([]);
     const [types, setTypes] = useState([]);
 
-    // Busca Categorias e Tipos para popular o ExpenseFilters (dropdowns)
+    // Busca Categorias e Tipos para popular o TransactionFilters (dropdowns)
     useEffect(() => {
         if (!householdId) return;
 
@@ -44,20 +44,20 @@ const ExpenseListPage = () => {
             <h1>Revisão Detalhada de Despesas</h1>
             
             {/* O Adicionar Despesa (Toggle) */}
-            <ExpenseAdder />
+            <TransactionAdder />
 
             {/* NOVO: Componente de Filtros */}
-            <ExpenseFilters 
+            <TransactionFilters 
                 categories={categories}
                 types={types}
                 onFilterChange={handleFilterChange} // Envia a função de callback
             />
 
             {/* A Lista agora recebe os filtros e implementa a lógica */}
-            <ExpenseList filters={filters} /> 
+            <TransactionList filters={filters} /> 
             
         </div>
     );
 };
 
-export default ExpenseListPage;
+export default TransactionListPage;

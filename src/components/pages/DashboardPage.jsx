@@ -3,15 +3,15 @@ import { db } from '../../firebase/firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
 // NOVO: Importa o hook customizado
 import { useHousehold } from '../../context/useHousehold'; 
-import AddExpenseForm from '../ui/AddExpenseForm'; 
-import ExpenseList from '../ui/ExpenseList'; 
+import AddTransactionForm from '../ui/AddTransactionForm'; 
+import TransactionList from '../ui/TransactionList'; 
 
 const DashboardPage = () => {
   // NOVO: Obtém os dados do Context API. 
   // O estado de autenticação e busca de ID não estão mais aqui.
   const { householdId, currentUserName } = useHousehold(); 
   
-  const [expenses, setExpenses] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   
   // REMOVIDO: const [householdId, setHouseholdId] = useState(null);
   // REMOVIDO: const [currentUserName, setCurrentUserName] = useState(''); 
@@ -24,13 +24,13 @@ const DashboardPage = () => {
   useEffect(() => {
     if (!householdId) return; // Se o ID ainda não carregou ou não existe, sai
 
-    const expensesCollectionRef = collection(db, `households/${householdId}/expenses`);
-    const unsubscribe = onSnapshot(expensesCollectionRef, (snapshot) => {
-      const expenseList = snapshot.docs.map(doc => ({
+    const transactionsCollectionRef = collection(db, `households/${householdId}/transactions`);
+    const unsubscribe = onSnapshot(transactionsCollectionRef, (snapshot) => {
+      const transactionList = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setExpenses(expenseList);
+      setTransactions(transactionList);
     });
 
     return () => unsubscribe();
@@ -39,15 +39,15 @@ const DashboardPage = () => {
   return (
     <div>
       {/* Passando props do Contexto para o formulário */}
-      <AddExpenseForm 
+      <AddTransactionForm 
         householdId={householdId} 
         currentUserName={currentUserName} 
       />
 
       <h2>Minhas Despesas</h2>
       
-      {/* Não passamos onDelete, pois a lógica está no ExpenseItem agora */}
-      <ExpenseList expenses={expenses} /> 
+      {/* Não passamos onDelete, pois a lógica está no TransactionItem agora */}
+      <TransactionList transactions={transactions} /> 
       
     </div>
   );

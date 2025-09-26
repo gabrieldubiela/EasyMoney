@@ -6,8 +6,8 @@ import useMonthlyBalance from '../../hooks/useMonthlyBalance';
 import BalanceSummary from '../dashboard/BalanceSummary'; 
 
 // Assumindo que você moveu estes para a nova estrutura de pastas
-import PlannedExpenseForm from '../forms/PlannedExpenseForm'; 
-import PlannedExpenseItem from '../items/PlannedExpenseItem'; 
+import PlannedTransactionForm from '../forms/PlannedTransactionForm'; 
+import PlannedTransactionItem from '../items/PlannedTransactionItem'; 
 
 const MonthlyBalancePage = () => {
     // 1. Gerenciamento do Período (Únicos estados que a Page controla)
@@ -18,7 +18,7 @@ const MonthlyBalancePage = () => {
     // 2. Uso do NOVO HOOK para toda a lógica de dados
     const {
         availableFunds, setAvailableFunds,
-        plannedExpenses,
+        plannedTransactions,
         totalEffective, totalPlanned,
         balance,
         categories, types,
@@ -50,20 +50,20 @@ const MonthlyBalancePage = () => {
 
             {/* Adicionar Despesa Planejada (Componente Isolado) */}
             <div style={{ marginBottom: '30px', padding: '15px', border: '1px dashed #aaa' }}>
-                <PlannedExpenseForm onSaveSuccess={refetch} />
+                <PlannedTransactionForm onSaveSuccess={refetch} />
             </div>
 
             {/* Lista de Despesas Planejadas */}
-            <h2>Despesas Planejadas ({plannedExpenses.length})</h2>
-            {plannedExpenses.length === 0 ? (
+            <h2>Despesas Planejadas ({plannedTransactions.length})</h2>
+            {plannedTransactions.length === 0 ? (
                 <p>Nenhuma despesa planejada para este período.</p>
             ) : (
-                plannedExpenses.map(expense => (
-                    <PlannedExpenseItem
-                        key={expense.id}
-                        expense={expense}
-                        categoryName={categories[expense.category_id] || 'N/A'}
-                        typeName={types[expense.type_id] || 'N/A'}
+                plannedTransactions.map(transaction => (
+                    <PlannedTransactionItem
+                        key={transaction.id}
+                        transaction={transaction}
+                        categoryName={categories[transaction.category_id] || 'N/A'}
+                        typeName={types[transaction.type_id] || 'N/A'}
                         onConvert={refetch} // Atualiza a lista após conversão
                     />
                 ))
