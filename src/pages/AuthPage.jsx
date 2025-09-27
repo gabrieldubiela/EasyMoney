@@ -23,11 +23,11 @@ const AuthPage = () => {
                     ? "Não tem uma conta? "
                     : "Já tem uma conta? "
                 }
-                <span
+                <button
                     onClick={toggleMode}
                 >
                     {isLogin ? "Cadastre-se" : "Faça Login"}
-                </span>
+                </button>
             </p>
 
             {/* Link "Esqueci minha senha" */}

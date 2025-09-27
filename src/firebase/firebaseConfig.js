@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Credenciais de configuração que você copiou do console
 const firebaseConfig = {
-  apiKey: "AIzaSyCfvV8dnKYiWYK_IuEuu3i8pFFPrwt2FTk",
-  authDomain: "easymoney-61ad6.firebaseapp.com",
-  projectId: "easymoney-61ad6",
-  storageBucket: "easymoney-61ad6.appspot.com",
-  messagingSenderId: "701611087112",
-  appId: "1:701611087112:web:d11f4f5d0699b2c54848bd",
-  measurementId: "G-W7HQBH0D2K"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // 1. Inicializa o Firebase e armazena a instância em 'app'

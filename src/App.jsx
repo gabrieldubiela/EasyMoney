@@ -1,18 +1,37 @@
-import React from 'react';
-// Importação do Provider (default export)
+// src/App.jsx
+
+import React, { useEffect } from 'react';
+
+// Importa a função de utilitário de notificação que criamos
+import { requestNotificationPermission } from './utils/notification';
+
+// Ajuste o caminho de importação do Contexto se necessário.
 import HouseholdProvider from './context/HouseholdContext'; 
-// Importação do novo componente de Roteamento
-import Routes from './components/Routes'; 
+
+// Importa o roteador da aplicação
+import AppRoutes from './routes/Routes'; 
+import useScheduledPayments from './hooks/useScheduledPayments';
+
 import './App.css'; 
 
 // Componente Principal App (Define o Provedor)
 function App() {
-  return (
-    <HouseholdProvider>
-      {/* Todo o roteamento e lógica de Auth foi movido para Routes */}
-      <Routes />
-    </HouseholdProvider>
-  );
+    
+    // 1. Hook para solicitar a permissão de notificação
+    useEffect(() => {
+        // Esta função irá verificar a permissão e pedir ao usuário, se necessário.
+        requestNotificationPermission(); 
+    }, []); // O array vazio garante que isso rode apenas uma vez, após a montagem.
+
+    useScheduledPayments();
+    
+    // 2. Renderização
+    return (
+        <HouseholdProvider>
+            {/* O componente AppRoutes contém todo o roteamento */}
+            <AppRoutes />
+        </HouseholdProvider>
+    );
 }
 
 export default App;

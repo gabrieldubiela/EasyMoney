@@ -1,12 +1,12 @@
 // src/components/pages/TransactionListPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import TransactionList from '../ui/lists/TransactionList';
-import TransactionAdder from '../ui/TransactionAdder';
+import TransactionList from '../components/ui/lists/TransactionList';
+import TransactionAdder from '../components/ui/TransactionAdder';
 import TransactionFilters from '../ui/TransactionFilters';
-import { useHousehold } from '../../context/useHousehold';
+import { useHousehold } from '../context/useHousehold';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 
 const TransactionListPage = () => {
     const { householdId } = useHousehold();

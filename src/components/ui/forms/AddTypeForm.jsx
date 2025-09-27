@@ -1,26 +1,26 @@
-// src/components/ui/AddTypeForm.jsx
+// src/components/ui/AddTypeForm.jsx (ATUALIZADO)
 
 import React, { useState } from 'react';
-import { db } from '../../../firebase/firebaseConfig';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
-import { useHousehold } from '../../../context/useHousehold';
+import useTypes from '../../hooks/useTypes'; // Importa o hook para a função addType
 
-const AddTypeForm = ({ types }) => {
-    const { householdId } = useHousehold();
+// Recebemos a lista de TIPOS para checagem de duplicidade
+const AddTypeForm = ({ existingTypes }) => {
+    // Usamos o hook para obter a função addType
+    const { addType } = useTypes();
+    
     const [name, setName] = useState('');
+    const [isIncome, setIsIncome] = useState(false); // NOVO: Estado para a flag de Receita
     const [loading, setLoading] = useState(false);
     
-    // Futuramente, você pode adicionar um campo 'isCredit' ou 'isCash' aqui.
-
     const handleAdd = async (e) => {
         e.preventDefault();
         const typeName = name.trim();
-        if (!typeName || !householdId) return;
+        if (!typeName) return;
         
         setLoading(true);
         
         // Verifica duplicidade (case-insensitive)
-        const exists = types.some(t => t.name.toLowerCase() === typeName.toLowerCase());
+        const exists = existingTypes.some(t => t.name.toLowerCase() === typeName.toLowerCase());
         if (exists) {
             alert(`O tipo "${typeName}" já existe.`);
             setLoading(false);
@@ -28,12 +28,11 @@ const AddTypeForm = ({ types }) => {
         }
 
         try {
-            await addDoc(collection(db, `households/${householdId}/types`), {
-                name: typeName,
-                createdAt: serverTimestamp()
-            });
+            // Usa a função do hook para adicionar o Tipo com a flag isIncome
+            await addType(typeName, isIncome); 
 
             setName('');
+            setIsIncome(false);
         } catch (error) {
             console.error('Erro ao adicionar tipo:', error);
             alert('Falha ao adicionar tipo. Tente novamente.');
@@ -43,14 +42,25 @@ const AddTypeForm = ({ types }) => {
     };
 
     return (
-        <form onSubmit={handleAdd}>
+        <form onSubmit={handleAdd} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <input
                 type="text"
-                placeholder="Nome do Novo Tipo (Ex: Cartão de Crédito)"
+                placeholder="Nome do Novo Tipo (Ex: Essencial, Lazer)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
             />
+            
+            {/* NOVO: Checkbox para Receita */}
+            <label>
+                <input
+                    type="checkbox"
+                    checked={isIncome}
+                    onChange={(e) => setIsIncome(e.target.checked)}
+                />
+                É Receita?
+            </label>
+
             <button type="submit" disabled={loading}>
                 {loading ? 'Adicionando...' : 'Adicionar Tipo'}
             </button>
