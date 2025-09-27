@@ -1,10 +1,9 @@
 // src/components/AnnualBudgetSheet.jsx
 
 import React, { useState, useMemo } from 'react';
-import useAnnualData from '../../../hooks/useAnnualData'; 
-// Importe useCategories se você precisar do nome das categorias para o display
-import { useHousehold } from '../../../hooks/useHousehold'; 
-import { db } from '../../../firebase/firebaseConfig';
+import useAnnualData from '../../hooks/useAnnualData'; 
+import { useHousehold } from '../../hooks/useHousehold'; 
+import { db } from '../../firebase/firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore'; 
 
 const MONTH_NAMES = [
