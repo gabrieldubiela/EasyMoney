@@ -2,8 +2,6 @@
 
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase/firebaseConfig';
 import { useHousehold } from '../hooks/useHousehold';
 
 
@@ -37,8 +35,8 @@ const EditTransactionPage = lazy(() => import('../pages/EditTransactionPage'));
 
 // 1. Rota Protegida Comum (Usuário Logado)
 const ProtectedRoute = ({ children }) => {
-    const { user, isLoading } = useHousehold();
-    if (isLoading) return <div className="app-loading">Carregando usuário...</div>;
+    const { user, loading } = useHousehold();
+    if (loading) return <div className="app-loading">Carregando usuário...</div>;
     
     if (!user) {
         return <Navigate to="/login" replace />;
@@ -48,8 +46,8 @@ const ProtectedRoute = ({ children }) => {
 
 // 2. Rota de Administração (Usuário Admin)
 const AdminRoute = ({ children }) => {
-    const { user, isLoading } = useHousehold();
-    if (isLoading) return <div className="app-loading">Carregando autorização...</div>;
+    const { user, loading } = useHousehold();
+    if (loading) return <div className="app-loading">Carregando autorização...</div>;
     
     // Se não estiver logado OU não for admin, volta para a dashboard
     if (!user || !user.isAdmin) { 
@@ -71,24 +69,16 @@ const AuthRoute = ({ children }) => {
 // --- Componente Principal de Roteamento ---
 const AppRoutes = () => {
     // Usaremos apenas o 'user' e 'isLoading' para o roteamento inicial
-    const { user, isLoading } = useHousehold(); 
-    
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error('Erro ao sair:', error.message);
-        }
-    };
+    const { user, loading } = useHousehold(); 
 
-    if (isLoading) {
+    if (loading) {
         return <div className="App">Carregando informações do sistema...</div>;
     }
 
     return (
         <BrowserRouter>
             {/* O componente Nav será renderizado somente se o usuário estiver logado */}
-            {user && <Nav onLogout={handleLogout} />} 
+            {user && <Nav />} 
             
             <Suspense fallback={<div className="page-loading-fallback">Carregando página...</div>}>
                 <RouterRoutes>

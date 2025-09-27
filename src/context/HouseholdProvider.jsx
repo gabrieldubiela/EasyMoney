@@ -4,7 +4,7 @@ import { HouseholdContext } from './HouseholdContext';
 import useUserAuthData from '../hooks/useUserAuthData';
 
 // ✅ Este arquivo AGORA exporta APENAS o componente Provider
-export const HouseholdProvider = ({ children }) => {
+const HouseholdProvider = ({ children }) => {
     // Usa o hook para obter o estado do usuário logado e loading
     const { user, loading: userLoading } = useUserAuthData(); 
     
@@ -32,3 +32,5 @@ export const HouseholdProvider = ({ children }) => {
         </HouseholdContext.Provider>
     );
 };
+
+export default HouseholdProvider;

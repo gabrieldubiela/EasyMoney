@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot, getDoc, doc } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from './useHousehold';
 
 // CORREÇÃO: A função agora se chama 'useTransactionData' e é exportada diretamente.
 export default function useTransactionData(transactionId) {

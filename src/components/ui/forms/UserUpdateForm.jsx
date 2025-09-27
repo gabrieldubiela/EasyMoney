@@ -1,4 +1,4 @@
-// src/components/forms/UserUpdateForm.jsx
+// src/components/ui/forms/UserUpdateForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { auth } from '../../../firebase/firebaseConfig';

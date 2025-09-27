@@ -9,9 +9,6 @@ import { format } from 'date-fns';
 
 const useScheduledPayments = () => {
     const { householdId } = useHousehold();
-    // ... (Estados e useEffect de busca, como no monthlybalance.js)
-    
-    // ... (Restante do código do hook)
 
     // LÓGICA CENTRAL DE ALERTA DE VENCIMENTO
     const checkForDueAlerts = (paymentsList) => {
@@ -72,8 +69,7 @@ const useScheduledPayments = () => {
         return () => unsubscribe();
     }, [householdId]);
 
-    // Este hook não retorna nada, apenas executa o side effect de notificação.
-    return null; 
+    // Este hook não retorna dados, apenas executa o side effect de notificação.
 };
 
 export default useScheduledPayments;

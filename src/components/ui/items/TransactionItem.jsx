@@ -1,7 +1,7 @@
 // src/components/ui/TransactionItem.jsx (ATUALIZADO)
 
 import React from 'react';
-import { useHousehold } from '../../../context/useHousehold';
+import { useHousehold } from '../../../hooks/useHousehold';
 import { db } from '../../../firebase/firebaseConfig';
 import { doc, deleteDoc } from 'firebase/firestore';
 // Importaremos o hook de navegação (Ex: useNavigate do React Router) no futuro

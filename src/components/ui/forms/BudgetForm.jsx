@@ -1,4 +1,4 @@
-// src/components/forms/BudgetForm.jsx
+// src/components/ui/forms/BudgetForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/firebaseConfig';

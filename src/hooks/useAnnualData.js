@@ -22,7 +22,7 @@ const useAnnualData = (selectedYear) => {
     const [annualData, setAnnualData] = useState({ 
         summary: {}, 
         performanceByCategories: {}, 
-        rawAnnualData: {} 
+        rawAnnualData: {}
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

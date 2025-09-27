@@ -1,7 +1,7 @@
-// src/components/ui/AddTypeForm.jsx (ATUALIZADO)
+// src/components/ui/forms/AddTypeForm.jsx (ATUALIZADO)
 
 import React, { useState } from 'react';
-import useTypes from '../../../hooks/useCombinedHouseholdData'; // Importa o hook para a função addType
+import useTypes from '../../../hooks/useTypes'; // Importa o hook para a função addType
 
 // Recebemos a lista de TIPOS para checagem de duplicidade
 const AddTypeForm = ({ existingTypes }) => {

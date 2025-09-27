@@ -1,4 +1,4 @@
-// src/WorkerRegistrationService.js 
+// src/services/serviceWorkerRegistration.js 
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -10,16 +10,8 @@ const isLocalhost = Boolean(
   )
 );
 
-// NOTA: Para fins de PWA, assumimos que o Service Worker deve ser registrado
-// apenas em ambientes seguros (localhost ou HTTPS), que é a exigência do navegador.
-
 export function register(config) {
-  // Mudamos a verificação para 'production' (que causava o erro)
-  // O Service Worker só será registrado em localhost ou se a página estiver em HTTPS.
-  if ('serviceWorker' in navigator && isLocalhost) {
-    
-    // Você pode precisar ajustar 'PUBLIC_URL' dependendo de como você faz o build.
-    // Se o service-worker.js estiver na raiz da sua aplicação, use '/service-worker.js'.
+  if ('serviceWorker' in navigator && (isLocalhost || window.location.protocol === 'https:')) {
     const swUrl = '/service-worker.js'; 
 
     window.addEventListener('load', () => {
@@ -38,5 +30,17 @@ export function register(config) {
             }
           });
     });
+  }
+}
+
+export function unregister() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready
+      .then(registration => {
+        registration.unregister();
+      })
+      .catch(error => {
+        console.error(error.message);
+      });
   }
 }

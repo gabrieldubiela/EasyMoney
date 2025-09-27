@@ -1,17 +1,23 @@
+// src/hooks/useBudgetAlerts.js
+
+import { useEffect } from 'react';
 import { displayNotification } from '../utils/notification';
 
-useEffect(() => {
-    // 5. LÓGICA DE ALERTA DE ORÇAMENTO (NOVO CÓDIGO)
-            const item = newPerformance[catId];
-            
+const useBudgetAlerts = (performance) => {
+    useEffect(() => {
+        if (!performance || Object.keys(performance).length === 0) return;
+
+        const alertMessages = [];
+
+        Object.values(performance).forEach(item => {
             // Só monitoramos categorias de DESPESA que têm uma meta (> 0)
-            if (!item.type?.isIncome && item.totalGoal > 0) {
-                const percentSpent = item.realSpent / item.totalGoal;
-                const remainingPercent = item.remaining / item.totalGoal;
+            if (!item.type?.isIncome && item.totalAvailable > 0) {
+                const percentSpent = Math.abs(item.realSpent) / item.totalAvailable;
+                const remainingPercent = item.remaining / item.totalAvailable;
 
                 // ⚠️ Alerta MÁXIMO: Gasto Excedido (> 100%)
                 if (item.isOverBudget) { 
-                    alertMessages.push(`⚠️ ${item.categoryName}: Limite de R$ ${item.totalGoal.toFixed(2)} ultrapassado em R$ ${Math.abs(item.remaining).toFixed(2)}.`);
+                    alertMessages.push(`⚠️ ${item.categoryName}: Limite de R$ ${item.totalAvailable.toFixed(2)} ultrapassado em R$ ${Math.abs(item.remaining).toFixed(2)}.`);
                 } 
                 // 🟠 Alerta INTERMEDIÁRIO: Próximo ao Limite (entre 80% e 100%)
                 else if (remainingPercent > 0 && remainingPercent < 0.2) {
@@ -19,8 +25,7 @@ useEffect(() => {
                 } 
                 // 🟡 NOVO ALERTA: Meio do Orçamento (acima de 50% e não próximo ao limite)
                 else if (percentSpent >= 0.50 && percentSpent < 0.85) { 
-                     // O alerta só é emitido uma vez (e atualizado) para o 50%
-                     alertMessages.push(`🟡 ${item.categoryName}: Você já gastou R$ ${item.realSpent.toFixed(2)}, atingindo ${(percentSpent * 100).toFixed(0)}% do limite de R$ ${item.totalGoal.toFixed(2)}.`);
+                     alertMessages.push(`🟡 ${item.categoryName}: Você já gastou R$ ${Math.abs(item.realSpent).toFixed(2)}, atingindo ${(percentSpent * 100).toFixed(0)}% do limite de R$ ${item.totalAvailable.toFixed(2)}.`);
                 }
             }
         });
@@ -34,3 +39,7 @@ useEffect(() => {
                 renotify: true 
             });
         }
+    }, [performance]);
+};
+
+export default useBudgetAlerts;

@@ -1,9 +1,9 @@
-// src/components/forms/MonthlyBudgetForm.jsx
+// src/components/ui/forms/MonthlyBudgetForm.jsx
 
 import React, { useState, useEffect } from 'react';
-import useCategories from '../../hooks/useCategories';
-import useTypes from '../../hooks/useTypes';
-import useMonthlyBudgetPerformance from '../../hooks/useMonthlyBudgetPerformance';
+import useCategories from '../../../hooks/useCategories';
+import useTypes from '../../../hooks/useTypes';
+import useMonthlyBudgetPerformance from '../../../hooks/useMonthlyBudgetPerformance';
 
 // Componente que lida com o input de metas mensais por categoria
 const MonthlyBudgetForm = () => {

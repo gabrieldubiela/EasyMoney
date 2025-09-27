@@ -1,4 +1,4 @@
-// src/components/forms/HouseholdUpdateForm.jsx
+// src/components/ui/forms/HouseholdUpdateForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/firebaseConfig';

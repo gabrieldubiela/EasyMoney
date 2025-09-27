@@ -1,7 +1,7 @@
-// src/components/ui/AddCategoryForm.jsx (ATUALIZADO)
+// src/components/ui/forms/AddCategoryForm.jsx (ATUALIZADO)
 
 import React, { useState } from 'react';
-import useCategories from '../../hooks/useCategories'; // Importa o hook para a função addCategory
+import useCategories from '../../../hooks/useCategories'; // Importa o hook para a função addCategory
 
 // Recebemos a lista de TIPOS do useTypes e a lista de CATEGORIAS para checagem de duplicidade
 const AddCategoryForm = ({ existingCategories, types }) => {

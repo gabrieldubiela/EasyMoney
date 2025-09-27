@@ -77,20 +77,19 @@ const useMonthlyBudgetPerformance = (yearMonth) => {
 
             // A. Calcular Gasto Real (Despesas)
             transactionsList
-                .filter(t => t.type === 'expense' && t.category?.id) // Apenas despesas com category.id
+                .filter(t => t.category_id) // Apenas transações com category_id
                 .forEach(t => {
-                    const catId = t.category.id;
+                    const catId = t.category_id;
                     const amount = t.amount || 0;
                     realSpentByCategory[catId] = (realSpentByCategory[catId] || 0) + amount;
                 });
 
             // B. Consolidar Dados por Categoria
-            let alertMessages = [];
             categories.forEach(category => {
                 const catId = category.id;
                 
                 // 1. Meta Base (Anual / 12)
-                const annualGoal = annualData[catId]?.goalAmount || 0;
+                const annualGoal = annualData.rawAnnualData?.[catId]?.budgeted || 0;
                 const monthlyBaseGoal = annualGoal / 12;
                 
                 // 2. Meta Mensal Ajustada/Rollover
@@ -120,8 +119,6 @@ const useMonthlyBudgetPerformance = (yearMonth) => {
                     monthlyBudgetId: monthlyBudgetDoc?.id || null,
                 };
 
-            
-
             setPerformance(newPerformance);
             setLoading(false);
         });
@@ -137,7 +134,13 @@ const useMonthlyBudgetPerformance = (yearMonth) => {
 
     return { 
         performance, 
-        loading
+        loading,
+        saveGoalAdjustment: async () => {
+            throw new Error('saveGoalAdjustment not implemented yet');
+        },
+        closeMonthAndCalculateRollover: async () => {
+            throw new Error('closeMonthAndCalculateRollover not implemented yet');
+        }
     };
 };
 

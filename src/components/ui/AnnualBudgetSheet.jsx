@@ -1,10 +1,10 @@
 // src/components/AnnualBudgetSheet.jsx
 
 import React, { useState, useMemo } from 'react';
-import useAnnualData from '../../hooks/useAnnualData'; 
+import useAnnualData from '../../../hooks/useAnnualData'; 
 // Importe useCategories se você precisar do nome das categorias para o display
-import { useHousehold } from '../../hooks/useHousehold'; 
-import { db } from '../../firebase/firebaseConfig';
+import { useHousehold } from '../../../hooks/useHousehold'; 
+import { db } from '../../../firebase/firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore'; 
 
 const MONTH_NAMES = [
@@ -59,7 +59,7 @@ const AnnualBudgetSheet = () => {
     // 3. Estrutura de Consolidada para Renderização
     // Usa useMemo para recalcular apenas quando annualData ou categoriesMap mudar
     const sheetData = useMemo(() => {
-        const dataArray = Object.entries(annualData).map(([categoryId, data]) => ({
+        const dataArray = Object.entries(annualData.rawAnnualData || {}).map(([categoryId, data]) => ({
             id: categoryId,
             name: categoriesMap[categoryId] || 'Categoria Desconhecida',
             ...data, // { budgeted: N, monthlyActuals: [N, N, ...] }
@@ -71,7 +71,7 @@ const AnnualBudgetSheet = () => {
         // Se a categoria for Receita, o total Real será positivo.
         
         return dataArray;
-    }, [annualData, categoriesMap]);
+    }, [annualData.rawAnnualData, categoriesMap]);
     
     // 4. Cálculos de Totais
     const totals = useMemo(() => {

@@ -1,4 +1,4 @@
-// src/components/pages/SettingsPage.jsx (ATUALIZADO E FINAL)
+// src/pages/SettingsPage.jsx (ATUALIZADO E FINAL)
 
 import React from 'react';
 import { useHousehold } from '../hooks/useHousehold';
