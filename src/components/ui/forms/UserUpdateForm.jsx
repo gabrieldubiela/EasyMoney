@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../../../firebase/firebaseConfig';
 import { updateProfile } from 'firebase/auth'; 
-import { useHousehold } from '../../../context/useHousehold'; // Para acessar o objeto user
+import { useHousehold } from '../../../hooks/useHousehold'; // Para acessar o objeto user
 
 const UserUpdateForm = () => {
     const { user } = useHousehold();

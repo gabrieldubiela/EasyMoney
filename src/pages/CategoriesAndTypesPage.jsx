@@ -2,13 +2,12 @@
 
 import React from 'react';
 // IMPORTAÇÃO CORRETA DOS HOOKS E COMPONENTES
-import { useHousehold } from '../../context/useHousehold';
-import useTypes from '../../hooks/useTypes'; // Importa o hook para Tipos
-import useCategories from '../../hooks/useCategories'; // Assumindo que você criou este hook
-
-import AddCategoryForm from '../ui/AddCategoryForm'; 
-import AddTypeForm from '../ui/AddTypeForm'; 
-import EditCategoryAndTypeItem from '../ui/EditCategoryAndTypeItem';
+import { useHousehold } from '../hooks/useHousehold';
+import useTypes from '../hooks/useTypes'; // Importa o hook para Tipos
+import useCategories from '../hooks/useCategories'; // Assumindo que você criou este hook
+import AddCategoryForm from '../components/ui/forms/AddCategoryForm'; 
+import AddTypeForm from '../components/ui/forms/AddTypeForm';
+import EditCategoryAndTypeItem from '../components/ui/items/EditCategoryAndTypeItem';
 
 // NOTA: Os imports de db e onSnapshot não são mais necessários nesta página.
 

@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-// Importa o Contexto do arquivo Base
-import { HouseholdContext } from './HouseholdContextBase'; 
+// Importa do NOVO arquivo simples:
+import { HouseholdContext } from '../context/HouseholdContext'; 
 
 export const useHousehold = () => {
   const context = useContext(HouseholdContext);

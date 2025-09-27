@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 const useMonthlyBalance = (year, month) => {
     const { householdId } = useHousehold();

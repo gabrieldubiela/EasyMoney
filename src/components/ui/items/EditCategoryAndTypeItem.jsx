@@ -2,14 +2,13 @@
 
 import React, { useState } from 'react';
 // Importamos os hooks para as funções CRUD
-import useCategories from '../../hooks/useCategories';
-import useTypes from '../../hooks/useTypes';
+import useTypesAndCategories from '../../../hooks/useCombinedHouseholdData';
 
 // O componente agora aceita o item genérico, a flag isType, e a lista de tipos (se for categoria)
 const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' }) => {
     // Hooks de Funções CRUD
-    const { updateCategory, deleteCategory } = useCategories();
-    const { deleteType } = useTypes();
+    const { updateCategory, deleteCategory } = useTypesAndCategoriesgories();
+    const { deleteType } = useTypesAndCategories();
     
     // O item pode ser uma Categoria ou um Tipo, mas ambos têm 'id' e 'name'
     const [isEditing, setIsEditing] = useState(false);
@@ -56,7 +55,7 @@ const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' })
         try {
             if (isType) {
                 // Se for um Tipo, apenas o nome é editável (usamos updateDoc do hook de types)
-                // OBS: Precisamos adicionar a função updateType no useTypes.js!
+                // OBS: Precisamos adicionar a função updateType no useTypesAndCategories.js!
                 // Por enquanto, vamos simular:
                 // await updateType(item.id, trimmedName);
             } else {

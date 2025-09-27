@@ -1,63 +1,63 @@
-// src/components/pages/TransactionListPage.jsx
+// src/pages/TransactionListPage.jsx
 
 import React, { useState, useEffect } from 'react';
 import TransactionList from '../components/ui/lists/TransactionList';
 import TransactionAdder from '../components/ui/TransactionAdder';
-import TransactionFilters from '../ui/TransactionFilters';
-import { useHousehold } from '../context/useHousehold';
+import TransactionFilter from '../components/ui/lists/TransactionFilter';
+import { useHousehold } from '../hooks/useHousehold';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
 const TransactionListPage = () => {
-    const { householdId } = useHousehold();
-    // Estado que será passado do Filtro para a Lista
-    const [filters, setFilters] = useState({}); 
-    const [categories, setCategories] = useState([]);
-    const [types, setTypes] = useState([]);
+  const { householdId } = useHousehold();
+  const [filters, setFilters] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [types, setTypes] = useState([]);
 
-    // Busca Categorias e Tipos para popular o TransactionFilters (dropdowns)
-    useEffect(() => {
-        if (!householdId) return;
+  // Busca Categorias e Tipos para popular os filtros e a lista
+  useEffect(() => {
+    if (!householdId) return;
 
-        const catRef = collection(db, `households/${householdId}/categories`);
-        const unsubCat = onSnapshot(catRef, (snapshot) => {
-            const list = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
-            setCategories(list);
-        });
+    const catRef = collection(db, `households/${householdId}/categories`);
+    const unsubCat = onSnapshot(catRef, (snapshot) => {
+      setCategories(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
 
-        const typeRef = collection(db, `households/${householdId}/types`);
-        const unsubType = onSnapshot(typeRef, (snapshot) => {
-            const list = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
-            setTypes(list);
-        });
+    const typeRef = collection(db, `households/${householdId}/types`);
+    const unsubType = onSnapshot(typeRef, (snapshot) => {
+      setTypes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
 
-        return () => { unsubCat(); unsubType(); };
-    }, [householdId]);
-
-    // Callback para receber as mudanças de filtro
-    const handleFilterChange = (newFilters) => {
-        setFilters(newFilters);
+    return () => {
+      unsubCat();
+      unsubType();
     };
+  }, [householdId]);
 
-    return (
-        <div>
-            <h1>Revisão Detalhada de Despesas</h1>
-            
-            {/* O Adicionar Despesa (Toggle) */}
-            <TransactionAdder />
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
-            {/* NOVO: Componente de Filtros */}
-            <TransactionFilters 
-                categories={categories}
-                types={types}
-                onFilterChange={handleFilterChange} // Envia a função de callback
-            />
+  return (
+    <div>
+      <h1>Revisão Detalhada de Despesas</h1>
+      
+      <TransactionAdder />
 
-            {/* A Lista agora recebe os filtros e implementa a lógica */}
-            <TransactionList filters={filters} /> 
-            
-        </div>
-    );
+      <TransactionFilter
+        categories={categories}
+        types={types}
+        onFilterChange={handleFilterChange}
+      />
+
+      {/* A Lista agora recebe os filtros e os metadados para evitar buscas duplicadas */}
+      <TransactionList
+        filters={filters}
+        categories={categories}
+        types={types}
+      />
+    </div>
+  );
 };
 
 export default TransactionListPage;

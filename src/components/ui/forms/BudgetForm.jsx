@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/firebaseConfig';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs } from 'firebase/firestore'; 
-import { useHousehold } from '../../../context/useHousehold';
+import { useHousehold } from '../../../hooks/useHousehold';
 
 const BudgetForm = ({ onSaveSuccess }) => { 
     const { householdId, user } = useHousehold();

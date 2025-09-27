@@ -1,7 +1,7 @@
 // src/components/ui/admin/DataManagement.jsx
 
 import React, { useState } from 'react';
-import { db } from '../../../../firebase/firebaseConfig';
+import { db } from '../../../firebase/firebaseConfig';
 import { useHousehold } from '../../../context/useHousehold';
 import { collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 

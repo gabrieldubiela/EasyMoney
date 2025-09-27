@@ -1,9 +1,9 @@
 // src/hooks/useMonthClosingStatus.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 /**
  * Hook para verificar se o mês anterior foi formalmente fechado (com rollover calculado).

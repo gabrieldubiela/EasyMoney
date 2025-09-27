@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // IMPORTADO seus componentes existentes!
-import Login from '../ui/Login';
-import Register from '../ui/Register';
+import Login from '../components/ui/auth/Login';
+import Register from '../components/ui/auth/Register';
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);

@@ -3,7 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { register } from './serviceWorkerRegistration'; // Importe o registro
+import { register } from './services/serviceWorkerRegistration'; // Importe o registro
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

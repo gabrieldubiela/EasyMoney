@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom'; // Importante: Componente Link
-import { useHousehold } from '../../context/useHousehold'; 
-import { auth } from '../../../firebase/firebaseConfig'; 
+import { useHousehold } from '../../hooks/useHousehold'; 
+import { auth } from '../../firebase/firebaseConfig'; 
 
 const Nav = () => {
     const { user, householdId, loading } = useHousehold(); 

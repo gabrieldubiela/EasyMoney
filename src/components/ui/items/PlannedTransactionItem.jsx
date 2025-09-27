@@ -3,7 +3,7 @@
 import React from 'react';
 import { db } from '../../../firebase/firebaseConfig';
 import { doc, deleteDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore'; 
-import { useHousehold } from '../../../context/useHousehold';
+import { useHousehold } from '../../../hooks/useHousehold';
 
 // Recebe a despesa, metadados e uma função de callback para atualizar a lista
 const PlannedTransactionItem = ({ transaction, categoryName, typeName, onConvert }) => {

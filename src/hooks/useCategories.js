@@ -1,8 +1,8 @@
 // src/hooks/useCategories.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
-import { useHousehold } from '../context/useHousehold';
+import { db } from '../firebase/firebaseConfig';
+import { useHousehold } from '../hooks/useHousehold';
 import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore'; 
 
 /**

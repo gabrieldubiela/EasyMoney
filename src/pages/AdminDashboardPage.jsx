@@ -1,7 +1,7 @@
 // src/pages/AdminDashboardPage.jsx (CORRIGIDO)
 
 import React, { useState } from 'react';
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 // Componentes Reais (importados)
 import UserManagement from '../components/ui/admin/UserManagement'; // Note: ajustei o caminho para seguir a convenção ui/admin

@@ -1,12 +1,12 @@
-// src/hooks/TransactionDataUse.js
+// src/hooks/useTransactionData.js
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot, getDoc, doc } from 'firebase/firestore'; 
 import { useHousehold } from '../context/useHousehold';
 
-// O hook recebe o ID da despesa
-const TransactionDataUse = (transactionId) => {
+// CORREÇÃO: A função agora se chama 'useTransactionData' e é exportada diretamente.
+export default function useTransactionData(transactionId) {
     const { householdId } = useHousehold();
     
     // Estados do Formulário
@@ -22,9 +22,9 @@ const TransactionDataUse = (transactionId) => {
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);
     const [types, setTypes] = useState([]);
-    const [transactionId, setTransactionId] = useState(null); // NOVO: ID do grupo de parcelas
+    const [transactionGroupId, setTransactionGroupId] = useState(null);
 
-    // 1. Efeito para buscar Categorias e Tipos
+    // Efeito para buscar Categorias e Tipos
     useEffect(() => {
         if (!householdId) {
             setLoading(false);
@@ -46,9 +46,9 @@ const TransactionDataUse = (transactionId) => {
         });
 
         return () => { unsubCat(); unsubType(); };
-    }, [householdId]);
+    }, [householdId, category, type]);
 
-    // 2. Efeito para carregar a despesa (APENAS SE ESTIVERMOS EDITANDO)
+    // Efeito para carregar a despesa (APENAS SE ESTIVERMOS EDITANDO)
     useEffect(() => {
         if (!transactionId || !householdId) {
             setLoading(false);
@@ -62,17 +62,16 @@ const TransactionDataUse = (transactionId) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
-                // Pré-preenche estados
                 setDescription(data.description || '');
                 setSupplier(data.supplier || '');
-                const originalAmount = data.amount * data.installments_total;
+                const originalAmount = Math.abs(data.amount * data.installments_total);
                 setAmount(originalAmount.toFixed(2)); 
                 setCategory(data.category_id);
                 setType(data.type_id);
                 const transactionDate = data.date.toDate().toISOString().substring(0, 10);
                 setDate(transactionDate); 
                 setInstallments(data.installments_total);
-                setTransactionId(data.transactionId || data.id); // NOVO: Usa o ID do grupo ou o próprio ID (se não for parcelado)
+                setTransactionGroupId(data.transactionGroupId);
             } else {
                 alert("Despesa não encontrada para edição.");
             }
@@ -82,9 +81,7 @@ const TransactionDataUse = (transactionId) => {
         fetchTransaction();
     }, [transactionId, householdId]);
     
-    // Retorna todos os estados e setters necessários
     return {
-        // Dados do formulário e setters
         description, setDescription,
         supplier, setSupplier,
         amount, setAmount,
@@ -92,13 +89,9 @@ const TransactionDataUse = (transactionId) => {
         type, setType,
         date, setDate,
         installments, setInstallments,
-        
-        // Metadados e status
         loading,
         categories,
         types,
-        transactionId, // NOVO: ID do grupo de parcelas
+        transactionGroupId,
     };
 };
-
-export default TransactionDataUse;

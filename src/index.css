@@ -1,68 +1,166 @@
+/* ================================
+  EasyMoney - Estilos Globais
+  ================================ */
+
+/* Importando fontes */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Paleta de cores - claro */
+  --color-primary: #31afb4;       /* Turquesa - Ações principais */
+  --color-primary-dark: #17817D;  /* Turquesa mais escuro */
+  --color-success: #22C55E;       /* Verde - Valores positivos */
+  --color-danger: #DC2626;        /* Vermelho - Alertas */
+  --color-bg: #F9FAFB;            /* Fundo neutro */
+  --color-surface: #FFFFFF;       /* Cartões, áreas destacadas */
+  --color-border: #E5E7EB;        /* Bordas suaves */
+  --color-text: #111827;          /* Texto principal */
+  --color-text-muted: #6B7280;    /* Texto secundário */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Tipografia */
+  --font-family-base: 'Inter', system-ui, sans-serif;
+  --font-family-title: 'Poppins', sans-serif;
+  --line-height-base: 1.5;
+  --font-weight-normal: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Espaçamento */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.15);
 }
 
+/* Modo escuro automático */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1a1a;
+    --color-surface: #242424;
+    --color-border: #374151;
+    --color-text: #F3F4F6;
+    --color-text-muted: #9CA3AF;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Links */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
 }
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* Cabeçalhos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  margin-bottom: var(--spacing-md);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Texto secundário */
+.muted {
+  color: var(--color-text-muted);
 }
 
+/* Botões */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  display: inline-block;
+  border: none;
+  border-radius: var(--radius-md);
   padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Botões principais */
+button.primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+button.primary:hover {
+  background-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+/* Botões secundários */
+button.secondary {
+  background-color: var(--color-success);
+  color: white;
+}
+button.secondary:hover {
+  background-color: #15803D;
+  box-shadow: var(--shadow-md);
+}
+
+/* Botões de alerta */
+button.danger {
+  background-color: var(--color-danger);
+  color: white;
+}
+button.danger:hover {
+  background-color: #B91C1C;
+  box-shadow: var(--shadow-md);
+}
+
+/* Cartões */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Inputs */
+input, select, textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(49, 175, 180, 0.25);
 }

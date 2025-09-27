@@ -1,9 +1,9 @@
 // src/hooks/useScheduledPayments.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 import { displayNotification } from '../utils/notification';
 import { format } from 'date-fns'; 
 

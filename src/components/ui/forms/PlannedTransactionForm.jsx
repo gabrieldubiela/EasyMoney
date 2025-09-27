@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/firebaseConfig';
 import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore'; 
-import { useHousehold } from '../../../context/useHousehold';
+import { useHousehold } from '../../../hooks/useHousehold';
 
 const PlannedTransactionForm = ({ onSaveSuccess }) => { 
     const { householdId, user } = useHousehold();

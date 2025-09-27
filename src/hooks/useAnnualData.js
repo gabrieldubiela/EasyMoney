@@ -1,9 +1,9 @@
 // src/hooks/useAnnualData.js (VERSÃO FINAL)
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 // Define a estrutura padrão de dados para cada categoria/mês
 const INITIAL_CATEGORY_DATA = {

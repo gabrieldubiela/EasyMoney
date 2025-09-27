@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebase/firebaseConfig';
 import { doc, updateDoc, getDoc } from 'firebase/firestore'; 
-import { useHousehold } from '../../../context/useHousehold';
+import { useHousehold } from '../../../hooks/useHousehold';
 
 const HouseholdUpdateForm = ({ householdId }) => {
     const [householdName, setHouseholdName] = useState('');

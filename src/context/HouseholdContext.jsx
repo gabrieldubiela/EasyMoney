@@ -3,7 +3,7 @@ import { db, auth } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 // Importa o Contexto do arquivo base
-import { HouseholdContext } from './HouseholdContextBase'; 
+import { HouseholdContext } from './HouseholdProvider'; 
 
 // 1. Componente Provedor (É o componente que o Fast Refresh deve observar)
 const HouseholdProvider = ({ children }) => { 
@@ -59,5 +59,4 @@ const HouseholdProvider = ({ children }) => {
   );
 };
 
-// 2. Exportação Padrão do Provedor (O ÚNICO EXPORT DESTE ARQUIVO)
 export default HouseholdProvider;

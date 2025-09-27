@@ -1,14 +1,14 @@
-// src/context/HouseholdContextBase.jsx (Ajustado)
+import React from 'react';
+// ✅ Importa do arquivo .js simples (para resolver o Fast Refresh)
+import { HouseholdContext } from './HouseholdContext'; 
+import useUserAuthData from '../hooks/useUserAuthData';
 
-import React, { createContext } from 'react';
-import useUserAuthData from '../hooks/useUserAuthData'; // NOVO: Importa o hook
-
-export const HouseholdContext = createContext();
-
+// ✅ Este arquivo AGORA exporta APENAS o componente Provider
 export const HouseholdProvider = ({ children }) => {
-    // NOVO: Usa o hook para obter o estado do usuário logado e loading
+    // Usa o hook para obter o estado do usuário logado e loading
     const { user, loading: userLoading } = useUserAuthData(); 
     
+    // 💡 LÓGICA REINSERIDA:
     // O HouseholdId é extraído diretamente do objeto user
     const householdId = user?.householdId || null;
     
@@ -16,10 +16,10 @@ export const HouseholdProvider = ({ children }) => {
     const loading = userLoading; 
 
     const contextValue = {
-        user, // Agora inclui: uid, email, householdId, isAdmin
+        user, // Inclui: uid, email, householdId, isAdmin
         householdId,
         loading,
-        // ... (outras funções ou estados do contexto)
+        // ... (outras funções ou estados do contexto que você possa ter)
     };
 
     if (loading) {

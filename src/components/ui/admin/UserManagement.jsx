@@ -1,7 +1,7 @@
 // src/components/ui/admin/UserManagement.jsx
 
 import React from 'react';
-import useAllUsers from '../../hooks/useAllUsers';
+import useAllUsers from '../../../hooks/useAllUsers';
 import { db } from '../../../firebase/firebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 

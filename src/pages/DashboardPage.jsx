@@ -1,13 +1,13 @@
 // src/components/pages/DashboardPage.jsx (NOVO COMPONENTE)
 
 import React, { useMemo } from 'react';
-import useMonthlyBalance from '../../hooks/useMonthlyBalance';
-import useMonthlyBudgetPerformance from '../../hooks/useMonthlyBudgetPerformance';
-import useAnnualData from '../../hooks/useAnnualData';
-import useCategories from '../../hooks/useCategories';
-import useTypes from '../../hooks/useTypes';
-import useScheduledPayments from '../../hooks/useScheduledPayments'; // Para Próximas Contas
-import useMonthClosingStatus from '../../hooks/useMonthClosingStatus'; // Novo hook
+import useMonthlyBalance from '../hooks/useMonthlyBalance';
+import useMonthlyBudgetPerformance from '../hooks/useMonthlyBudgetPerformance';
+import useAnnualData from '../hooks/useAnnualData';
+import useCategories from '../hooks/useCategories';
+import useTypes from '../hooks/useTypes';
+import useScheduledPayments from '../hooks/useScheduledPayments'; 
+import useMonthClosingStatus from '../hooks/useMonthClosingStatus';
 
 // Simples componente utilitário para formatar moedas
 const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

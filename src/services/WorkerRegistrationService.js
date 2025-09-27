@@ -1,4 +1,4 @@
-// src/serviceWorkerRegistration.js (CORRIGIDO)
+// src/WorkerRegistrationService.js 
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||

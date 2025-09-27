@@ -1,7 +1,7 @@
 // src/pages/AnnualBudgetSheetPage.jsx
 
 import React from 'react';
-import AnnualBudgetSheet from '../components/AnnualBudgetSheet'; // Componente que contém toda a lógica e a tabela
+import AnnualBudgetSheet from '../components/ui/AnnualBudgetSheet';
 
 const AnnualBudgetSheetPage = () => {
     return (

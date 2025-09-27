@@ -12,7 +12,7 @@ import HouseholdProvider from './context/HouseholdContext';
 import AppRoutes from './routes/Routes'; 
 import useScheduledPayments from './hooks/useScheduledPayments';
 
-import './App.css'; 
+import './index.css';
 
 // Componente Principal App (Define o Provedor)
 function App() {

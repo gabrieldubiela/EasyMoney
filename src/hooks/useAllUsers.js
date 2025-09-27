@@ -1,7 +1,7 @@
 // src/hooks/useAllUsers.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'; 
 
 /**

@@ -1,10 +1,11 @@
-// src/routes/Routes.jsx (Refatorado e Atualizado)
+// src/routes/Routes.jsx
 
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
+
 
 // --- Importação de Componentes (Certifique-se que o caminho 'pages' está correto) ---
 

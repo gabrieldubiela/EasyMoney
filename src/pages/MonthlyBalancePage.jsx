@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 // IMPORTAÇÃO DOS NOVOS COMPONENTES
-import useMonthlyBalance from '../../hooks/useMonthlyBalance'; 
-import BalanceSummary from '../dashboard/BalanceSummary'; 
+import useMonthlyBalance from '../hooks/useMonthlyBalance'; 
+import BalanceSummary from '../components/ui/dashboard/BalanceSummary'; 
 
 // Assumindo que você moveu estes para a nova estrutura de pastas
-import PlannedTransactionForm from '../forms/PlannedTransactionForm'; 
-import PlannedTransactionItem from '../items/PlannedTransactionItem'; 
+import PlannedTransactionForm from '../components/ui/forms/PlannedTransactionForm'; 
+import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem'; 
 
 const MonthlyBalancePage = () => {
     // 1. Gerenciamento do Período (Únicos estados que a Page controla)

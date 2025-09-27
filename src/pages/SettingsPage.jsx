@@ -1,12 +1,12 @@
 // src/components/pages/SettingsPage.jsx (ATUALIZADO E FINAL)
 
 import React from 'react';
-import { useHousehold } from '../../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 // Importa os novos componentes refatorados
-import UserUpdateForm from '../forms/UserUpdateForm';
-import HouseholdUpdateForm from '../forms/HouseholdUpdateForm';
-import InviteCodeDisplay from '../ui/InviteCodeDisplay';
+import UserUpdateForm from '../components/ui/forms/UserUpdateForm';
+import HouseholdUpdateForm from '../components/ui/forms/HouseholdUpdateForm';
+import InviteCodeDisplay from '../components/ui/InviteCodeDisplay';
 
 const SettingsPage = () => {
     const { user, householdId } = useHousehold();
