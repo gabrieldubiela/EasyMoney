@@ -1,11 +1,11 @@
 // src/hooks/useUserAuthData.js
 
 import { useState, useEffect } from 'react';
-import { auth, db } from '../firebase/firebaseConfig'; // Assumindo que você tem auth e db importados aqui
+import { auth, db } from '../firebase/firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore'; 
 
 const useUserAuthData = () => {
-    const [user, setUser] = useState(null); // Objeto do usuário (inclui isAdmin e householdId)
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {

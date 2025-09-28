@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHousehold } from '../hooks/useHousehold';
 
 // Componentes Reais (importados)
-import UserManagement from '../components/ui/admin/UserManagement'; // Note: ajustei o caminho para seguir a convenção ui/admin
+import UserManagement from '../components/ui/admin/UserManagement';
 import HouseholdManagement from '../components/ui/admin/HouseholdManagement'; 
 import DataManagement from '../components/ui/admin/DataManagement'; 
 
@@ -45,7 +45,6 @@ const AdminDashboardPage = () => {
     return (
         <div>
             <h1>Painel de Administração</h1>
-            <p>Bem-vindo, Administrador(a) {user.email}!</p>
             
             {/* Menu de Navegação (Tabs) */}
             <div className="admin-tabs">

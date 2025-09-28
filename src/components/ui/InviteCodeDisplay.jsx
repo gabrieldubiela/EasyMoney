@@ -16,21 +16,14 @@ const InviteCodeDisplay = ({ householdId }) => {
 
     return (
         <>
-            <h3 style={{ marginTop: '20px' }}>Convidar Membros</h3>
-            <p>Compartilhe o código abaixo. O usuário convidado deve usá-lo ao se registrar para acessar as despesas desta Família/Casa.</p>
+            <h3>Convidar Membros</h3>
+            <p>Compartilhe o código abaixo. O usuário convidado deve usá-lo ao se registrar para acessar as despesas desta Família.</p>
 
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                border: '1px dashed #007bff', 
-                padding: '10px', 
-                backgroundColor: '#e6f0ff' 
-            }}>
-                <strong style={{ flexGrow: 1, marginRight: '10px' }}>{householdId || 'Carregando...'}</strong>
+            <div>
+                {householdId || 'Carregando...'}
                 <button 
                     type="button" 
                     onClick={handleCopyCode} 
-                    style={{ padding: '8px 15px', cursor: 'pointer' }}
                     disabled={!householdId}
                 >
                     {copyMessage}

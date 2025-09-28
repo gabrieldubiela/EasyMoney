@@ -48,8 +48,8 @@ const UserManagement = () => {
                         <tr key={user.id}>
                             <td>{user.email}</td>
                             <td>
-                                <span style={{ fontWeight: 'bold', color: user.isAdmin ? 'red' : 'green' }}>
-                                    {user.isAdmin ? 'ADMIN' : 'Membro Comum'}
+                                <span>
+                                    {user.isAdmin ? 'ADMIN' : 'Usuário'}
                                 </span>
                             </td>
                             <td>{user.householdId || 'NENHUMA'}</td>
@@ -59,7 +59,6 @@ const UserManagement = () => {
                                 >
                                     {user.isAdmin ? 'Remover Admin' : 'Tornar Admin'}
                                 </button>
-                                {/* Implementar 'Bloquear Usuário' aqui futuramente */}
                             </td>
                         </tr>
                     ))}
