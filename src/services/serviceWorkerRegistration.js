@@ -12,7 +12,7 @@ const isLocalhost = Boolean(
 
 export function register(config) {
   if ('serviceWorker' in navigator && (isLocalhost || window.location.protocol === 'https:')) {
-    const swUrl = '/service-worker.js'; 
+    const swUrl = '/sw.js';
 
     window.addEventListener('load', () => {
         navigator.serviceWorker
