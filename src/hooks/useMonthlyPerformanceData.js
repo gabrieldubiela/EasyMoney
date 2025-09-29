@@ -1,9 +1,9 @@
 // src/hooks/useMonthlyPerformanceData.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useHousehold } from '../context/useHousehold';
+import { useHousehold } from '../hooks/useHousehold';
 
 /**
  * Hook focado exclusivamente em buscar e consolidar dados de performance orçamentária.

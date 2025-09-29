@@ -1,6 +1,6 @@
-// src/hooks/useTransactionList.js
+// src/hooks/useTransactionList.js - CORRIGIDO
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, orderBy, limit, startAfter, where, getDocs } from 'firebase/firestore';
 import { useHousehold } from '../hooks/useHousehold';
@@ -13,6 +13,13 @@ export function useTransactionList(filters) {
     const [loading, setLoading] = useState(true);
     const [lastVisible, setLastVisible] = useState(null);
     const [hasMore, setHasMore] = useState(true);
+    
+    // Usar ref para armazenar filtros e evitar loops
+    const filtersRef = useRef(filters);
+    
+    useEffect(() => {
+        filtersRef.current = filters;
+    }, [filters]);
 
     const fetchTransactions = useCallback(async (isInitialLoad = false, startDoc = null) => {
         if (!householdId) {
@@ -21,30 +28,34 @@ export function useTransactionList(filters) {
         }
 
         setLoading(true);
-
-        // Constrói a Query base
-        let baseQueryConstraints = [];
-        if (filters.category) {
-            baseQueryConstraints.push(where('category_id', '==', filters.category));
-        }
-        if (filters.type) {
-            baseQueryConstraints.push(where('type_id', '==', filters.type));
-        }
-
-        // Adiciona ordenação e limite de página
-        let q = query(
-            collection(db, `households/${householdId}/transactions`),
-            ...baseQueryConstraints,
-            orderBy('date', 'desc'),
-            limit(PAGE_SIZE)
-        );
-
-        // Adiciona o cursor para paginação
-        if (startDoc) {
-            q = query(q, startAfter(startDoc));
-        }
+        
+        const currentFilters = filtersRef.current;
 
         try {
+            // Constrói a Query base
+            let baseQueryConstraints = [];
+            
+            if (currentFilters.category) {
+                baseQueryConstraints.push(where('category_id', '==', currentFilters.category));
+            }
+            if (currentFilters.type) {
+                baseQueryConstraints.push(where('type_id', '==', currentFilters.type));
+            }
+
+            // Adiciona ordenação e limite de página
+            baseQueryConstraints.push(orderBy('date', 'desc'));
+            baseQueryConstraints.push(limit(PAGE_SIZE));
+
+            let q = query(
+                collection(db, `households/${householdId}/transactions`),
+                ...baseQueryConstraints
+            );
+
+            // Adiciona o cursor para paginação
+            if (startDoc) {
+                q = query(q, startAfter(startDoc));
+            }
+
             const snapshot = await getDocs(q);
             let newTransactions = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -52,14 +63,23 @@ export function useTransactionList(filters) {
             }));
 
             // Filtro client-side para data e texto (termo de busca)
-            if (filters.minDate) {
-                newTransactions = newTransactions.filter(t => t.date.toDate() >= new Date(filters.minDate));
+            if (currentFilters.minDate) {
+                const minDateObj = new Date(currentFilters.minDate);
+                newTransactions = newTransactions.filter(t => {
+                    const transactionDate = t.date?.toDate();
+                    return transactionDate >= minDateObj;
+                });
             }
-            if (filters.maxDate) {
-                newTransactions = newTransactions.filter(t => t.date.toDate() <= new Date(filters.maxDate));
+            if (currentFilters.maxDate) {
+                const maxDateObj = new Date(currentFilters.maxDate);
+                maxDateObj.setHours(23, 59, 59, 999); // Final do dia
+                newTransactions = newTransactions.filter(t => {
+                    const transactionDate = t.date?.toDate();
+                    return transactionDate <= maxDateObj;
+                });
             }
-            if (filters.searchTerm) {
-                const term = filters.searchTerm.toLowerCase();
+            if (currentFilters.searchTerm) {
+                const term = currentFilters.searchTerm.toLowerCase();
                 newTransactions = newTransactions.filter(t =>
                     t.supplier?.toLowerCase().includes(term) ||
                     t.description?.toLowerCase().includes(term)
@@ -77,10 +97,11 @@ export function useTransactionList(filters) {
             }
         } catch (error) {
             console.error('Erro ao carregar transações:', error);
+            alert('Erro ao carregar transações. Verifique o console.');
         } finally {
             setLoading(false);
         }
-    }, [householdId, filters]);
+    }, [householdId]); // Apenas householdId como dependência
 
     // Efeito para re-buscar quando os filtros mudam
     useEffect(() => {
@@ -88,7 +109,7 @@ export function useTransactionList(filters) {
         setLastVisible(null);
         setHasMore(true);
         fetchTransactions(true);
-    }, [filters, fetchTransactions]);
+    }, [filters, fetchTransactions, householdId]); // Inclui filters aqui para reagir às mudanças
 
     const loadMore = () => {
         if (!hasMore || loading) return;

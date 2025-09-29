@@ -1,6 +1,6 @@
-// src/pages/TransactionListPage.jsx
+// src/pages/TransactionListPage.jsx - CORRIGIDO
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import TransactionList from '../components/ui/lists/TransactionList';
 import TransactionAdder from '../components/ui/TransactionAdder';
 import TransactionFilter from '../components/ui/lists/TransactionFilter';
@@ -10,11 +10,18 @@ import { db } from '../firebase/firebaseConfig';
 
 const TransactionListPage = () => {
   const { householdId } = useHousehold();
-  const [filters, setFilters] = useState({});
+  
+  // Filtros individuais para evitar recriação de objeto
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [minDate, setMinDate] = useState('');
+  const [maxDate, setMaxDate] = useState('');
+  
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
 
-  // Busca Categorias e Tipos para popular os filtros e a lista
+  // Busca Categorias e Tipos
   useEffect(() => {
     if (!householdId) return;
 
@@ -34,8 +41,21 @@ const TransactionListPage = () => {
     };
   }, [householdId]);
 
+  // Cria o objeto filters apenas quando os valores mudam
+  const filters = useMemo(() => ({
+    category: categoryFilter,
+    type: typeFilter,
+    searchTerm: searchTerm,
+    minDate: minDate,
+    maxDate: maxDate
+  }), [categoryFilter, typeFilter, searchTerm, minDate, maxDate]);
+
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setCategoryFilter(newFilters.category || '');
+    setTypeFilter(newFilters.type || '');
+    setSearchTerm(newFilters.searchTerm || '');
+    setMinDate(newFilters.minDate || '');
+    setMaxDate(newFilters.maxDate || '');
   };
 
   return (
@@ -50,7 +70,6 @@ const TransactionListPage = () => {
         onFilterChange={handleFilterChange}
       />
 
-      {/* A Lista agora recebe os filtros e os metadados para evitar buscas duplicadas */}
       <TransactionList
         filters={filters}
         categories={categories}

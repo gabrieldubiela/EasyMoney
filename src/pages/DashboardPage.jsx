@@ -2,9 +2,9 @@
 
 import React from 'react';
 import BalanceSummary from '../components/ui/dashboard/BalanceSummary'; // Verifique o caminho
-import useDashboardData from '../../hooks/useDashboardData';
-import { closeMonthAndCalculateRollover } from '../../services/budgetService'; // Importa a ação do serviço
-import { useHousehold } from '../../context/useHousehold';
+import useDashboardData from '../hooks/useDashboardData';
+import { closeMonthAndCalculateRollover } from '../services/budgetService'; // Importa a ação do serviço
+import { useHousehold } from '../hooks/useHousehold';
 
 const formatCurrency = (value = 0) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
