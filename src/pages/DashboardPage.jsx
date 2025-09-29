@@ -51,7 +51,7 @@ const DashboardPage = () => {
     return (
         <div style={{ padding: '20px' }}>
             <h1>Dashboard Financeiro</h1>
-            
+
             {/* Seção de Ações e Alertas */}
             <div style={{ border: '2px solid #ffc107', padding: '15px', marginBottom: '30px' }}>
                 <h2>🔔 Ações e Alertas</h2>
@@ -65,12 +65,13 @@ const DashboardPage = () => {
             </div>
 
             {/* Componente de Balanço agora recebe os dados do hook */}
-            <BalanceSummary 
+            <BalanceSummary
                 availableFunds={availableFunds}
                 setAvailableFunds={setAvailableFunds}
-                totalEffective={totalEffective}
-                totalPlanned={totalPlanned}
-                balance={balance}
+                incomeEffective={receitasRecebidas}      // Receitas já recebidas
+                incomePlanned={receitasARceber}          // Receitas a receber
+                expenseEffective={despesasPagas}         // Despesas já pagas
+                expensePlanned={despesasAPagar}          // Despesas a pagar
             />
 
             {/* Outras seções do Dashboard (Resumo Anual, etc.) */}

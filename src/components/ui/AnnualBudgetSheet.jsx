@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from 'react';
 import useAnnualData from '../../hooks/useAnnualData';
-// NOVO: Importa o hook combinado para obter metadados otimizados
 import useCombinedHouseholdData from '../../hooks/useCombinedHouseholdData';
 
 const MONTH_NAMES = [
@@ -10,15 +9,12 @@ const MONTH_NAMES = [
     'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
-// REMOVIDO: O hook 'useCategories' interno foi completamente removido.
-
 const AnnualBudgetSheet = () => {
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
     
     const { annualData, loading: annualDataLoading, error } = useAnnualData(selectedYear);
     
-    // NOVO: Utiliza o hook centralizado para obter um mapa de categorias
     const { categoryMap, loading: metadataLoading } = useCombinedHouseholdData();
 
     const formatBRL = (value) => {
@@ -74,7 +70,7 @@ const AnnualBudgetSheet = () => {
                         <th>Categoria</th>
                         <th>Orçado (Anual)</th>
                         {MONTH_NAMES.map(month => <th key={month}>{month}</th>)}
-                        <th>Total Real</th>
+                        <th>Total</th>
                         <th>Diferença</th>
                     </tr>
                 </thead>
@@ -95,7 +91,7 @@ const AnnualBudgetSheet = () => {
                     })}
                     {/* Linha de Totais */}
                     <tr style={{fontWeight: 'bold', borderTop: '2px solid black'}}>
-                        <td>TOTAL GERAL</td>
+                        <td>TOTAL</td>
                         <td>{formatBRL(totals.budgeted)}</td>
                         {totals.monthlyActuals.map((actual, index) => (
                             <td key={index}>{formatBRL(actual)}</td>

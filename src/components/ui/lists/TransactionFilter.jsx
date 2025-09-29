@@ -26,15 +26,8 @@ const TransactionFilters = ({ categories, types, onFilterChange }) => {
 
         const q = query(
             collection(db, `households/${householdId}/transactions`),
-            // Busca despesas onde o campo começa com o termo de busca
-            // NOTE: Firestore não tem 'LIKE'. Isso é uma simulação básica de prefixo.
-            // Para produção, é recomendado usar ElasticSearch/Algolia.
             limit(5)
         );
-
-        // NOTA: No Firestore real, você precisaria criar índices para campos específicos.
-        // E a query de prefixo real é difícil. Aqui, só faremos a busca, e o filtro
-        // final na lista será feito no React (menos eficiente, mas funcional).
         
         try {
             const snapshot = await getDocs(q);
@@ -88,7 +81,7 @@ const TransactionFilters = ({ categories, types, onFilterChange }) => {
 
     return (
         <div style={{ padding: '15px', border: '1px solid #ccc' }}>
-            <h3>Filtros de Despesas</h3>
+            <h3>Filtros de Transações</h3>
             
             {/* Filtro de Período */}
             <label>Período de:</label>

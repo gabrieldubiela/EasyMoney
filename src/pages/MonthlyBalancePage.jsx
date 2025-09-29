@@ -1,11 +1,8 @@
 // src/pages/MonthlyBalancePage.jsx (Refatorado)
 
 import React, { useState } from 'react';
-// IMPORTAÇÃO DOS NOVOS COMPONENTES
 import useMonthlyBalance from '../hooks/useMonthlyBalance'; 
 import BalanceSummary from '../components/ui/dashboard/BalanceSummary'; 
-
-// Assumindo que você moveu estes para a nova estrutura de pastas
 import PlannedTransactionForm from '../components/ui/forms/PlannedTransactionForm'; 
 import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem'; 
 
@@ -51,13 +48,14 @@ const MonthlyBalancePage = () => {
             <input type="number" value={year} onChange={(e) => setYear(parseInt(e.target.value))} style={{ width: '80px', marginLeft: '10px' }}/>
 
             {/* Resumo do Balanço (Componente Isolado) */}
-            <BalanceSummary 
-                availableFunds={availableFunds}
-                setAvailableFunds={setAvailableFunds}
-                totalEffective={totalEffective}
-                totalPlanned={totalPlanned}
-                balance={balance}
-            />
+            <BalanceSummary
+  availableFunds={availableFunds}
+  setAvailableFunds={setAvailableFunds}
+  incomeEffective={receitasRecebidas}     
+  incomePlanned={receitasARceber}          
+  expenseEffective={despesasPagas}         
+  expensePlanned={despesasAPagar}         
+/>
 
             {/* Adicionar Despesa Planejada (Componente Isolado) */}
             <div style={{ marginBottom: '30px', padding: '15px', border: '1px dashed #aaa' }}>
@@ -75,7 +73,7 @@ const MonthlyBalancePage = () => {
                         transaction={transaction}
                         categoryName={categories[transaction.category_id] || 'N/A'}
                         typeName={types[transaction.type_id] || 'N/A'}
-                        onConvert={refetch} // Atualiza a lista após conversão
+                        onConvert={refetch}
                     />
                 ))
             )}

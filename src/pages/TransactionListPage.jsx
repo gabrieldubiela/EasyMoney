@@ -60,7 +60,7 @@ const TransactionListPage = () => {
 
   return (
     <div>
-      <h1>Revisão Detalhada de Despesas</h1>
+      <h1>RLista de Transações</h1>
       
       <TransactionAdder />
 
