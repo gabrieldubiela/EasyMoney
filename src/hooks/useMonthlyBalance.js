@@ -4,10 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore'; 
 import { useHousehold } from './useHousehold';
+import useCombinedHouseholdData from './useCombinedHouseholdData';
 import useFinancialSummary from './useFinancialSummary';
 
 export default function useMonthlyBalance(year, month, availableFunds) {
     const { householdId } = useHousehold();
+    const { categories, types } = useCombinedHouseholdData();
 
     const [effectiveTransactions, setEffectiveTransactions] = useState([]);
     const [plannedTransactions, setPlannedTransactions] = useState([]);  
@@ -67,6 +69,9 @@ export default function useMonthlyBalance(year, month, availableFunds) {
         currentBalance: summary.currentBalance,
         projectedBalance: summary.projectedBalance,
         availableBalance: summary.availableBalance,
+        // Metadados necessários para a UI
+        categories,
+        types,
         // Mantém compatibilidade com código existente
         balance: summary,
         totalEffective: summary.currentBalance,
