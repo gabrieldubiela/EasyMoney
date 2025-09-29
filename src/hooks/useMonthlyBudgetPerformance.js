@@ -1,147 +1,91 @@
-// src/hooks/useMonthlyBudgetPerformance.js
+// src/hooks/useMonthlyPerformanceData.js
 
 import { useState, useEffect } from 'react';
-import { db } from '../firebase/firebaseConfig';
-import { 
-    collection, 
-    query, 
-    where, 
-    onSnapshot, 
-    getDocs,      
-    addDoc, 
-    doc, 
-    updateDoc, 
-    deleteDoc 
-} from 'firebase/firestore'; 
-import { useHousehold } from '../hooks/useHousehold';
-import useAnnualData from './useAnnualData'; 
-import useCategories from './useCategories'; 
-import useTypes from './useTypes';
-
+import { db } from '../../firebase/firebaseConfig';
+import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
+import { useHousehold } from '../context/useHousehold';
 
 /**
- * Hook para consolidar a performance orçamentária mensal (Meta Base, Rollover, Gasto Real).
+ * Hook focado exclusivamente em buscar e consolidar dados de performance orçamentária.
  */
-const useMonthlyBudgetPerformance = (yearMonth) => {
+export default function useMonthlyPerformanceData({ yearMonth, annualData, categories, types }) {
     const { householdId } = useHousehold();
-    const { categories } = useCategories();
-    const { types } = useTypes(); // Lista de Tipos para verificar isIncome
-    
-    // Assumimos que o useAnnualData recebe o ano (ex: 2025)
-    const { annualData, loading: annualLoading } = useAnnualData(yearMonth ? yearMonth.substring(0, 4) : null);
     
     const [performance, setPerformance] = useState({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!householdId || !yearMonth || annualLoading || categories.length === 0 || types.length === 0) {
-            setLoading(annualLoading || categories.length === 0 || types.length === 0);
+        if (!householdId || !yearMonth || !annualData || categories.length === 0 || types.length === 0) {
+            setLoading(false);
             return;
         }
+        setLoading(true);
 
-        // 1. QUERY para Transações do Mês
-        const transactionsRef = collection(db, `households/${householdId}/transactions`);
-        const qTransactions = query(
-            transactionsRef,
+        // Listener para transações do mês
+        const transactionsQuery = query(
+            collection(db, `households/${householdId}/transactions`),
+            where('yearMonth', '==', yearMonth)
+        );
+        
+        // Listener para ajustes de orçamento do mês
+        const budgetsQuery = query(
+            collection(db, `households/${householdId}/monthlyBudgets`),
             where('yearMonth', '==', yearMonth)
         );
 
-        // 2. QUERY para Metas Mensais Ajustadas/Rollover
-        const budgetsRef = collection(db, `households/${householdId}/monthlyBudgets`);
-        const qBudgets = query(
-            budgetsRef,
-            where('yearMonth', '==', yearMonth)
-        );
-
-        let transactionsList = [];
-        let budgetsList = [];
-        let unsubscribeTransactions = () => {};
-        let unsubscribeBudgets = () => {};
-
-        // 3. Monitorar Transações e Metas Mensais
-        unsubscribeTransactions = onSnapshot(qTransactions, (snapshot) => {
-            transactionsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            recalculatePerformance();
-        });
-
-        unsubscribeBudgets = onSnapshot(qBudgets, (snapshot) => {
-            budgetsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            recalculatePerformance();
-        });
-
-
-        // 4. Lógica Principal de Recálculo
-        const recalculatePerformance = () => {
-            const newPerformance = {};
-            const realSpentByCategory = {};
-
-            // A. Calcular Gasto Real (Despesas)
-            transactionsList
-                .filter(t => t.category_id) // Apenas transações com category_id
-                .forEach(t => {
-                    const catId = t.category_id;
-                    const amount = t.amount || 0;
-                    realSpentByCategory[catId] = (realSpentByCategory[catId] || 0) + amount;
+        const unsubTransactions = onSnapshot(transactionsQuery, (transactionsSnapshot) => {
+            const unsubBudgets = onSnapshot(budgetsQuery, (budgetsSnapshot) => {
+                
+                const realSpentByCategory = {};
+                transactionsSnapshot.docs.forEach(doc => {
+                    const t = doc.data();
+                    const typeInfo = types.find(typ => typ.id === t.type_id);
+                    // Acumula apenas despesas
+                    if (t.category_id && typeInfo && !typeInfo.isIncome) {
+                        realSpentByCategory[t.category_id] = (realSpentByCategory[t.category_id] || 0) + t.amount;
+                    }
                 });
 
-            // B. Consolidar Dados por Categoria
-            categories.forEach(category => {
-                const catId = category.id;
+                const monthlyBudgetsMap = Object.fromEntries(
+                    budgetsSnapshot.docs.map(doc => [doc.data().categoryId, { id: doc.id, ...doc.data() }])
+                );
                 
-                // 1. Meta Base (Anual / 12)
-                const annualGoal = annualData.rawAnnualData?.[catId]?.budgeted || 0;
-                const monthlyBaseGoal = annualGoal / 12;
-                
-                // 2. Meta Mensal Ajustada/Rollover
-                const monthlyBudgetDoc = budgetsList.find(b => b.categoryId === catId);
-                const adjustedGoal = monthlyBudgetDoc?.goalAmount || monthlyBaseGoal;
-                const rollover = monthlyBudgetDoc?.rollover || 0;
-                
-                // 3. Gasto Real
-                const realSpent = realSpentByCategory[catId] || 0;
-
-                // 4. Consolidação
-                newPerformance[catId] = {
-                    categoryId: catId,
-                    categoryName: category.name,
-                    typeId: category.typeId,
+                const newPerformance = {};
+                categories.forEach(category => {
+                    const catId = category.id;
+                    const annualGoal = annualData[catId]?.goalAmount || 0;
+                    const monthlyBaseGoal = annualGoal / 12;
                     
-                    // Metas
-                    monthlyBaseGoal: monthlyBaseGoal,
-                    adjustedGoal: adjustedGoal,
-                    rollover: rollover,
-                    totalAvailable: adjustedGoal + rollover,
+                    const monthlyBudgetDoc = monthlyBudgetsMap[catId];
+                    const adjustedGoal = monthlyBudgetDoc?.goalAmount ?? monthlyBaseGoal;
+                    const rollover = monthlyBudgetDoc?.rollover || 0;
                     
-                    // Performance
-                    realSpent: realSpent,
-                    remaining: (adjustedGoal + rollover) - realSpent,
-                    isOverBudget: realSpent > (adjustedGoal + rollover),
-                    monthlyBudgetId: monthlyBudgetDoc?.id || null,
-                };
-
-            setPerformance(newPerformance);
-            setLoading(false);
+                    const realSpent = realSpentByCategory[catId] || 0;
+                    const totalAvailable = adjustedGoal + rollover;
+                    
+                    newPerformance[catId] = {
+                        categoryId: catId,
+                        categoryName: category.name,
+                        monthlyBaseGoal,
+                        adjustedGoal,
+                        rollover,
+                        totalAvailable,
+                        realSpent,
+                        remaining: totalAvailable + realSpent, // realSpent é negativo
+                        isOverBudget: -realSpent > totalAvailable,
+                        monthlyBudgetId: monthlyBudgetDoc?.id || null,
+                    };
+                });
+                
+                setPerformance(newPerformance);
+                setLoading(false);
+            });
+            return () => unsubBudgets();
         });
-        };
 
-        // Limpeza dos listeners
-        return () => {
-            unsubscribeTransactions();
-            unsubscribeBudgets();
-        };
+        return () => unsubTransactions();
 
-    }, [householdId, yearMonth, annualLoading, categories, annualData, types]); // Adicionado 'types' na dependência
+    }, [householdId, yearMonth, annualData, categories, types]);
 
-    return { 
-        performance, 
-        loading,
-        saveGoalAdjustment: async () => {
-            throw new Error('saveGoalAdjustment not implemented yet');
-        },
-        closeMonthAndCalculateRollover: async () => {
-            throw new Error('closeMonthAndCalculateRollover not implemented yet');
-        }
-    };
+    return { performance, loading };
 };
-
-export default useMonthlyBudgetPerformance;
