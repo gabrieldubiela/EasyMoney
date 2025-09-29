@@ -1,33 +1,30 @@
 // src/pages/MonthlyBalancePage.jsx (Refatorado)
 
 import React, { useState } from 'react';
-import useMonthlyBalance from '../hooks/useMonthlyBalance'; 
-import BalanceSummary from '../components/ui/dashboard/BalanceSummary'; 
-import PlannedTransactionForm from '../components/ui/forms/PlannedTransactionForm'; 
-import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem'; 
+import useMonthlyBalance from '../hooks/useMonthlyBalance';
+import BalanceSummary from '../components/ui/dashboard/BalanceSummary';
+import PlannedTransactionForm from '../components/ui/forms/PlannedTransactionForm';
+import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem';
 
 const MonthlyBalancePage = () => {
     // 1. Gerenciamento do Período (Únicos estados que a Page controla)
     const today = new Date();
     const [year, setYear] = useState(today.getFullYear());
-    const [month, setMonth] = useState(today.getMonth() + 1); 
+    const [month, setMonth] = useState(today.getMonth() + 1);
 
-    // 2. Uso do NOVO HOOK para toda a lógica de dados
+    // 2. Uso do HOOK para toda a lógica de dados
     const {
         availableFunds, setAvailableFunds,
         plannedTransactions,
         totalEffective, totalPlanned,
-        balance,
-        categories, types,
-        loading,
-        refetch // Função para recarregar dados
-    } = useMonthlyBalance(year, month);
+        balance, categories, types,
+        loading, refetch
+    } = useMonthlyBalance(year, month, availableFunds);
 
-
-    if (loading) return <div style={{ padding: '20px' }}>Carregando Balanço Mensal...</div>;
+    if (loading) return <div >Carregando Balanço Mensal...</div>;
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div >
             <h1>Balanço e Planejamento Mensal</h1>
 
             {/* Seleção de Período */}
@@ -45,20 +42,24 @@ const MonthlyBalancePage = () => {
                 <option value={11}>Novembro</option>
                 <option value={12}>Dezembro</option>
             </select>
-            <input type="number" value={year} onChange={(e) => setYear(parseInt(e.target.value))} style={{ width: '80px', marginLeft: '10px' }}/>
+            <input
+                type="number"
+                value={year}
+                onChange={(e) => setYear(parseInt(e.target.value))}
+            />
 
             {/* Resumo do Balanço (Componente Isolado) */}
             <BalanceSummary
-  availableFunds={availableFunds}
-  setAvailableFunds={setAvailableFunds}
-  incomeEffective={receitasRecebidas}     
-  incomePlanned={receitasARceber}          
-  expenseEffective={despesasPagas}         
-  expensePlanned={despesasAPagar}         
-/>
+                availableFunds={availableFunds}
+                setAvailableFunds={setAvailableFunds}
+                incomeEffective={totalEffective > 0 ? totalEffective : 0}
+                incomePlanned={totalPlanned > 0 ? totalPlanned : 0}
+                expenseEffective={totalEffective < 0 ? Math.abs(totalEffective) : 0}
+                expensePlanned={totalPlanned < 0 ? Math.abs(totalPlanned) : 0}
+            />
 
             {/* Adicionar Despesa Planejada (Componente Isolado) */}
-            <div style={{ marginBottom: '30px', padding: '15px', border: '1px dashed #aaa' }}>
+            <div>
                 <PlannedTransactionForm onSaveSuccess={refetch} />
             </div>
 
@@ -73,7 +74,7 @@ const MonthlyBalancePage = () => {
                         transaction={transaction}
                         categoryName={categories[transaction.category_id] || 'N/A'}
                         typeName={types[transaction.type_id] || 'N/A'}
-                        onConvert={refetch}
+                        onConvert={refetch} // Atualiza a lista após conversão
                     />
                 ))
             )}

@@ -7,6 +7,7 @@ import useMonthlyBalance from './useMonthlyBalance';
 import useMonthlyPerformanceData from './useMonthlyPerformanceData';
 import useScheduledPayments from './useScheduledPayments';
 import useMonthClosingStatus from './useMonthClosingStatus';
+import useFinancialSummary from './useFinancialSummary';
 
 /**
  * Hook container que orquestra todos os dados necessários para o Dashboard.
@@ -27,21 +28,40 @@ export default function useDashboardData() {
     const { needsClosing, loading: closingLoading } = useMonthClosingStatus();
     
     // 3. Hooks que dependem de outros dados
-    const { balance, totalEffective, totalPlanned, effectiveTransactions, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
+    const { balance, totalEffective, totalPlanned, effectiveTransactions, plannedTransactions, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
     const { performance, loading: performanceLoading } = useMonthlyPerformanceData({ yearMonth: currentYearMonth, annualData, categories, types });
 
     // 4. Cálculos derivados (memoizados para performance)
     const { criticalCategories, totalByType } = useMemo(() => {
-        const critical = Object.values(performance).filter(item => item.isOverBudget || (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2));
-        
-        const byType = effectiveTransactions.reduce((acc, transaction) => {
-            const typeName = types.find(t => t.id === transaction.type_id)?.name || 'Outros';
-            acc[typeName] = (acc[typeName] || 0) + transaction.amount;
-            return acc;
-        }, {});
+        // Categorias críticas
+        const critical = Object.values(performance).filter(item => 
+            item.isOverBudget || (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2)
+        );
 
-        return { criticalCategories: critical, totalByType: byType };
-    }, [performance, effectiveTransactions, types]);
+        // Totais por tipo (income/expense x planned/effective)
+        const totals = {
+            income: { effective: 0, planned: 0 },
+            expense: { effective: 0, planned: 0 }
+        };
+
+        effectiveTransactions.forEach(tx => {
+            if (tx.amount > 0) {
+                totals.income.effective += tx.amount;
+            } else {
+                totals.expense.effective += Math.abs(tx.amount);
+            }
+        });
+
+        plannedTransactions.forEach(tx => {
+            if (tx.amount > 0) {
+                totals.income.planned += tx.amount;
+            } else {
+                totals.expense.planned += Math.abs(tx.amount);
+            }
+        });
+
+        return { criticalCategories: critical, totalByType: totals };
+    }, [performance, effectiveTransactions, plannedTransactions]);
 
     const isLoading = metadataLoading || annualLoading || paymentsLoading || closingLoading || balanceLoading || performanceLoading;
 

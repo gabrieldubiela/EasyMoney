@@ -68,11 +68,12 @@ const DashboardPage = () => {
             <BalanceSummary
                 availableFunds={availableFunds}
                 setAvailableFunds={setAvailableFunds}
-                incomeEffective={receitasRecebidas}      // Receitas já recebidas
-                incomePlanned={receitasARceber}          // Receitas a receber
-                expenseEffective={despesasPagas}         // Despesas já pagas
-                expensePlanned={despesasAPagar}          // Despesas a pagar
+                incomeEffective={totalByType?.income?.effective || 0}
+                incomePlanned={totalByType?.income?.planned || 0}
+                expenseEffective={totalByType?.expense?.effective || 0}
+                expensePlanned={totalByType?.expense?.planned || 0}
             />
+
 
             {/* Outras seções do Dashboard (Resumo Anual, etc.) */}
             <div style={{ marginTop: '30px' }}>
