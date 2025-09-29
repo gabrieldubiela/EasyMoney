@@ -60,7 +60,7 @@ const TransactionListPage = () => {
 
   return (
     <div>
-      <h1>RLista de Transações</h1>
+      <h1>Revisão Detalhada de Despesas</h1>
       
       <TransactionAdder />
 
@@ -74,7 +74,6 @@ const TransactionListPage = () => {
         filters={filters}
         categories={categories}
         types={types}
-        onSaveSuccess={refetch}
       />
     </div>
   );

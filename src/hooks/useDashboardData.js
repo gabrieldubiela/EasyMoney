@@ -28,7 +28,7 @@ export default function useDashboardData() {
     const { needsClosing, loading: closingLoading } = useMonthClosingStatus();
     
     // 3. Hooks que dependem de outros dados
-    const { balance, totalEffective, totalPlanned, effectiveTransactions, plannedTransactions, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
+    const { balance, totalEffective, totalPlanned, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
     const { performance, loading: performanceLoading } = useMonthlyPerformanceData({ yearMonth: currentYearMonth, annualData, categories, types });
 
     // 4. Cálculos derivados (memoizados para performance) 

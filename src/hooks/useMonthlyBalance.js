@@ -1,25 +1,26 @@
 // src/hooks/useMonthlyBalance.js
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { collection, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore'; 
-import { useHousehold } from './useHousehold';
-import useCombinedHouseholdData from './useCombinedHouseholdData';
-import useFinancialSummary from './useFinancialSummary';
+import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { useHousehold } from '../hooks/useHousehold';
 
-export default function useMonthlyBalance(year, month, availableFunds) {
+export default function useMonthlyBalance(year, month) {
     const { householdId } = useHousehold();
-    const { categories, types } = useCombinedHouseholdData();
-
+    
     const [effectiveTransactions, setEffectiveTransactions] = useState([]);
-    const [plannedTransactions, setPlannedTransactions] = useState([]);  
+    const [plannedTransactions, setPlannedTransactions] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [types, setTypes] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchTransactionsForPeriod = useCallback(async () => {
+    // Fetch com onSnapshot para atualização em tempo real
+    useEffect(() => {
         if (!householdId || !year || !month) {
             setLoading(false);
             return;
         }
+
         setLoading(true);
 
         const startOfMonth = new Date(year, month - 1, 1);
@@ -27,56 +28,105 @@ export default function useMonthlyBalance(year, month, availableFunds) {
         const startTimestamp = Timestamp.fromDate(startOfMonth);
         const endTimestamp = Timestamp.fromDate(endOfMonth);
 
-        try {
-            const effectiveQuery = query(
-                collection(db, `households/${householdId}/transactions`),
-                where('date', '>=', startTimestamp),
-                where('date', '<=', endTimestamp)
-            );
-            const effectiveSnapshot = await getDocs(effectiveQuery);
-            setEffectiveTransactions(effectiveSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        // Listener para transações efetivas - ATUALIZAÇÃO EM TEMPO REAL
+        const effectiveQuery = query(
+            collection(db, `households/${householdId}/transactions`),
+            where('date', '>=', startTimestamp),
+            where('date', '<=', endTimestamp)
+        );
 
-            const plannedQuery = query(
-                collection(db, `households/${householdId}/plannedTransactions`),
-                where('paymentDate', '>=', startTimestamp),
-                where('paymentDate', '<=', endTimestamp)
-            );
-            const plannedSnapshot = await getDocs(plannedQuery);
-            setPlannedTransactions(plannedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        } catch(error) {
-            console.error("Erro ao carregar transações:", error);
-        } finally {
+        const unsubEffective = onSnapshot(effectiveQuery, (snapshot) => {
+            const transactions = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data() 
+            }));
+            setEffectiveTransactions(transactions);
+        });
+
+        // Listener para transações planejadas - ATUALIZAÇÃO EM TEMPO REAL
+        const plannedQuery = query(
+            collection(db, `households/${householdId}/plannedTransactions`),
+            where('paymentDate', '>=', startTimestamp),
+            where('paymentDate', '<=', endTimestamp)
+        );
+
+        const unsubPlanned = onSnapshot(plannedQuery, (snapshot) => {
+            const transactions = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data() 
+            }));
+            setPlannedTransactions(transactions);
+        });
+
+        // Listener para categorias - ATUALIZAÇÃO EM TEMPO REAL
+        const categoriesQuery = collection(db, `households/${householdId}/categories`);
+        const unsubCategories = onSnapshot(categoriesQuery, (snapshot) => {
+            const cats = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data() 
+            }));
+            setCategories(cats);
+        });
+
+        // Listener para tipos - ATUALIZAÇÃO EM TEMPO REAL
+        const typesQuery = collection(db, `households/${householdId}/types`);
+        const unsubTypes = onSnapshot(typesQuery, (snapshot) => {
+            const typs = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data() 
+            }));
+            setTypes(typs);
             setLoading(false);
-        }
+        });
+
+        // Cleanup - desinscrever de todos os listeners
+        return () => {
+            unsubEffective();
+            unsubPlanned();
+            unsubCategories();
+            unsubTypes();
+        };
     }, [householdId, year, month]);
 
-    useEffect(() => {
-        fetchTransactionsForPeriod();
-    }, [fetchTransactionsForPeriod]);
+    // Separar receitas e despesas usando useMemo
+    const financialData = useMemo(() => {
+        const incomeEffective = effectiveTransactions
+            .filter(t => t.amount > 0)
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        const expenseEffective = effectiveTransactions
+            .filter(t => t.amount < 0)
+            .reduce((sum, t) => sum + t.amount, 0);
 
-    const summary = useFinancialSummary(effectiveTransactions, plannedTransactions, availableFunds);
+        const incomePlanned = plannedTransactions
+            .filter(t => t.amount > 0)
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        const expensePlanned = plannedTransactions
+            .filter(t => t.amount < 0)
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        return {
+            incomeEffective,
+            expenseEffective,
+            incomePlanned,
+            expensePlanned
+        };
+    }, [effectiveTransactions, plannedTransactions]);
+
+    // Função refetch não é mais necessária com onSnapshot
+    const refetch = useCallback(() => {
+        // onSnapshot já atualiza automaticamente
+        console.log('Dados sendo atualizados automaticamente via onSnapshot');
+    }, []);
 
     return {
         effectiveTransactions,
         plannedTransactions,
-        // Retorna os valores do summary de forma explícita
-        incomeEffective: summary.incomeEffective,
-        expenseEffective: summary.expenseEffective,
-        incomePlanned: summary.incomePlanned,
-        expensePlanned: summary.expensePlanned,
-        totalIncome: summary.totalIncome,
-        totalExpense: summary.totalExpense,
-        currentBalance: summary.currentBalance,
-        projectedBalance: summary.projectedBalance,
-        availableBalance: summary.availableBalance,
-        // Metadados necessários para a UI
         categories,
         types,
-        // Mantém compatibilidade com código existente
-        balance: summary,
-        totalEffective: summary.currentBalance,
-        totalPlanned: summary.incomePlanned - summary.expensePlanned,
+        ...financialData,
         loading,
-        refetch: fetchTransactionsForPeriod
+        refetch // Mantido para compatibilidade
     };
 }

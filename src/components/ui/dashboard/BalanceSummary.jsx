@@ -21,12 +21,9 @@ const BalanceSummary = ({
     // Cálculos
     const totalIncome = incomeEffective + incomePlanned;
     const totalExpense = expenseEffective + expensePlanned;
-    const currentBalance = incomeEffective - expenseEffective; // Saldo atual (apenas efetivos)
-    const projectedBalance = totalIncome - totalExpense; // Saldo projetado (com planejados)
-    const availableBalance = currentBalance + availableFunds; // Fundos disponíveis
-
-    const isCurrentNegative = currentBalance < 0;
-    const isProjectedNegative = projectedBalance < 0;
+    const currentBalance = incomeEffective + expenseEffective;
+    const projectedBalance = totalIncome + totalExpense;
+    const availableBalance = currentBalance + availableFunds;
     const isAvailableNegative = availableBalance < 0;
 
     // Função para atualizar fundos disponíveis
@@ -51,7 +48,7 @@ const BalanceSummary = ({
                         type="number"
                         value={availableFunds || 0}
                         onChange={handleFundsChange}
-                        step="0.01"                        
+                        step="0.01"
                     />
                 </label>
             </div>
@@ -85,7 +82,7 @@ const BalanceSummary = ({
                     <p>• Saldo Projetado (incluindo valores planejados): {formatCurrency(projectedBalance)}</p>
 
                     <p>
-                        💰 FUNDOS DISPONÍVEIS: {formatCurrency(availableBalance)}</p>
+                        FUNDOS DISPONÍVEIS: {formatCurrency(availableBalance)}</p>
 
                     {isAvailableNegative && (
                         <p> ⚠️ Atenção: Seus fundos disponíveis estão negativos!</p>

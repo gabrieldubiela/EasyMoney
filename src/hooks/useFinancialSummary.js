@@ -23,8 +23,8 @@ export default function useFinancialSummary(effectiveTransactions = [], plannedT
     const totalExpense = expenseEffective + expensePlanned;
     
     // Saldos calculados
-    const currentBalance = incomeEffective - expenseEffective;
-    const projectedBalance = totalIncome - totalExpense;
+    const currentBalance = incomeEffective + expenseEffective;
+    const projectedBalance = totalIncome + totalExpense;
     const availableBalance = currentBalance + availableFunds;
 
     return {

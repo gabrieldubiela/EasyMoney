@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase/firebaseConfig'; 
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { HouseholdContext } from './HouseholdContext'; 
 import useUserAuthData from '../hooks/useUserAuthData';
 
-// ✅ Este arquivo AGORA exporta APENAS o componente Provider
 const HouseholdProvider = ({ children }) => {
-    // Usa o hook para obter o estado do usuário logado e loading
     const { user, loading: userLoading } = useUserAuthData();
-    const [familyName, setFamilyName] = useState(null); 
+    const [familyName, setFamilyName] = useState(null);
+    const [users, setUsers] = useState([]); // NOVO: lista de usuários
     
-    // O HouseholdId é extraído diretamente do objeto user
     const householdId = user?.householdId || null;
-    
-    // O loading do contexto deve ser o loading da busca de dados do usuário
-    const loading = userLoading; 
+    const loading = userLoading;
 
-    // Busca o nome da família baseado no householdId
+    // Busca o nome da família
     useEffect(() => {
         async function fetchFamilyName() {
             if (!householdId) {
@@ -25,14 +21,10 @@ const HouseholdProvider = ({ children }) => {
             }
 
             try {
-                // 1. Cria a referência ao documento da household
                 const householdDocRef = doc(db, 'households', householdId);
-                
-                // 2. Busca o documento
                 const docSnap = await getDoc(householdDocRef);
 
                 if (docSnap.exists()) {
-                    // 3. Extrai o nome e salva no estado
                     setFamilyName(docSnap.data().familyName || 'Minha Família');
                 } else {
                     console.warn(`Documento da Household ID ${householdId} não encontrado!`);
@@ -44,22 +36,47 @@ const HouseholdProvider = ({ children }) => {
             }
         }
 
-        // Se o user já foi carregado e tem um householdId, execute a busca.
         if (!loading && householdId) {
             fetchFamilyName();
         } else if (!loading && !householdId) {
-             // Caso o usuário esteja logado mas não pertença a uma casa
             setFamilyName('Sem Família');
         }
-
     }, [householdId, loading]);
 
+    // NOVO: Busca lista de usuários da household
+    useEffect(() => {
+        if (!householdId) {
+            setUsers([]);
+            return;
+        }
+
+        // Query para buscar todos os usuários desta household
+        const usersQuery = query(
+            collection(db, 'users'),
+            where('householdId', '==', householdId)
+        );
+
+        const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
+            const usersList = snapshot.docs.map(doc => ({
+                uid: doc.id,
+                displayName: doc.data().displayName || doc.data().email || 'Sem Nome',
+                email: doc.data().email,
+                ...doc.data()
+            }));
+            setUsers(usersList);
+        }, (error) => {
+            console.error('Erro ao buscar usuários:', error);
+        });
+
+        return () => unsubscribe();
+    }, [householdId]);
+
     const contextValue = {
-        user, // Inclui: uid, email, householdId, isAdmin
+        user,
         householdId,
         familyName,
+        users, // NOVO: disponibiliza lista de usuários
         loading,
-        // ... (outras funções ou estados do contexto que você possa ter)
     };
 
     if (loading) {

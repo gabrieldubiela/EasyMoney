@@ -1,19 +1,17 @@
-// src/pages/MonthlyBalancePage.jsx (Refatorado e Corrigido)
+// src/pages/MonthlyBalancePage.jsx
 
 import React, { useState } from 'react';
 import useMonthlyBalance from '../hooks/useMonthlyBalance';
 import BalanceSummary from '../components/ui/dashboard/BalanceSummary';
-import PlannedTransactionForm from '../components/ui/forms/PlannedTransactionForm';
+import TransactionForm from '../components/ui/forms/TransactionForm';
 import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem';
 
 const MonthlyBalancePage = () => {
-    // 1. Estados locais PRIMEIRO (antes de usar nos hooks)
     const today = new Date();
     const [year, setYear] = useState(today.getFullYear());
     const [month, setMonth] = useState(today.getMonth() + 1);
     const [availableFunds, setAvailableFunds] = useState(0);
 
-    // 2. Hook que usa os estados já declarados
     const {
         plannedTransactions,
         incomeEffective, 
@@ -26,9 +24,8 @@ const MonthlyBalancePage = () => {
         refetch
     } = useMonthlyBalance(year, month, availableFunds);
 
-    if (loading) return <div>Carregando Balanço Mensal...</div>;
+    if (loading) return <div style={{ padding: '20px' }}>Carregando Balanço Mensal...</div>;
 
-    // Função auxiliar para mapear nomes
     const getCategoryName = (categoryId) => {
         const category = categories.find(c => c.id === categoryId);
         return category ? category.name : 'N/A';
@@ -40,13 +37,17 @@ const MonthlyBalancePage = () => {
     };
 
     return (
-        <div>
+        <div style={{ padding: '20px' }}>
             <h1>Balanço e Planejamento Mensal</h1>
 
             {/* Seleção de Período */}
-            <div>
-                <label>Mês: </label>
-                <select value={month} onChange={(e) => setMonth(parseInt(e.target.value))}>
+            <div style={{ marginBottom: '20px' }}>
+                <label style={{ marginRight: '10px' }}>Mês: </label>
+                <select 
+                    value={month} 
+                    onChange={(e) => setMonth(parseInt(e.target.value))}
+                    style={{ marginRight: '20px', padding: '5px' }}
+                >
                     <option value={1}>Janeiro</option>
                     <option value={2}>Fevereiro</option>
                     <option value={3}>Março</option>
@@ -61,11 +62,12 @@ const MonthlyBalancePage = () => {
                     <option value={12}>Dezembro</option>
                 </select>
                 
-                <label>Ano: </label>
+                <label style={{ marginRight: '10px' }}>Ano: </label>
                 <input
                     type="number"
                     value={year}
                     onChange={(e) => setYear(parseInt(e.target.value))}
+                    style={{ width: '80px', padding: '5px' }}
                 />
             </div>
 
@@ -79,26 +81,33 @@ const MonthlyBalancePage = () => {
                 expensePlanned={expensePlanned}
             />
 
-            {/* Adicionar Despesa Planejada */}
+            {/* Formulário Unificado - Modo Planejado */}
             <div>
-                <PlannedTransactionForm onSaveSuccess={refetch} />
+                <h3>Adicionar Transação Planejada</h3>
+                <TransactionForm 
+                    isPlanned={true} 
+                    onSaveSuccess={refetch}
+                    transactionId={null}
+                />
             </div>
 
-            {/* Lista de Despesas Planejadas */}
+            {/* Lista de Transações Planejadas */}
             <div>
-                <h2>Despesas Planejadas ({plannedTransactions.length})</h2>
+                <h2>Transações Planejadas ({plannedTransactions.length})</h2>
                 {plannedTransactions.length === 0 ? (
-                    <p>Nenhuma despesa planejada para este período.</p>
+                    <p>Nenhuma transação planejada para este período.</p>
                 ) : (
-                    plannedTransactions.map(transaction => (
-                        <PlannedTransactionItem
-                            key={transaction.id}
-                            transaction={transaction}
-                            categoryName={getCategoryName(transaction.category_id)}
-                            typeName={getTypeName(transaction.type_id)}
-                            onConvert={refetch}
-                        />
-                    ))
+                    <div>
+                        {plannedTransactions.map(transaction => (
+                            <PlannedTransactionItem
+                                key={transaction.id}
+                                transaction={transaction}
+                                categoryName={getCategoryName(transaction.category_id)}
+                                typeName={getTypeName(transaction.type_id)}
+                                onConvert={refetch}
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
         </div>
