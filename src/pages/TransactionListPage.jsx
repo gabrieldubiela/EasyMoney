@@ -74,6 +74,7 @@ const TransactionListPage = () => {
         filters={filters}
         categories={categories}
         types={types}
+        onSaveSuccess={refetch}
       />
     </div>
   );

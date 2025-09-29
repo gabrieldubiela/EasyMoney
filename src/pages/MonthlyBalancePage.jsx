@@ -44,7 +44,7 @@ const MonthlyBalancePage = () => {
             <h1>Balanço e Planejamento Mensal</h1>
 
             {/* Seleção de Período */}
-            <div style={{ marginBottom: '20px' }}>
+            <div>
                 <label>Mês: </label>
                 <select value={month} onChange={(e) => setMonth(parseInt(e.target.value))}>
                     <option value={1}>Janeiro</option>
@@ -61,12 +61,11 @@ const MonthlyBalancePage = () => {
                     <option value={12}>Dezembro</option>
                 </select>
                 
-                <label style={{ marginLeft: '20px' }}>Ano: </label>
+                <label>Ano: </label>
                 <input
                     type="number"
                     value={year}
                     onChange={(e) => setYear(parseInt(e.target.value))}
-                    style={{ width: '80px', marginLeft: '5px' }}
                 />
             </div>
 
@@ -81,12 +80,12 @@ const MonthlyBalancePage = () => {
             />
 
             {/* Adicionar Despesa Planejada */}
-            <div style={{ marginTop: '30px' }}>
+            <div>
                 <PlannedTransactionForm onSaveSuccess={refetch} />
             </div>
 
             {/* Lista de Despesas Planejadas */}
-            <div style={{ marginTop: '30px' }}>
+            <div>
                 <h2>Despesas Planejadas ({plannedTransactions.length})</h2>
                 {plannedTransactions.length === 0 ? (
                     <p>Nenhuma despesa planejada para este período.</p>

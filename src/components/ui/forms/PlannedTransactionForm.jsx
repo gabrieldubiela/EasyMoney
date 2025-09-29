@@ -116,6 +116,7 @@ const PlannedTransactionForm = ({ onSaveSuccess }) => {
             <h3>Adicionar Transação Planejada</h3>
 
             <input type="text" placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} required />
+            <input type="text" placeholder="Fornecedor/Origem" value={supplier} onChange={(e) => setSupplier(e.target.value)} />
             <input type="number" placeholder="Valor" value={amount} onChange={(e) => setAmount(e.target.value)} required min="0.01" step="0.01" />
             <label>Data</label>
             <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required />

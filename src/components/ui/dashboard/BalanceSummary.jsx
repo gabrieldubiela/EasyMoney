@@ -44,71 +44,51 @@ const BalanceSummary = ({
             <h3>RESUMO FINANCEIRO</h3>
 
             {/* Campo de Fundos Iniciais */}
-            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+            <div>
                 <label>
                     Fundos Disponíveis Iniciais:
                     <input
                         type="number"
                         value={availableFunds || 0}
                         onChange={handleFundsChange}
-                        step="0.01"
-                        style={{ marginLeft: '10px', padding: '5px', width: '150px' }}
+                        step="0.01"                        
                     />
                 </label>
             </div>
 
             {/* Seção de Receitas */}
-            <div style={{ marginBottom: '20px' }}>
+            <div>
                 <h4>Receitas</h4>
-                <div style={{ paddingLeft: '15px' }}>
-                    <p>• Receitas Recebidas (efetivas): <strong style={{ color: '#22C55E' }}>{formatCurrency(incomeEffective)}</strong></p>
-                    <p>• Receitas a Receber (planejadas): <strong style={{ color: '#6B7280' }}>{formatCurrency(incomePlanned)}</strong></p>
-                    <p style={{ borderTop: '1px solid #E5E7EB', paddingTop: '8px', marginTop: '8px' }}>
-                        <strong>Total de Receitas: {formatCurrency(totalIncome)}</strong>
-                    </p>
+                <div>
+                    <p>• Receitas Recebidas (efetivas): {formatCurrency(incomeEffective)}</p>
+                    <p>• Receitas a Receber (planejadas): {formatCurrency(incomePlanned)}</p>
+                    <p>Total de Receitas: {formatCurrency(totalIncome)}</p>
                 </div>
             </div>
 
             {/* Seção de Despesas */}
-            <div style={{ marginBottom: '20px' }}>
+            <div>
                 <h4>Despesas</h4>
-                <div style={{ paddingLeft: '15px' }}>
-                    <p>• Despesas Pagas (efetivas): <strong style={{ color: '#DC2626' }}>{formatCurrency(expenseEffective)}</strong></p>
-                    <p>• Despesas a Pagar (planejadas): <strong style={{ color: '#6B7280' }}>{formatCurrency(expensePlanned)}</strong></p>
-                    <p style={{ borderTop: '1px solid #E5E7EB', paddingTop: '8px', marginTop: '8px' }}>
-                        <strong>Total de Despesas: {formatCurrency(totalExpense)}</strong>
-                    </p>
+                <div>
+                    <p>• Despesas Pagas (efetivas): {formatCurrency(expenseEffective)}</p>
+                    <p>• Despesas a Pagar (planejadas): {formatCurrency(expensePlanned)}</p>
+                    <p >Total de Despesas: {formatCurrency(totalExpense)}</p>
                 </div>
             </div>
 
             {/* Seção de Saldos */}
-            <div style={{ backgroundColor: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
+            <div>
                 <h4>Resumo</h4>
-                <div style={{ paddingLeft: '15px' }}>
-                    <p>• Saldo Atual (receitas recebidas - despesas pagas): 
-                        <strong style={{ color: isCurrentNegative ? '#DC2626' : '#22C55E', marginLeft: '10px' }}>
-                            {formatCurrency(currentBalance)}
-                        </strong>
-                    </p>
+                <div>
+                    <p>• Saldo Atual (receitas recebidas - despesas pagas): {formatCurrency(currentBalance)}</p>
 
-                    <p>• Saldo Projetado (incluindo valores planejados): 
-                        <strong style={{ color: isProjectedNegative ? '#DC2626' : '#22C55E', marginLeft: '10px' }}>
-                            {formatCurrency(projectedBalance)}
-                        </strong>
-                    </p>
+                    <p>• Saldo Projetado (incluindo valores planejados): {formatCurrency(projectedBalance)}</p>
 
-                    <p style={{ borderTop: '2px solid #31afb4', paddingTop: '12px', marginTop: '12px', fontSize: '1.1em' }}>
-                        💰 <strong>FUNDOS DISPONÍVEIS: 
-                            <span style={{ color: isAvailableNegative ? '#DC2626' : '#31afb4', marginLeft: '10px' }}>
-                                {formatCurrency(availableBalance)}
-                            </span>
-                        </strong>
-                    </p>
+                    <p>
+                        💰 FUNDOS DISPONÍVEIS: {formatCurrency(availableBalance)}</p>
 
                     {isAvailableNegative && (
-                        <p style={{ color: '#DC2626', fontWeight: 'bold', marginTop: '10px' }}>
-                            ⚠️ Atenção: Seus fundos disponíveis estão negativos!
-                        </p>
+                        <p> ⚠️ Atenção: Seus fundos disponíveis estão negativos!</p>
                     )}
                 </div>
             </div>

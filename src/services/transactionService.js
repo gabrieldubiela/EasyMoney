@@ -70,8 +70,8 @@ export const saveTransaction = async ({ householdId, userId, formData, editingDa
   const originalAmount = parseFloat(amount);
   const numInstallments = parseInt(installments);
 
-  if (!householdId || !description.trim() || isNaN(originalAmount) || originalAmount <= 0 || !category || !type) {
-    throw new Error("Por favor, preencha todos os campos obrigatórios e use um valor positivo.");
+  if (!householdId || !description.trim() || isNaN(originalAmount) || !category || !type) {
+    throw new Error("Por favor, preencha todos os campos obrigatórios.");
   }
   
   // A lógica de sinal (receita/despesa) permanece no formulário por enquanto, 
