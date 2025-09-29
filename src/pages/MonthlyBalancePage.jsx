@@ -14,12 +14,15 @@ const MonthlyBalancePage = () => {
 
     // 2. Uso do HOOK para toda a lógica de dados
     const {
-        availableFunds, setAvailableFunds,
         plannedTransactions,
-        totalEffective, totalPlanned,
-        balance, categories, types,
+        incomeEffective, expenseEffective, incomePlanned, expensePlanned,
+        currentBalance, projectedBalance, availableBalance,
+        categories, types,
         loading, refetch
     } = useMonthlyBalance(year, month, availableFunds);
+    
+    // Estado local para fundos disponíveis
+    const [availableFunds, setAvailableFunds] = useState(0);
 
     if (loading) return <div >Carregando Balanço Mensal...</div>;
 
@@ -52,10 +55,10 @@ const MonthlyBalancePage = () => {
             <BalanceSummary
                 availableFunds={availableFunds}
                 setAvailableFunds={setAvailableFunds}
-                incomeEffective={totalEffective > 0 ? totalEffective : 0}
-                incomePlanned={totalPlanned > 0 ? totalPlanned : 0}
-                expenseEffective={totalEffective < 0 ? Math.abs(totalEffective) : 0}
-                expensePlanned={totalPlanned < 0 ? Math.abs(totalPlanned) : 0}
+                incomeEffective={incomeEffective}
+                incomePlanned={incomePlanned}
+                expenseEffective={expenseEffective}
+                expensePlanned={expensePlanned}
             />
 
             {/* Adicionar Despesa Planejada (Componente Isolado) */}

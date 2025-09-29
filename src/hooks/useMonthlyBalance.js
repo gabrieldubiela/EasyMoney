@@ -57,7 +57,20 @@ export default function useMonthlyBalance(year, month, availableFunds) {
     return {
         effectiveTransactions,
         plannedTransactions,
-        ...summary,
+        // Retorna os valores do summary de forma explícita
+        incomeEffective: summary.incomeEffective,
+        expenseEffective: summary.expenseEffective,
+        incomePlanned: summary.incomePlanned,
+        expensePlanned: summary.expensePlanned,
+        totalIncome: summary.totalIncome,
+        totalExpense: summary.totalExpense,
+        currentBalance: summary.currentBalance,
+        projectedBalance: summary.projectedBalance,
+        availableBalance: summary.availableBalance,
+        // Mantém compatibilidade com código existente
+        balance: summary,
+        totalEffective: summary.currentBalance,
+        totalPlanned: summary.incomePlanned - summary.expensePlanned,
         loading,
         refetch: fetchTransactionsForPeriod
     };

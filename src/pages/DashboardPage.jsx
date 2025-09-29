@@ -68,10 +68,10 @@ const DashboardPage = () => {
             <BalanceSummary
                 availableFunds={availableFunds}
                 setAvailableFunds={setAvailableFunds}
-                incomeEffective={totalByType?.income?.effective || 0}
-                incomePlanned={totalByType?.income?.planned || 0}
-                expenseEffective={totalByType?.expense?.effective || 0}
-                expensePlanned={totalByType?.expense?.planned || 0}
+                incomeEffective={balance?.incomeEffective || 0}
+                incomePlanned={balance?.incomePlanned || 0}
+                expenseEffective={balance?.expenseEffective || 0}
+                expensePlanned={balance?.expensePlanned || 0}
             />
 
 

@@ -31,37 +31,15 @@ export default function useDashboardData() {
     const { balance, totalEffective, totalPlanned, effectiveTransactions, plannedTransactions, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
     const { performance, loading: performanceLoading } = useMonthlyPerformanceData({ yearMonth: currentYearMonth, annualData, categories, types });
 
-    // 4. Cálculos derivados (memoizados para performance)
-    const { criticalCategories, totalByType } = useMemo(() => {
+    // 4. Cálculos derivados (memoizados para performance) 
+    const { criticalCategories } = useMemo(() => {
         // Categorias críticas
         const critical = Object.values(performance).filter(item => 
             item.isOverBudget || (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2)
         );
 
-        // Totais por tipo (income/expense x planned/effective)
-        const totals = {
-            income: { effective: 0, planned: 0 },
-            expense: { effective: 0, planned: 0 }
-        };
-
-        effectiveTransactions.forEach(tx => {
-            if (tx.amount > 0) {
-                totals.income.effective += tx.amount;
-            } else {
-                totals.expense.effective += Math.abs(tx.amount);
-            }
-        });
-
-        plannedTransactions.forEach(tx => {
-            if (tx.amount > 0) {
-                totals.income.planned += tx.amount;
-            } else {
-                totals.expense.planned += Math.abs(tx.amount);
-            }
-        });
-
-        return { criticalCategories: critical, totalByType: totals };
-    }, [performance, effectiveTransactions, plannedTransactions]);
+        return { criticalCategories: critical };
+    }, [performance]);
 
     const isLoading = metadataLoading || annualLoading || paymentsLoading || closingLoading || balanceLoading || performanceLoading;
 
@@ -76,7 +54,6 @@ export default function useDashboardData() {
         upcomingPayments,
         needsClosing,
         criticalCategories,
-        totalByType,
         annualData,
         // Dados para passar para o serviço de fechamento de mês
         performanceDataForClosing: {

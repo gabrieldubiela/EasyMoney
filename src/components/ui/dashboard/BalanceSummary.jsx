@@ -40,72 +40,77 @@ const BalanceSummary = ({
     };
 
     return (
-        <div>
-
-            {/* Campo de Fundos Iniciais */}
-            <div>
-                <label>
-                    Fundos Disponíveis Iniciais:
-                </label>
-                <input
-                    type="number"
-                    value={availableFunds || 0}
-                    onChange={handleFundsChange}
-                    step="0.01"
-                />
-            </div>
-
+        <div className="card">
             <h3>RESUMO FINANCEIRO</h3>
 
+            {/* Campo de Fundos Iniciais */}
+            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                <label>
+                    Fundos Disponíveis Iniciais:
+                    <input
+                        type="number"
+                        value={availableFunds || 0}
+                        onChange={handleFundsChange}
+                        step="0.01"
+                        style={{ marginLeft: '10px', padding: '5px', width: '150px' }}
+                    />
+                </label>
+            </div>
+
             {/* Seção de Receitas */}
-            <div>
+            <div style={{ marginBottom: '20px' }}>
                 <h4>Receitas</h4>
-                <p>
-                    Recebidas (efetivas): {formatCurrency(incomeEffective)}
-                </p>
-                <p>
-                    A Receber (planejadas): {formatCurrency(incomePlanned)}
-                </p>
-                <p>
-                    Total de Receitas: {formatCurrency(totalIncome)}
-                </p>
+                <div style={{ paddingLeft: '15px' }}>
+                    <p>• Receitas Recebidas (efetivas): <strong style={{ color: '#22C55E' }}>{formatCurrency(incomeEffective)}</strong></p>
+                    <p>• Receitas a Receber (planejadas): <strong style={{ color: '#6B7280' }}>{formatCurrency(incomePlanned)}</strong></p>
+                    <p style={{ borderTop: '1px solid #E5E7EB', paddingTop: '8px', marginTop: '8px' }}>
+                        <strong>Total de Receitas: {formatCurrency(totalIncome)}</strong>
+                    </p>
+                </div>
             </div>
 
             {/* Seção de Despesas */}
-            <div>
+            <div style={{ marginBottom: '20px' }}>
                 <h4>Despesas</h4>
-                <p>
-                    Pagas (efetivas): {formatCurrency(Math.abs(expenseEffective))}
-                </p>
-                <p>
-                    A Pagar (planejadas): {formatCurrency(Math.abs(expensePlanned))}
-                </p>
-                <p>
-                    Total de Despesas: {formatCurrency(Math.abs(totalExpense))}
-                </p>
+                <div style={{ paddingLeft: '15px' }}>
+                    <p>• Despesas Pagas (efetivas): <strong style={{ color: '#DC2626' }}>{formatCurrency(expenseEffective)}</strong></p>
+                    <p>• Despesas a Pagar (planejadas): <strong style={{ color: '#6B7280' }}>{formatCurrency(expensePlanned)}</strong></p>
+                    <p style={{ borderTop: '1px solid #E5E7EB', paddingTop: '8px', marginTop: '8px' }}>
+                        <strong>Total de Despesas: {formatCurrency(totalExpense)}</strong>
+                    </p>
+                </div>
             </div>
 
             {/* Seção de Saldos */}
-            <div>
-                <h4>Resumo de Saldos</h4>
-
-                <p>
-                    Saldo Atual (efetivo): {formatCurrency(currentBalance)}
-                </p>
-
-                <p>
-                    Saldo Projetado (com planejados): {formatCurrency(projectedBalance)}
-                </p>
-
-                <p>
-                    💰 FUNDOS DISPONÍVEIS: {formatCurrency(availableBalance)}
-                </p>
-
-                {isAvailableNegative && (
-                    <p>
-                        ⚠️ Atenção: Seus fundos disponíveis estão negativos!
+            <div style={{ backgroundColor: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
+                <h4>Resumo</h4>
+                <div style={{ paddingLeft: '15px' }}>
+                    <p>• Saldo Atual (receitas recebidas - despesas pagas): 
+                        <strong style={{ color: isCurrentNegative ? '#DC2626' : '#22C55E', marginLeft: '10px' }}>
+                            {formatCurrency(currentBalance)}
+                        </strong>
                     </p>
-                )}
+
+                    <p>• Saldo Projetado (incluindo valores planejados): 
+                        <strong style={{ color: isProjectedNegative ? '#DC2626' : '#22C55E', marginLeft: '10px' }}>
+                            {formatCurrency(projectedBalance)}
+                        </strong>
+                    </p>
+
+                    <p style={{ borderTop: '2px solid #31afb4', paddingTop: '12px', marginTop: '12px', fontSize: '1.1em' }}>
+                        💰 <strong>FUNDOS DISPONÍVEIS: 
+                            <span style={{ color: isAvailableNegative ? '#DC2626' : '#31afb4', marginLeft: '10px' }}>
+                                {formatCurrency(availableBalance)}
+                            </span>
+                        </strong>
+                    </p>
+
+                    {isAvailableNegative && (
+                        <p style={{ color: '#DC2626', fontWeight: 'bold', marginTop: '10px' }}>
+                            ⚠️ Atenção: Seus fundos disponíveis estão negativos!
+                        </p>
+                    )}
+                </div>
             </div>
         </div>
     );
