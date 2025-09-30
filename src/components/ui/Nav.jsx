@@ -11,7 +11,7 @@ const Nav = () => {
     if (loading || !user) return null;
 
     const householdName = familyName ? `Família: ${familyName.substring(0, 4)}...` : 'Sem Família';
-    const isAdmin = user && user.isAdmin === true;
+
     
     const handleLogout = async () => {
         try {
@@ -29,13 +29,9 @@ const Nav = () => {
                 {householdName}
                 {/* Links de Navegação */}
                 <Link to="/user">{user.firstName}</Link>
-                <Link to="/">Dashboard</Link>
                 <Link to="/monthly-balance">Balanço Mensal</Link>
                 <Link to="/transactions">Transações</Link>
-                <Link to="/annual-sheet">Planilha Anual</Link>
                 <Link to="/settings">Configurações</Link>
-                {/* Link Condicional para o Painel de Administração */}
-                {isAdmin && (<Link to="/admin">Painel do Administrador</Link>)}
                 <button onClick={handleLogout}>Sair</button>
             </div>
         </nav>
