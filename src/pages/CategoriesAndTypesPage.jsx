@@ -1,7 +1,6 @@
 // src/pages/CategoriesAndTypesPage.jsx
 
 import React from 'react';
-// IMPORTAÇÃO CORRETA DOS HOOKS E COMPONENTES
 import { useHousehold } from '../hooks/useHousehold';
 import useTypes from '../hooks/useTypes'; // Importa o hook para Tipos
 import useCategories from '../hooks/useCategories'; // Assumindo que você criou este hook
@@ -9,10 +8,8 @@ import AddCategoryForm from '../components/ui/forms/AddCategoryForm';
 import AddTypeForm from '../components/ui/forms/AddTypeForm';
 import EditCategoryAndTypeItem from '../components/ui/items/EditCategoryAndTypeItem';
 
-// NOTA: Os imports de db e onSnapshot não são mais necessários nesta página.
 
 const CategoriesAndTypesPage = () => { 
-    // Substituindo os useEffects pela chamada dos Hooks
     const { householdId, isLoading: householdLoading } = useHousehold(); 
     const { types, loading: typesLoading } = useTypes();
     const { categories, loading: categoriesLoading } = useCategories();
@@ -69,8 +66,6 @@ const CategoriesAndTypesPage = () => {
                         <EditCategoryAndTypeItem 
                             key={category.id} 
                             item={category} 
-                            isType={false}
-                            typeName={getTypeName(category.typeId)} // Passamos o nome do Tipo
                         />
                     ))}
                 </div>

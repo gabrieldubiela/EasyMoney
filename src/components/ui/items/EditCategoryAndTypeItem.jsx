@@ -82,7 +82,7 @@ const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' })
                     onBlur={handleSaveEdit} 
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            e.preventDefault(); // Evita submissão de formulário
+                            e.preventDefault();
                             handleSaveEdit();
                         }
                         if (e.key === 'Escape') {
@@ -97,25 +97,6 @@ const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' })
                 <span onDoubleClick={() => setIsEditing(true)} style={{ fontWeight: 'bold' }}>
                     {item.name}
                 </span>
-            )}
-
-            {/* Exibição e Edição do Tipo (Apenas para Categoria) */}
-            {!isType && (
-                isEditing ? (
-                    <select
-                        value={editedTypeId}
-                        onChange={(e) => setEditedTypeId(e.target.value)}
-                        onBlur={handleSaveEdit} // Salva ao mudar a seleção
-                    >
-                        {allTypes.map(type => (
-                            <option key={type.id} value={type.id}>{type.name}</option>
-                        ))}
-                    </select>
-                ) : (
-                    <span style={{ fontSize: '0.9em', color: '#666' }}>
-                        (Tipo: {typeName})
-                    </span>
-                )
             )}
 
             {/* Botões de Ação */}

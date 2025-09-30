@@ -1,18 +1,19 @@
 // src/components/ui/Nav.jsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useHousehold } from '../../hooks/useHousehold'; 
-import { auth } from '../../firebase/firebaseConfig'; 
+import { useHousehold } from '../../hooks/useHousehold';
+import { auth } from '../../firebase/firebaseConfig';
 
 const Nav = () => {
-    const { user, familyName, loading } = useHousehold(); 
-    
+    const { user, familyName, loading } = useHousehold();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     if (loading || !user) return null;
 
     const householdName = familyName ? `Família: ${familyName}` : 'Sem Família';
 
-    
+
     const handleLogout = async () => {
         try {
             await auth.signOut();
@@ -25,8 +26,16 @@ const Nav = () => {
     return (
         <nav className="nav">
             <div className="nav-container">
-                <span className="nav-info">{householdName}</span>
-                <ul className="nav-menu">
+                <a href="/" className="nav-brand">EasyMoney</a>
+                <span className={`nav-info ${isMenuOpen ? 'active' : ''}`}>{householdName}</span>
+                <button
+                    className="nav-toggle"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    <span className="nav-toggle-icon"></span>
+                </button>
+                <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <li className="nav-item">
                         <Link to="/user" className="nav-link">{user.firstName}</Link>
                     </li>
