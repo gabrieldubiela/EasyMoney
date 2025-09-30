@@ -28,12 +28,12 @@ const Nav = () => {
             <div >
                 {householdName}
                 {/* Links de Navegação */}
-                <Link to="/settings">{user.firstName}</Link>
+                <Link to="/user">{user.firstName}</Link>
                 <Link to="/">Dashboard</Link>
                 <Link to="/monthly-balance">Balanço Mensal</Link>
-                <Link to="/transactions">Lançamentos</Link>
+                <Link to="/transactions">Transações</Link>
                 <Link to="/annual-sheet">Planilha Anual</Link>
-                <Link to="/categories">Categorias</Link>
+                <Link to="/settings">Configurações</Link>
                 {/* Link Condicional para o Painel de Administração */}
                 {isAdmin && (<Link to="/admin">Painel do Administrador</Link>)}
                 <button onClick={handleLogout}>Sair</button>
