@@ -210,9 +210,9 @@ const MonthlyBudgetForm = () => {
              <ul style={{ listStyle: 'none', padding: 0 }}>
                 {sortedPerformance.map(item => (
                     <li key={`real-${item.categoryId}`} style={{ padding: '5px 0', borderBottom: '1px dotted #ccc', color: item.isOverBudget ? 'red' : 'black' }}>
-                        **{item.categoryName}** ({getTypeName(item.typeId)}): 
+                        Categoria:{item.categoryName} ({getTypeName(item.typeId)}): 
                         Gasto Real: R$ {item.realSpent.toFixed(2)} | 
-                        **Restante:** R$ {item.remaining.toFixed(2)}
+                        Restante: R$ {item.remaining.toFixed(2)}
                     </li>
                 ))}
             </ul>

@@ -74,9 +74,9 @@ const TransactionItem = ({ transaction, userName, categoryName, typeName }) => {
                 )}
             </p>
             
-            {/* Linha 3: Categorias/Tipos (AGORA COM NOMES) */}
+            {/* Linha 3: Categorias/Tipos */}
             <p style={{ fontSize: '0.8em', color: '#666' }}>
-                **{categoryName}** | Tipo: {typeName}
+                Categoria:{categoryName} | Tipo: {typeName}
             </p>
 
             {/* Linha 4: Metadados e Botão de Excluir */}

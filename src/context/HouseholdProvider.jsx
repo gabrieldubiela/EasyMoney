@@ -59,7 +59,7 @@ const HouseholdProvider = ({ children }) => {
         const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
             const usersList = snapshot.docs.map(doc => ({
                 uid: doc.id,
-                displayName: doc.data().displayName || doc.data().email || 'Sem Nome',
+                displayName: doc.data().firstName || 'Sem Nome',
                 email: doc.data().email,
                 ...doc.data()
             }));

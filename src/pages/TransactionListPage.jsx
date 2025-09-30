@@ -1,4 +1,4 @@
-// src/pages/TransactionListPage.jsx - CORRIGIDO
+// src/pages/TransactionListPage.jsx
 
 import React, { useState, useEffect, useMemo } from 'react';
 import TransactionList from '../components/ui/lists/TransactionList';

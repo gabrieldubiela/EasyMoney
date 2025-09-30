@@ -57,7 +57,7 @@ const DashboardPage = () => {
                 <h2>🔔 Ações e Alertas</h2>
                 {needsClosing && (
                     <div>
-                        <p>⚠️ **Mês para Fechar:** O mês de **{needsClosing.monthName}** precisa ser fechado!</p>
+                        <p>⚠️ Mês para Fechar: O mês de {needsClosing.monthName} precisa ser fechado!</p>
                         <button onClick={handleCloseMonth}>Fechar Mês</button>
                     </div>
                 )}
