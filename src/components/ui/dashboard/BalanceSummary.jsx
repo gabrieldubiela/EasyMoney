@@ -23,7 +23,7 @@ const BalanceSummary = ({
     const totalExpense = expenseEffective + expensePlanned;
     const currentBalance = incomeEffective + expenseEffective;
     const projectedBalance = totalIncome + totalExpense;
-    const availableBalance = currentBalance + availableFunds;
+    const availableBalance = currentBalance + availableFunds + projectedBalance;
     const isAvailableNegative = availableBalance < 0;
 
     // Função para atualizar fundos disponíveis
@@ -43,7 +43,7 @@ const BalanceSummary = ({
             {/* Campo de Fundos Iniciais */}
             <div>
                 <label>
-                    Fundos Disponíveis Iniciais:
+                    Fundos iniciais:
                     <input
                         type="number"
                         value={availableFunds || 0}
@@ -57,8 +57,8 @@ const BalanceSummary = ({
             <div>
                 <h4>Receitas</h4>
                 <div>
-                    <p>• Receitas Recebidas (efetivas): {formatCurrency(incomeEffective)}</p>
-                    <p>• Receitas a Receber (planejadas): {formatCurrency(incomePlanned)}</p>
+                    <p>• Receitas recebidas: {formatCurrency(incomeEffective)}</p>
+                    <p>• Receitas pendentes: {formatCurrency(incomePlanned)}</p>
                     <p>Total de Receitas: {formatCurrency(totalIncome)}</p>
                 </div>
             </div>
@@ -67,9 +67,9 @@ const BalanceSummary = ({
             <div>
                 <h4>Despesas</h4>
                 <div>
-                    <p>• Despesas Pagas (efetivas): {formatCurrency(expenseEffective)}</p>
-                    <p>• Despesas a Pagar (planejadas): {formatCurrency(expensePlanned)}</p>
-                    <p >Total de Despesas: {formatCurrency(totalExpense)}</p>
+                    <p>• Despesas pagas: {formatCurrency(-expenseEffective)}</p>
+                    <p>• Despesas pendentes: {formatCurrency(-expensePlanned)}</p>
+                    <p >Total de Despesas: {formatCurrency(-totalExpense)}</p>
                 </div>
             </div>
 
@@ -77,9 +77,8 @@ const BalanceSummary = ({
             <div>
                 <h4>Resumo</h4>
                 <div>
-                    <p>• Saldo Atual (receitas recebidas - despesas pagas): {formatCurrency(currentBalance)}</p>
-
-                    <p>• Saldo Projetado (incluindo valores planejados): {formatCurrency(projectedBalance)}</p>
+                    <p>• Saldo atual: {formatCurrency(currentBalance)}</p>
+                    <p>• Saldo futuro: {formatCurrency(projectedBalance)}</p>
 
                     <p>
                         FUNDOS DISPONÍVEIS: {formatCurrency(availableBalance)}</p>

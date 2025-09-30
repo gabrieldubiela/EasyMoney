@@ -2,14 +2,13 @@
 
 import React from 'react';
 import AnnualBudgetSheet from '../components/ui/AnnualBudgetSheet';
+import BudgetForm from '../components/ui/forms/BudgetForm';
 
 const AnnualBudgetSheetPage = () => {
     return (
         <div className="annual-sheet-page">
-            {/* O componente AnnualBudgetSheet já lida com a seleção de ano, 
-               loading e a exibição da tabela consolidada.
-            */}
             <AnnualBudgetSheet />
+            <BudgetForm />
         </div>
     );
 };

@@ -19,12 +19,9 @@ const MonthlyBalancePage = () => {
         incomePlanned, 
         expensePlanned,
         categories, 
-        types,
-        loading, 
+        types, 
         refetch
     } = useMonthlyBalance(year, month, availableFunds);
-
-    if (loading) return <div style={{ padding: '20px' }}>Carregando Balanço Mensal...</div>;
 
     const getCategoryName = (categoryId) => {
         const category = categories.find(c => c.id === categoryId);
@@ -41,12 +38,11 @@ const MonthlyBalancePage = () => {
             <h1>Balanço e Planejamento Mensal</h1>
 
             {/* Seleção de Período */}
-            <div style={{ marginBottom: '20px' }}>
-                <label style={{ marginRight: '10px' }}>Mês: </label>
+            <div>
+                <label>Mês: </label>
                 <select 
                     value={month} 
                     onChange={(e) => setMonth(parseInt(e.target.value))}
-                    style={{ marginRight: '20px', padding: '5px' }}
                 >
                     <option value={1}>Janeiro</option>
                     <option value={2}>Fevereiro</option>
@@ -62,12 +58,11 @@ const MonthlyBalancePage = () => {
                     <option value={12}>Dezembro</option>
                 </select>
                 
-                <label style={{ marginRight: '10px' }}>Ano: </label>
+                <label>Ano: </label>
                 <input
                     type="number"
                     value={year}
                     onChange={(e) => setYear(parseInt(e.target.value))}
-                    style={{ width: '80px', padding: '5px' }}
                 />
             </div>
 
@@ -83,7 +78,7 @@ const MonthlyBalancePage = () => {
 
             {/* Formulário Unificado - Modo Planejado */}
             <div>
-                <h3>Adicionar Transação Planejada</h3>
+                <h3>Adicionar Transação Futura</h3>
                 <TransactionForm 
                     isPlanned={true} 
                     onSaveSuccess={refetch}

@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'; 
 
-/**
- * Hook personalizado para buscar e monitorar todos os documentos da coleção 'households'.
- */
+
+// Hook para buscar todos os documentos da coleção 'households'.
 const useAllHouseholds = () => {
     const [households, setHouseholds] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,14 +13,13 @@ const useAllHouseholds = () => {
 
     useEffect(() => {
         const householdsRef = collection(db, 'households');
-        // Ordena por nome para facilitar a visualização
         const q = query(householdsRef, orderBy('name', 'asc')); 
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const list = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-                name: doc.data().name || 'Família Sem Nome', // Fallback
+                name: doc.data().name || 'Família Sem Nome',
             }));
             setHouseholds(list);
             setLoading(false);

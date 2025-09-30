@@ -10,7 +10,6 @@ const useBudgetAlerts = (performance) => {
         const alertMessages = [];
 
         Object.values(performance).forEach(item => {
-            // Só monitoramos categorias de DESPESA que têm uma meta (> 0)
             if (!item.type?.isIncome && item.totalAvailable > 0) {
                 const percentSpent = Math.abs(item.realSpent) / item.totalAvailable;
                 const remainingPercent = item.remaining / item.totalAvailable;

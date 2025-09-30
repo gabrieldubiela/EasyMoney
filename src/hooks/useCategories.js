@@ -5,10 +5,7 @@ import { db } from '../firebase/firebaseConfig';
 import { useHousehold } from '../hooks/useHousehold';
 import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore'; 
 
-/**
- * Hook para buscar, monitorar e gerenciar a coleção de Categorias (CRUD).
- * Cada categoria é vinculada ao ID de um Tipo (typeId) para flexibilidade.
- */
+// Hook para buscar, monitorar e gerenciar a coleção de Categorias (CRUD).
 const useCategories = () => {
     const { householdId } = useHousehold();
     const [categories, setCategories] = useState([]);
@@ -22,15 +19,12 @@ const useCategories = () => {
         }
 
         const categoriesRef = collection(db, `households/${householdId}/categories`);
-        // Ordena por nome para exibição na interface
         const q = query(categoriesRef, orderBy('name', 'asc')); 
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const categoriesList = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-                // Garante que 'typeId' existe, mesmo que seja nulo
-                typeId: doc.data().typeId || null,
             }));
             setCategories(categoriesList);
             setLoading(false);
@@ -44,13 +38,12 @@ const useCategories = () => {
 
     // 2. Funções CRUD
 
-    // Adiciona uma nova Categoria, vinculada a um Tipo
-    const addCategory = async (name, typeId) => {
-        if (!householdId || !name.trim() || !typeId) return;
+    // Adiciona uma nova Categoria,
+    const addCategory = async (name) => {
+        if (!householdId || !name.trim()) return;
         try {
             await addDoc(collection(db, `households/${householdId}/categories`), {
                 name: name.trim(),
-                typeId: typeId, // ID do Tipo (Ex: Fixo, Variável, Receita)
             });
         } catch (e) {
             console.error("Erro ao adicionar categoria:", e);
@@ -58,12 +51,11 @@ const useCategories = () => {
     };
 
     // Atualiza o nome ou o Tipo de uma Categoria existente
-    const updateCategory = async (categoryId, newName, newTypeId) => {
+    const updateCategory = async (categoryId, newName,) => {
         if (!householdId || !categoryId) return;
         
         const updateData = {};
         if (newName) updateData.name = newName.trim();
-        if (newTypeId) updateData.typeId = newTypeId;
 
         try {
             await updateDoc(doc(db, `households/${householdId}/categories`, categoryId), updateData);

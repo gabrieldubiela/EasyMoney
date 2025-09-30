@@ -1,6 +1,6 @@
 // src/hooks/useMonthlyBalance.js
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { useHousehold } from '../hooks/useHousehold';
@@ -14,7 +14,7 @@ export default function useMonthlyBalance(year, month) {
     const [types, setTypes] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch com onSnapshot para atualização em tempo real
+    // Fetch com onSnapshot
     useEffect(() => {
         if (!householdId || !year || !month) {
             setLoading(false);
@@ -28,7 +28,7 @@ export default function useMonthlyBalance(year, month) {
         const startTimestamp = Timestamp.fromDate(startOfMonth);
         const endTimestamp = Timestamp.fromDate(endOfMonth);
 
-        // Listener para transações efetivas - ATUALIZAÇÃO EM TEMPO REAL
+        // Listener para transações efetivas
         const effectiveQuery = query(
             collection(db, `households/${householdId}/transactions`),
             where('date', '>=', startTimestamp),
@@ -43,7 +43,7 @@ export default function useMonthlyBalance(year, month) {
             setEffectiveTransactions(transactions);
         });
 
-        // Listener para transações planejadas - ATUALIZAÇÃO EM TEMPO REAL
+        // Listener para transações planejadas
         const plannedQuery = query(
             collection(db, `households/${householdId}/plannedTransactions`),
             where('paymentDate', '>=', startTimestamp),
@@ -58,7 +58,7 @@ export default function useMonthlyBalance(year, month) {
             setPlannedTransactions(transactions);
         });
 
-        // Listener para categorias - ATUALIZAÇÃO EM TEMPO REAL
+        // Listener para categorias
         const categoriesQuery = collection(db, `households/${householdId}/categories`);
         const unsubCategories = onSnapshot(categoriesQuery, (snapshot) => {
             const cats = snapshot.docs.map(doc => ({ 
@@ -68,7 +68,7 @@ export default function useMonthlyBalance(year, month) {
             setCategories(cats);
         });
 
-        // Listener para tipos - ATUALIZAÇÃO EM TEMPO REAL
+        // Listener para tipos
         const typesQuery = collection(db, `households/${householdId}/types`);
         const unsubTypes = onSnapshot(typesQuery, (snapshot) => {
             const typs = snapshot.docs.map(doc => ({ 
@@ -114,19 +114,12 @@ export default function useMonthlyBalance(year, month) {
         };
     }, [effectiveTransactions, plannedTransactions]);
 
-    // Função refetch não é mais necessária com onSnapshot
-    const refetch = useCallback(() => {
-        // onSnapshot já atualiza automaticamente
-        console.log('Dados sendo atualizados automaticamente via onSnapshot');
-    }, []);
-
     return {
         effectiveTransactions,
         plannedTransactions,
         categories,
         types,
         ...financialData,
-        loading,
-        refetch // Mantido para compatibilidade
+        loading
     };
 }

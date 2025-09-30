@@ -2,16 +2,12 @@
 
 import React, { useState } from 'react';
 import { useHousehold } from '../../../hooks/useHousehold';
-// NOVO: Importa o hook de categorias centralizado
-import useCategories from '../../../hooks/useCategories'; 
-// NOVO: Importa a função de serviço
+import useCategories from '../../../hooks/useCategories';
 import { createAnnualBudget } from '../../../services/budgetService';
 
 const BudgetForm = ({ onSaveSuccess }) => { 
     const { householdId, user } = useHousehold();
     const currentYear = new Date().getFullYear().toString();
-    
-    // NOVO: Busca as categorias usando o hook centralizado
     const { categories, loading: categoriesLoading } = useCategories();
     
     // Estados do Formulário
@@ -22,14 +18,12 @@ const BudgetForm = ({ onSaveSuccess }) => {
     
     const yearsList = Array.from({ length: 5 }, (_, i) => (parseInt(currentYear) - 2) + i).map(y => y.toString());
 
-    // REMOVIDO: O useEffect que buscava categorias foi removido.
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
 
         try {
-            // NOVO: Delega a lógica de salvar para o serviço
+            // Delega a lógica de salvar para o serviço
             await createAnnualBudget({
                 householdId,
                 userId: user.uid,

@@ -7,11 +7,8 @@ import useMonthlyBalance from './useMonthlyBalance';
 import useMonthlyPerformanceData from './useMonthlyPerformanceData';
 import useScheduledPayments from './useScheduledPayments';
 import useMonthClosingStatus from './useMonthClosingStatus';
-import useFinancialSummary from './useFinancialSummary';
 
-/**
- * Hook container que orquestra todos os dados necessários para o Dashboard.
- */
+// Hook container que orquestra todos os dados necessários para o Dashboard.
 export default function useDashboardData() {
     const today = new Date();
     const currentYear = today.getFullYear().toString();

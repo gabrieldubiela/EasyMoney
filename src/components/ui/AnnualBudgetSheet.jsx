@@ -9,11 +9,53 @@ const MONTH_NAMES = [
     'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
+// Componente para a célula editável
+const EditableBudgetCell = React.memo(({ categoryId, currentGoal, formatBRL, updateAnnualGoal }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    // Usa o valor do goal atual como estado inicial e para o input
+    const [inputValue, setInputValue] = useState(currentGoal); 
+
+    const saveGoal = () => {
+        // Só atualiza se o valor mudou
+        if (inputValue !== currentGoal) {
+            updateAnnualGoal(categoryId, inputValue);
+        }
+        setIsEditing(false); // Sai do modo de edição
+    };
+
+    if (isEditing) {
+        return (
+            <input
+                type="number"
+                value={inputValue}
+                // Garante que o valor seja salvo ao ser digitado
+                onChange={(e) => setInputValue(parseFloat(e.target.value))}
+                // Salva o valor quando o usuário clica fora
+                onBlur={saveGoal} 
+                // Salva o valor quando o usuário pressiona ENTER
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') saveGoal();
+                }}
+                // Foca automaticamente no campo
+                autoFocus
+                style={{width: '90%', textAlign: 'right'}}
+            />
+        );
+    }
+
+    return (
+        // Entra no modo de edição ao clicar
+        <span onClick={() => setIsEditing(true)}>
+            {formatBRL(currentGoal)}
+        </span>
+    );
+});
+
 const AnnualBudgetSheet = () => {
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
     
-    const { annualData, loading: annualDataLoading, error } = useAnnualData(selectedYear);
+    const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
     
     const { categoryMap, loading: metadataLoading } = useCombinedHouseholdData();
 
@@ -64,11 +106,11 @@ const AnnualBudgetSheet = () => {
                 ))}
             </select>
 
-            <table style={{width: '100%', borderCollapse: 'collapse', marginTop: '20px'}}>
+            <table>
                 <thead>
                     <tr>
                         <th>Categoria</th>
-                        <th>Orçado (Anual)</th>
+                        <th>Estimativa Anual</th>
                         {MONTH_NAMES.map(month => <th key={month}>{month}</th>)}
                         <th>Total</th>
                         <th>Diferença</th>
@@ -80,7 +122,14 @@ const AnnualBudgetSheet = () => {
                         return (
                             <tr key={row.id}>
                                 <td>{row.name}</td>
-                                <td>{formatBRL(row.budgeted)}</td>
+                                <td>
+                                    <EditableBudgetCell
+                                        categoryId={row.id}
+                                        currentGoal={row.budgeted}
+                                        formatBRL={formatBRL}
+                                        updateAnnualGoal={updateAnnualGoal}
+                                    />
+                                </td>
                                 {row.monthlyActuals.map((actual, index) => (
                                     <td key={index}>{formatBRL(actual)}</td>
                                 ))}

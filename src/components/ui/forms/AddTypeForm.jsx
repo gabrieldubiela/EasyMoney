@@ -1,4 +1,4 @@
-// src/components/ui/forms/AddTypeForm.jsx (ATUALIZADO)
+// src/components/ui/forms/AddTypeForm.jsx
 
 import React, { useState } from 'react';
 import useTypes from '../../../hooks/useTypes'; // Importa o hook para a função addType
@@ -9,7 +9,7 @@ const AddTypeForm = ({ existingTypes }) => {
     const { addType } = useTypes();
     
     const [name, setName] = useState('');
-    const [isIncome, setIsIncome] = useState(false); // NOVO: Estado para a flag de Receita
+    const [isIncome, setIsIncome] = useState(false);
     const [loading, setLoading] = useState(false);
     
     const handleAdd = async (e) => {
@@ -42,7 +42,7 @@ const AddTypeForm = ({ existingTypes }) => {
     };
 
     return (
-        <form onSubmit={handleAdd} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <form onSubmit={handleAdd}>
             <input
                 type="text"
                 placeholder="Nome do Novo Tipo (Ex: Essencial, Lazer)"
@@ -51,7 +51,7 @@ const AddTypeForm = ({ existingTypes }) => {
                 required
             />
             
-            {/* NOVO: Checkbox para Receita */}
+            {/* Checkbox para Receita */}
             <label>
                 <input
                     type="checkbox"
@@ -61,7 +61,7 @@ const AddTypeForm = ({ existingTypes }) => {
                 É Receita?
             </label>
 
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading || name.trim() === ''}>
                 {loading ? 'Adicionando...' : 'Adicionar Tipo'}
             </button>
         </form>

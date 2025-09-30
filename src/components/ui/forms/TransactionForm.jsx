@@ -112,13 +112,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned }) => {
     }
   };
 
-  if (loading) return <div>Carregando metadados...</div>;
+  if (loading) return <div>Carregando dados...</div>;
   if (categories.length === 0 || typesList.length === 0) return <div>Configure categorias e tipos antes de adicionar transações.</div>;
 
   return (
     <form onSubmit={handleSave}>
-      <h3>{transactionId ? 'Editar Transação' : 'Adicionar Transação'}</h3>
-
       <input type="text" placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} required />
       <input type="text" placeholder="Fornecedor/Origem" value={supplier} onChange={(e) => setSupplier(e.target.value)} />
       <input type="number" placeholder="Valor" value={amount} onChange={(e) => setAmount(e.target.value)} required min="0.01" step="0.01" />
@@ -126,7 +124,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned }) => {
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
       {!isPlanned && (
         <>
-          <label>Número de Parcelas:</label>
+          <label>Parcelas</label>
           <input type="number" value={installments} onChange={(e) => setInstallments(e.target.value)} min="1" />
         </>
       )}
