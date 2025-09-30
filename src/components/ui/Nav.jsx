@@ -10,7 +10,7 @@ const Nav = () => {
     
     if (loading || !user) return null;
 
-    const householdName = familyName ? `Família: ${familyName.substring(0, 4)}...` : 'Sem Família';
+    const householdName = familyName ? `Família: ${familyName}` : 'Sem Família';
 
     
     const handleLogout = async () => {

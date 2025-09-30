@@ -4,32 +4,20 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { useHousehold } from '../hooks/useHousehold';
 
-
-// --- Importação de Componentes (Certifique-se que o caminho 'pages' está correto) ---
-
 // Componentes UI
 const Nav = lazy(() => import('../components/ui/Nav')); // Importa o Nav que criamos
 
-// Páginas Existentes/Principais
+// Páginas
 const AuthPage = lazy(() => import('../pages/AuthPage'));
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 const MonthlyBalancePage = lazy(() => import('../pages/MonthlyBalancePage'));
-// Assumindo que o ExpenseListPage cobre a TransactionListPage
 const TransactionListPage = lazy(() => import('../pages/TransactionListPage')); 
-
-// NOVAS PÁGINAS IMPLEMENTADAS
 const AdminDashboardPage = lazy(() => import('../pages/AdminDashboardPage'));
 const AnnualBudgetSheetPage = lazy(() => import('../pages/AnnualBudgetSheetPage'));
 const CategoriesAndTypesPage = lazy(() => import('../pages/CategoriesAndTypesPage'));
 const EditTransactionPage = lazy(() => import('../pages/EditTransactionPage'));
 // -----------------------------------------------------------------------------------
-
-
-// --- Componente de Layout (Menu de Navegação Simulado) ---
-// NOTA: Removemos o NavMenu daqui. Usaremos o componente Nav.jsx importado.
-// --------------------------------------------------------
-
 
 // --- Componente de Proteção de Rotas ---
 
@@ -112,11 +100,11 @@ const AppRoutes = () => {
                         element={<ProtectedRoute><AnnualBudgetSheetPage /></ProtectedRoute>} 
                     />
                     <Route 
-                        path="/settings" 
+                        path="/user" 
                         element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} 
                     />
                     <Route 
-                        path="/categories" 
+                        path="/settings" 
                         element={<ProtectedRoute><CategoriesAndTypesPage /></ProtectedRoute>} 
                     />
 
