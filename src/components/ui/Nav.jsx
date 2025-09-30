@@ -23,16 +23,26 @@ const Nav = () => {
     };
 
     return (
-        <nav>
-            {/* Cabeçalho da Família */}
-            <div >
-                {householdName}
-                {/* Links de Navegação */}
-                <Link to="/user">{user.firstName}</Link>
-                <Link to="/monthly-balance">Balanço Mensal</Link>
-                <Link to="/transactions">Transações</Link>
-                <Link to="/settings">Configurações</Link>
-                <button onClick={handleLogout}>Sair</button>
+        <nav className="nav">
+            <div className="nav-container">
+                <span className="nav-info">{householdName}</span>
+                <ul className="nav-menu">
+                    <li className="nav-item">
+                        <Link to="/user" className="nav-link">{user.firstName}</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link to="/monthly-balance" className="nav-link">Balanço Mensal</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link to="/transactions" className="nav-link">Transações</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link to="/settings" className="nav-link">Configurações</Link>
+                    </li>
+                    <li className="nav-item">
+                        <button onClick={handleLogout} className="primary nav-button">Sair</button>
+                    </li>
+                </ul>
             </div>
         </nav>
     );

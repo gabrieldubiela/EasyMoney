@@ -80,47 +80,58 @@ const TransactionFilters = ({ categories, types, onFilterChange }) => {
 
 
     return (
-        <div style={{ padding: '15px', border: '1px solid #ccc' }}>
-            <h3>Filtros de Transações</h3>
-            
-            {/* Filtro de Período */}
-            <label>Período de:</label>
-            <input type="date" value={minDate} onChange={(e) => setMinDate(e.target.value)} />
-            <label> a </label>
-            <input type="date" value={maxDate} onChange={(e) => setMaxDate(e.target.value)} />
+        <div className="transaction-filter">
+            <h3 className="transaction-filter-title">Filtros de Transações</h3>
 
-            {/* Filtro de Categoria */}
-            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                <option value="">Todas as Categorias</option>
-                {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-            </select>
+            <div className="transaction-filter-row">
+                <div className="transaction-filter-col">
+                    <label className="form-label">Período de:</label>
+                    <input type="date" value={minDate} onChange={(e) => setMinDate(e.target.value)} />
+                </div>
+                <div className="transaction-filter-col">
+                    <label className="form-label">até:</label>
+                    <input type="date" value={maxDate} onChange={(e) => setMaxDate(e.target.value)} />
+                </div>
+            </div>
 
-            {/* Filtro de Tipo */}
-            <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
-                <option value="">Todos os Tipos</option>
-                {types.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-            </select>
-            
-            {/* Campo de Busca (Fornecedor/Descrição) com Sugestões */}
-            <input 
-                type="text" 
-                placeholder="Buscar Fornecedor ou Descrição"
-                list="search-suggestions" // Liga ao datalist
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-            />
-            
-            {/* Datalist para Autocomplete */}
-            <datalist id="search-suggestions">
-                {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s} />)}
-                {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d} />)}
-            </datalist>
+            <div className="transaction-filter-row">
+                <div className="transaction-filter-col">
+                    <label className="form-label">Categoria</label>
+                    <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                        <option value="">Todas as Categorias</option>
+                        {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-            <button onClick={() => { setSearchTerm(''); setSelectedCategory(''); setSelectedType(''); setMinDate(''); setMaxDate(''); }}>
+                <div className="transaction-filter-col">
+                    <label className="form-label">Tipo</label>
+                    <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
+                        <option value="">Todos os Tipos</option>
+                        {types.map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div className="form-group">
+                <label className="form-label">Buscar</label>
+                <input
+                    type="text"
+                    placeholder="Buscar Fornecedor ou Descrição"
+                    list="search-suggestions"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <datalist id="search-suggestions">
+                    {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s} />)}
+                    {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d} />)}
+                </datalist>
+            </div>
+
+            <button onClick={() => { setSearchTerm(''); setSelectedCategory(''); setSelectedType(''); setMinDate(''); setMaxDate(''); }} className="btn-outline btn-block">
                 Limpar Filtros
             </button>
         </div>

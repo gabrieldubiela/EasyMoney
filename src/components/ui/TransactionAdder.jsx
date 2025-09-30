@@ -20,27 +20,24 @@ const TransactionAdder = () => {
     };
 
     return (
-        <div>
+        <div className="mb-lg">
             {isFormVisible ? (
-                <>
-                    {/* Renderiza o formulário de adição */}
-                    {/* Passamos onSaveSuccess para que ele feche após o sucesso */}
-                    <TransactionForm 
-                        onSaveSuccess={handleSaveSuccess} 
-                        transactionId={null} // Indica que é o modo de Adição
-                    /> 
-                    
-                    {/* Botão para fechar o formulário */}
-                    <button 
+                <div className="card">
+                    <TransactionForm
+                        onSaveSuccess={handleSaveSuccess}
+                        transactionId={null}
+                    />
+                    <button
                         onClick={handleToggleForm}
+                        className="secondary btn-block mt-md"
                     >
                         Fechar Formulário
                     </button>
-                </>
+                </div>
             ) : (
-                // Botão "adicionar" que aparece quando o formulário está fechado
-                <button 
+                <button
                     onClick={handleToggleForm}
+                    className="primary btn-block"
                 >
                     + Adicionar Nova Despesa
                 </button>

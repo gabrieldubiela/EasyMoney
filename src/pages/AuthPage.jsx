@@ -11,33 +11,30 @@ const AuthPage = () => {
     };
 
     return (
-        <div>
-            <h1>{isLogin ? 'Entrar no EasyMoney' : 'Criar Nova Conta'}</h1>
+        <div className="auth-page">
+            <div className="auth-container">
+                {isLogin ? <Login /> : <Register />}
 
-            {/* Renderiza o componente ativo */}
-            {isLogin ? <Login /> : <Register />}
+                <div className="auth-links">
+                    <p>
+                        {isLogin
+                            ? "Não tem uma conta? "
+                            : "Já tem uma conta? "
+                        }
+                        <a href="#" onClick={(e) => { e.preventDefault(); toggleMode(); }}>
+                            {isLogin ? "Cadastre-se" : "Faça Login"}
+                        </a>
+                    </p>
 
-            {/* Botão para alternar entre as telas (removido CSS inline) */}
-            <p>
-                {isLogin
-                    ? "Não tem uma conta? "
-                    : "Já tem uma conta? "
-                }
-                <button
-                    onClick={toggleMode}
-                >
-                    {isLogin ? "Cadastre-se" : "Faça Login"}
-                </button>
-            </p>
-
-            {/* Link "Esqueci minha senha" */}
-            {isLogin && (
-                <p>
-                    <span>
-                        Esqueci minha senha
-                    </span>
-                </p>
-            )}
+                    {isLogin && (
+                        <p>
+                            <a href="#" onClick={(e) => e.preventDefault()}>
+                                Esqueci minha senha
+                            </a>
+                        </p>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

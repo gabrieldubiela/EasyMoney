@@ -55,42 +55,41 @@ const TransactionItem = ({ transaction, userName, categoryName, typeName }) => {
 
 
     return (
-        // O container é clicável para edição
-        <div onClick={handleEditClick} style={{ cursor: 'pointer', padding: '15px', borderBottom: '1px solid #eee' }}>
-            
-            {/* Linha 1: Descrição e Fornecedor */}
-            <p>
-                <strong>{transaction.description}</strong> 
-                {transaction.supplier && <small> ({transaction.supplier})</small>}
-            </p>
-
-            {/* Linha 2: Valor e Data/Parcela */}
-            <p>
-                <span>{formattedAmount}</span>
-                {' | '}
-                <span>{transactionDate}</span>
-                {transaction.installments_total > 1 && (
-                    <small> (Parc. {transaction.installments_current}/{transaction.installments_total})</small>
-                )}
-            </p>
-            
-            {/* Linha 3: Categorias/Tipos */}
-            <p style={{ fontSize: '0.8em', color: '#666' }}>
-                Categoria:{categoryName} | Tipo: {typeName}
-            </p>
-
-            {/* Linha 4: Metadados e Botão de Excluir */}
-            <div>
-                <p style={{ fontSize: '0.7em', color: '#999' }}>
-                    Adicionado por: {userName}
-                </p>
-                <button 
-                    onClick={handleDelete} 
-                >
-                    Excluir
-                </button>
+        <div className="transaction-item" onClick={handleEditClick}>
+            <div className="transaction-item-header">
+                <div>
+                    <div className="transaction-item-description">
+                        {transaction.description}
+                        {transaction.supplier && <span className="transaction-item-supplier"> ({transaction.supplier})</span>}
+                    </div>
+                </div>
+                <div className={`transaction-item-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}`}>
+                    {formattedAmount}
+                </div>
             </div>
-            
+
+            <div className="transaction-item-details">
+                <span className="transaction-item-date">{transactionDate}</span>
+                {transaction.installments_total > 1 && (
+                    <span className="transaction-item-installments">
+                        Parc. {transaction.installments_current}/{transaction.installments_total}
+                    </span>
+                )}
+            </div>
+
+            <div className="transaction-item-meta">
+                <span className="transaction-item-category">Categoria: {categoryName}</span>
+                <span className="transaction-item-type">Tipo: {typeName}</span>
+            </div>
+
+            <div className="transaction-item-footer">
+                <span className="transaction-item-user">Adicionado por: {userName}</span>
+                <div className="transaction-item-actions">
+                    <button onClick={handleDelete} className="danger btn-sm">
+                        Excluir
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

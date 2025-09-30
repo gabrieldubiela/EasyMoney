@@ -16,18 +16,23 @@ const TransactionList = ({ filters, categories, types }) => {
   const totalAmount = (transactions || []).reduce((sum, transaction) => sum + transaction.amount, 0);
 
   if (loading && transactions.length === 0) {
-    return <div>Carregando transações...</div>;
+    return <div className="loading">Carregando transações...</div>;
   }
 
   return (
     <div>
-      <h3>Total: {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h3>
+      <div className="card">
+        <h3>Total: {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h3>
+      </div>
 
       {transactions.length === 0 && !loading && (
-        <div>Nenhuma transação encontrada com os filtros aplicados.</div>
+        <div className="empty-state">
+          <div className="empty-state-title">Nenhuma transação encontrada</div>
+          <p className="empty-state-description">Tente ajustar os filtros ou adicione uma nova transação.</p>
+        </div>
       )}
 
-      <div>
+      <div className="transaction-list">
         {transactions.map(transaction => (
           <TransactionItem
             key={transaction.id}
@@ -40,10 +45,12 @@ const TransactionList = ({ filters, categories, types }) => {
       </div>
 
       {hasMore && !loading && (
-        <button onClick={loadMore}>Carregar Mais</button>
+        <div className="text-center mt-lg">
+          <button onClick={loadMore} className="primary">Carregar Mais</button>
+        </div>
       )}
 
-      {loading && transactions.length > 0 && <div>Carregando mais...</div>}
+      {loading && transactions.length > 0 && <div className="loading">Carregando mais...</div>}
     </div>
   );
 };

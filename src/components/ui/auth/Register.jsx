@@ -55,57 +55,69 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h2>Criar uma nova conta</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          placeholder="Primeiro Nome"
-          required
-        />
-        <input
-          type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          placeholder="Sobrenome"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Senha"
-          required
-        />
-        <input
-          type="text"
-          value={householdIdInput}
-          onChange={(e) => setHouseholdIdInput(e.target.value)}
-          placeholder="ID de Família Existente (Opcional)"
-        />
-        {!householdIdInput && (
+    <div className="auth-card">
+      <h2 className="auth-title">Criar uma nova conta</h2>
+      {success && <p className="auth-success">{success}</p>}
+      {error && <p className="auth-error">{error}</p>}
+      <form onSubmit={handleRegister} className="auth-form">
+        <div className="form-group">
           <input
             type="text"
-            value={familyName}
-            onChange={(e) => setFamilyName(e.target.value)}
-            placeholder="Nome da sua Família (ex: Casa Silva)"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Primeiro Nome"
+            required
           />
+        </div>
+        <div className="form-group">
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Sobrenome"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Senha"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <input
+            type="text"
+            value={householdIdInput}
+            onChange={(e) => setHouseholdIdInput(e.target.value)}
+            placeholder="ID de Família Existente (Opcional)"
+          />
+        </div>
+        {!householdIdInput && (
+          <div className="form-group">
+            <input
+              type="text"
+              value={familyName}
+              onChange={(e) => setFamilyName(e.target.value)}
+              placeholder="Nome da sua Família (ex: Casa Silva)"
+            />
+          </div>
         )}
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className="primary">
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
-      {success && <p>{success}</p>}
-      {error && <p>{error}</p>}
     </div>
   );
 };

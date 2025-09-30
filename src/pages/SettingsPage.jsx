@@ -10,31 +10,33 @@ const SettingsPage = () => {
     const { user, householdId } = useHousehold();
 
     if (!user) {
-        return <div>Carregando dados do usuário...</div>;
+        return <div className="loading">Carregando dados do usuário...</div>;
     }
 
     return (
-        <div>
-            <h1>Configurações de Perfil</h1>
+        <div className="container">
+            <div className="page-header">
+                <h1 className="page-title">Configurações de Perfil</h1>
+            </div>
 
-            {/* SEÇÃO 1: DADOS PESSOAIS */}
-            <UserUpdateForm />
-
-            {/* SEÇÃO 2: DADOS DA FAMÍLIA */}
-            <section>
-                <h2>Dados da Família</h2>
-
-                {householdId && (
-                    <>
-                        {/* Formulário de Atualização do Nome da Casa */}
-                        <HouseholdUpdateForm householdId={householdId} />
-
-                        {/* Display do Código de Convite */}
-                        <InviteCodeDisplay householdId={householdId} />
-                    </>
-                )}
-                
+            <section className="section">
+                <h2 className="section-title">Dados Pessoais</h2>
+                <div className="card">
+                    <UserUpdateForm />
+                </div>
             </section>
+
+            {householdId && (
+                <section className="section">
+                    <h2 className="section-title">Dados da Família</h2>
+                    <div className="card">
+                        <HouseholdUpdateForm householdId={householdId} />
+                    </div>
+                    <div className="card mt-md">
+                        <InviteCodeDisplay householdId={householdId} />
+                    </div>
+                </section>
+            )}
         </div>
     );
 };

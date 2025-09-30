@@ -59,9 +59,11 @@ const TransactionListPage = () => {
   };
 
   return (
-    <div>
-      <h1>Revisão Detalhada de Despesas</h1>
-      
+    <div className="container">
+      <div className="page-header">
+        <h1 className="page-title">Revisão Detalhada de Despesas</h1>
+      </div>
+
       <TransactionAdder />
 
       <TransactionFilter

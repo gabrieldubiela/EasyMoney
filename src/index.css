@@ -5,6 +5,15 @@
 /* Importando fontes */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700&display=swap');
 
+/* Importações de Módulos CSS */
+@import './styles/layout.css';
+@import './styles/components.css';
+@import './styles/forms.css';
+@import './styles/navigation.css';
+@import './styles/transactions.css';
+@import './styles/auth.css';
+@import './styles/utilities.css';
+
 :root {
   /* Paleta de cores - claro */
   --color-primary: #31afb4;       /* Turquesa - Ações principais */

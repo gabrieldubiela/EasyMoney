@@ -22,27 +22,30 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Acessar sua conta</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Senha"
-          required
-        />
-        <button type="submit">Entrar</button>
+    <div className="auth-card">
+      <h2 className="auth-title">Acessar sua conta</h2>
+      <form onSubmit={handleLogin} className="auth-form">
+        <div className="form-group">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Senha"
+            required
+          />
+        </div>
+        <button type="submit" className="primary">Entrar</button>
       </form>
-      {/* Removido style inline */}
-      {error && <p>{error}</p>}
+      {error && <p className="auth-error">{error}</p>}
     </div>
   );
 };
