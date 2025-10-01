@@ -70,7 +70,7 @@ const Nav = () => {
                         <Link to="/settings" className="nav-link" onClick={handleLinkClick}>Configurações</Link>
                     </li>
                     <li className="nav-item">
-                        <button onClick={handleLogout} className="primary nav-button" onClick={handleLinkClick}>Sair</button>
+                        <button onClick={handleLogout} className="primary nav-button">Sair</button>
                     </li>
                 </ul>
             </div>
