@@ -13,8 +13,28 @@ const Nav = () => {
 
     const householdName = familyName ? `Família: ${familyName}` : 'Sem Família';
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (navRef.current && !navRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
+    const handleLinkClick = () => {
+        setIsMenuOpen(false);
+    };
 
     const handleLogout = async () => {
+        setIsMenuOpen(false);
         try {
             await auth.signOut();
         } catch (error) {
@@ -32,24 +52,25 @@ const Nav = () => {
                     className="nav-toggle"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     aria-label="Toggle menu"
+                    aria-expanded={isMenuOpen}
                 >
                     <span className="nav-toggle-icon"></span>
                 </button>
                 <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <li className="nav-item">
-                        <Link to="/user" className="nav-link">{user.firstName}</Link>
+                        <Link to="/user" className="nav-link" onClick={handleLinkClick}>{user.firstName}</Link>
                     </li>
                     <li className="nav-item">
-                        <Link to="/monthly-balance" className="nav-link">Balanço Mensal</Link>
+                        <Link to="/monthly-balance" className="nav-link" onClick={handleLinkClick}>Balanço Mensal</Link>
                     </li>
                     <li className="nav-item">
-                        <Link to="/transactions" className="nav-link">Transações</Link>
+                        <Link to="/transactions" className="nav-link" onClick={handleLinkClick}>Transações</Link>
                     </li>
                     <li className="nav-item">
-                        <Link to="/settings" className="nav-link">Configurações</Link>
+                        <Link to="/settings" className="nav-link" onClick={handleLinkClick}>Configurações</Link>
                     </li>
                     <li className="nav-item">
-                        <button onClick={handleLogout} className="primary nav-button">Sair</button>
+                        <button onClick={handleLogout} className="primary nav-button" onClick={handleLinkClick}>Sair</button>
                     </li>
                 </ul>
             </div>
