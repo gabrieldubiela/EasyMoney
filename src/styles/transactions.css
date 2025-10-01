@@ -10,16 +10,34 @@
 
 .transaction-item {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   cursor: pointer;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.transaction-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: transparent;
+  transition: background-color var(--transition-base);
 }
 
 .transaction-item:hover {
+  border-color: var(--color-primary-light);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+}
+
+.transaction-item:hover::before {
+  background-color: var(--color-primary);
 }
 
 .transaction-item-header {
@@ -41,8 +59,9 @@
 }
 
 .transaction-item-amount {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
 }
 
 .transaction-item-amount.positive {
@@ -51,6 +70,10 @@
 
 .transaction-item-amount.negative {
   color: var(--color-danger);
+}
+
+.transaction-item-amount.neutral {
+  color: var(--color-text);
 }
 
 .transaction-item-details {
@@ -104,17 +127,19 @@
 }
 
 .transaction-item-actions button {
-  padding: 0.4em 0.8em;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
+  min-width: 80px;
 }
 
 /* Filtros */
 .transaction-filter {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .transaction-filter-title {
@@ -134,6 +159,14 @@
   min-width: 200px;
 }
 
+.transaction-filter-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
 /* Sumários e Estatísticas */
 .balance-summary {
   display: grid;
@@ -144,10 +177,35 @@
 
 .balance-card {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   text-align: center;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.balance-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
+}
+
+.balance-card:hover::before {
+  opacity: 1;
 }
 
 .balance-card-label {
@@ -159,8 +217,10 @@
 }
 
 .balance-card-value {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  margin: var(--spacing-sm) 0;
 }
 
 .balance-card-value.income {
@@ -175,6 +235,10 @@
   color: var(--color-primary-dark);
 }
 
+.balance-card-value.warning {
+  color: var(--color-warning);
+}
+
 .balance-card-change {
   font-size: 0.875rem;
   margin-top: var(--spacing-sm);
@@ -184,11 +248,12 @@
 /* Responsividade */
 @media (max-width: 768px) {
   .transaction-item {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
 
   .transaction-item-header {
     flex-direction: column;
+    gap: var(--spacing-sm);
   }
 
   .transaction-item-details {
@@ -202,6 +267,18 @@
     gap: var(--spacing-xs);
   }
 
+  .transaction-item-actions {
+    flex-direction: column;
+  }
+
+  .transaction-item-actions button {
+    width: 100%;
+  }
+
+  .transaction-filter {
+    padding: var(--spacing-md);
+  }
+
   .transaction-filter-row {
     flex-direction: column;
   }
@@ -210,7 +287,19 @@
     min-width: 100%;
   }
 
+  .transaction-filter-actions {
+    flex-direction: column;
+  }
+
+  .transaction-filter-actions button {
+    width: 100%;
+  }
+
   .balance-summary {
     grid-template-columns: 1fr;
+  }
+
+  .balance-card-value {
+    font-size: 1.75rem;
   }
 }
