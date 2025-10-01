@@ -1,6 +1,6 @@
 // src/components/ui/Nav.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useHousehold } from '../../hooks/useHousehold';
 import { auth } from '../../firebase/firebaseConfig';
@@ -8,6 +8,7 @@ import { auth } from '../../firebase/firebaseConfig';
 const Nav = () => {
     const { user, familyName, loading } = useHousehold();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navRef = useRef(null);
 
     if (loading || !user) return null;
 
