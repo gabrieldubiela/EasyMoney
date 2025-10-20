@@ -9,7 +9,6 @@ import {
   query,
   where,
   getDocs,
-  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
@@ -75,7 +74,7 @@ export const closeMonthAndCalculateRollover = async ({ householdId, yearMonth, p
 
     // Ignora categorias de receita para o rollover orçamentário
     if (type?.isIncome) continue;
-    
+
     // O 'remaining' já é o saldo final: (Meta + Rollover Anterior) - Gasto Real
     const rolloverAmount = item.remaining;
     if (rolloverAmount === 0 && !item.monthlyBudgetId) continue;
@@ -86,9 +85,9 @@ export const closeMonthAndCalculateRollover = async ({ householdId, yearMonth, p
       where('yearMonth', '==', nextYearMonth),
       where('categoryId', '==', catId)
     );
-    
+
     const snapshot = await getDocs(qNextBudget);
-    
+
     if (!snapshot.empty) {
       // UPDATE: Atualiza o documento do próximo mês se ele já existir
       const nextBudgetId = snapshot.docs[0].id;
@@ -133,7 +132,7 @@ export const createAnnualBudget = async ({ householdId, userId, category, year, 
     where('category_id', '==', category),
     where('year', '==', parseInt(year))
   );
-  
+
   const existingBudgets = await getDocs(q);
   if (!existingBudgets.empty) {
     throw new Error("Já existe um orçamento para esta Categoria e Ano. Por favor, edite o registro existente.");
@@ -145,6 +144,5 @@ export const createAnnualBudget = async ({ householdId, userId, category, year, 
     year: parseInt(year), // Salva como número
     annual_estimate: estimateValue,
     user_id: userId,
-    createdAt: serverTimestamp()
   });
 };

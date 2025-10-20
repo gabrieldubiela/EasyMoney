@@ -2,14 +2,12 @@
 
 import {
   collection,
-  addDoc,
   updateDoc,
   doc,
   query,
   where,
   getDocs,
   writeBatch,
-  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
@@ -18,7 +16,7 @@ const createTransactionGroup = async (householdId, userId, data, transactionGrou
   const { description, supplier, category, type, date, totalAmount, numInstallments } = data;
 
   const monthlyAmount = totalAmount / numInstallments;
-  const startDate = new Date(date + 'T00:00:00'); // Garante que a data não tenha problemas de fuso horário
+  const startDate = new Date(date + 'T00:00:00');
 
   const batch = writeBatch(db);
 
@@ -40,7 +38,6 @@ const createTransactionGroup = async (householdId, userId, data, transactionGrou
       user_id: userId,
       yearMonth: yearMonthIndex,
       transactionGroupId: transactionGroupId, // ID do grupo
-      createdAt: serverTimestamp(),
     });
   }
 
@@ -95,7 +92,6 @@ export const saveTransaction = async ({ householdId, userId, formData, editingDa
         amount: monthlyAmount,
         category_id: category,
         type_id: type,
-        // Não alteramos a data de uma única parcela para manter a simplicidade
       });
     }
   } else {

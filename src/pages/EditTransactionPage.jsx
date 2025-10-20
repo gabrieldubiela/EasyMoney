@@ -1,12 +1,12 @@
 // src/pages/EditTransactionPage.jsx
 
 import React from 'react';
-import TransactionForm from '../components/ui/forms/TransactionForm'; 
-import { useHousehold } from '../hooks/useHousehold';
+import TransactionForm from '../components/forms/TransactionForm'; 
+import { useAppContext } from '../context/AppContext';
 
 // Simulando a obtenção do ID da URL (necessário React Router no futuro)
 const EditTransactionPage = ({ transactionId }) => { 
-    const { householdName } = useHousehold();
+    const { householdName } = useAppContext();
     
     // Se estivéssemos usando React Router, faríamos:
     // const { id } = useParams(); 

@@ -2,8 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { requestNotificationPermission } from './utils/notification';
-import HouseholdProvider from './context/HouseholdProvider'; 
-import AppRoutes from './routes/Routes'; 
+import { AppProvider } from './context/AppContext';
+import AppRoutes from './pages/Routes'; 
 import useScheduledPayments from './hooks/useScheduledPayments';
 import './index.css';
 
@@ -20,9 +20,9 @@ function App() {
     }, []);
     
     return (
-        <HouseholdProvider>
+        <AppProvider>
             <AppContent />
-        </HouseholdProvider>
+        </AppProvider>
     );
 }
 

@@ -1,7 +1,7 @@
 // src/services/authService.js
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 
 /**
@@ -11,12 +11,11 @@ import { auth, db } from '../firebase/firebaseConfig';
  * * @param {object} userData - Os dados do formulário de registro.
  * @param {string} userData.email - O email do usuário.
  * @param {string} userData.password - A senha do usuário.
- * @param {string} userData.firstName - O primeiro nome do usuário.
- * @param {string} userData.lastName - O sobrenome do usuário.
+ * @param {string} userData.name - O nome do usuário.
  * @param {string} [userData.householdId] - O ID de uma família existente (opcional).
  * @param {string} [userData.familyName] - O nome para uma nova família (opcional).
  */
-export const registerUserAndHandleHousehold = async ({ email, password, firstName, lastName, householdId, familyName }) => {
+export const registerUserAndHandleHousehold = async ({ email, password, name, householdId, familyName }) => {
   // 1. Cria o usuário no Firebase Authentication
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
@@ -34,7 +33,7 @@ export const registerUserAndHandleHousehold = async ({ email, password, firstNam
       if (householdSnap.exists()) {
         // Se a família existe, adiciona o novo membro
         await updateDoc(householdRef, {
-          [`members.${user.uid}`]: true
+          [`members.${user.uid}`]: false // Novo membro não é admin por padrão
         });
       } else {
         // Se o código da família é inválido, desfaz a criação do usuário para não deixar lixo
@@ -43,15 +42,14 @@ export const registerUserAndHandleHousehold = async ({ email, password, firstNam
       }
     } else {
       // Opção B: Criando uma nova família
-      finalFamilyName = familyName || `${firstName} ${lastName}'s Family`;
+      finalFamilyName = familyName;
       finalHouseholdId = user.uid; // Define o ID da família como o UID do criador
 
       await setDoc(doc(db, 'households', finalHouseholdId), {
         family_name: finalFamilyName,
         members: {
-          [user.uid]: true
-        },
-        createdAt: serverTimestamp()
+          [user.uid]: true // O criador é admin
+        }
       });
     }
 
@@ -59,11 +57,9 @@ export const registerUserAndHandleHousehold = async ({ email, password, firstNam
     await setDoc(doc(db, 'users', user.uid), {
       uid: user.uid,
       email: email,
-      firstName: firstName,
-      lastName: lastName,
-      householdId: finalHouseholdId,
+      name: name,
+      householdId: [finalHouseholdId],
       isAdmin: false,
-      createdAt: serverTimestamp()
     });
 
   } catch (error) {

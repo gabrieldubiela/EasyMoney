@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import useMonthlyBalance from '../hooks/useMonthlyBalance';
-import BalanceSummary from '../components/ui/dashboard/BalanceSummary';
-import TransactionForm from '../components/ui/forms/TransactionForm';
-import PlannedTransactionItem from '../components/ui/items/PlannedTransactionItem';
+import BalanceSummary from '../components/charts/BalanceSummary';
+import TransactionForm from '../components/forms/TransactionForm';
+import PlannedTransactionItem from '../components/ui/PlannedTransactionItem';
 
 const MonthlyBalancePage = () => {
     const today = new Date();

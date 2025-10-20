@@ -13,6 +13,7 @@
     "preview:debug": "vite preview --debug"
   },
   "dependencies": {
+    "chart.js": "^4.5.1",
     "date-fns": "^4.1.0",
     "firebase": "^12.3.0",
     "react": "^19.1.1",

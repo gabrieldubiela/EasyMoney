@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore'; 
 
 /**
@@ -10,7 +10,7 @@ import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateD
  * Os Tipos serão armazenados na coleção 'types' dentro da household.
  */
 const useTypes = () => {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     const [types, setTypes] = useState([]);
     const [loading, setLoading] = useState(true);
 

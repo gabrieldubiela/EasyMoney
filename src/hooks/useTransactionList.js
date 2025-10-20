@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, orderBy, limit, where, onSnapshot } from 'firebase/firestore';
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 
 const PAGE_SIZE = 15; // Aumentado para carregar mais de uma vez
 
 export function useTransactionList(filters) {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     

@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 
 /**
  * Hook focado exclusivamente em buscar e consolidar dados de performance orçamentária.
  */
 export default function useMonthlyPerformanceData({ yearMonth, annualData, categories, types }) {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     
     const [performance, setPerformance] = useState({});
     const [loading, setLoading] = useState(true);

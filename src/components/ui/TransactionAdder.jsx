@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // Importa o formulário principal, agora renomeado para TransactionForm
-import TransactionForm from './forms/TransactionForm'; 
+import TransactionForm from '../forms/TransactionForm'; 
 
 const TransactionAdder = () => {
     // Estado para controlar se o formulário está visível

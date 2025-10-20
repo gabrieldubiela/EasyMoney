@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore'; 
 
 // Hook para buscar, monitorar e gerenciar a coleção de Categorias (CRUD).
 const useCategories = () => {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 

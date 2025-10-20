@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 // Importações necessárias para leitura, escrita (setDoc, addDoc) e data do Firebase
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, getDocs, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore'; 
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 
 // Define a estrutura padrão de dados para cada categoria/mês
 const INITIAL_CATEGORY_DATA = {
@@ -13,7 +13,7 @@ const INITIAL_CATEGORY_DATA = {
 };
 
 const useAnnualData = (selectedYear) => {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     // Gatilho para forçar a re-execução do useEffect após uma edição
     const [refreshTrigger, setRefreshTrigger] = useState(0); 
     

@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, onSnapshot, getDoc, doc } from 'firebase/firestore'; 
-import { useHousehold } from './useHousehold';
+import { useAppContext } from './useAppContext';
 
 // CORREÇÃO: A função agora se chama 'useTransactionData' e é exportada diretamente.
 export default function useTransactionData(transactionId) {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     
     // Estados do Formulário
     const [description, setDescription] = useState('');

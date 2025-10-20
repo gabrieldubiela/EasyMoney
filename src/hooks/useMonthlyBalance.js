@@ -3,10 +3,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 
 export default function useMonthlyBalance(year, month) {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     
     const [effectiveTransactions, setEffectiveTransactions] = useState([]);
     const [plannedTransactions, setPlannedTransactions] = useState([]);

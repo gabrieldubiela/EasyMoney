@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore'; 
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 
 /**
  * Hook para verificar se o mês anterior foi formalmente fechado (com rollover calculado).
  * A verificação é feita buscando um documento de monthlyBudget com a flag 'isClosed'.
  */
 const useMonthClosingStatus = () => {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
     const [needsClosing, setNeedsClosing] = useState(false);
     const [loading, setLoading] = useState(true);
 

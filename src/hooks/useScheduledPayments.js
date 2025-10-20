@@ -3,12 +3,12 @@
 import { useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useHousehold } from '../hooks/useHousehold';
+import { useAppContext } from '../context/AppContext';
 import { displayNotification } from '../utils/notification';
 import { format } from 'date-fns'; 
 
 const useScheduledPayments = () => {
-    const { householdId } = useHousehold();
+    const { householdId } = useAppContext();
 
     // LÓGICA CENTRAL DE ALERTA DE VENCIMENTO
     const checkForDueAlerts = (paymentsList) => {
