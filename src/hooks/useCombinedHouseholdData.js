@@ -1,44 +1,108 @@
-// src/hooks/useCombinedHouseholdData.js
+// src/hooks/useHouseholdBaseData.js
 
 import { useMemo } from 'react';
-import useCategories from './useCategories';
-import useTypes from './useTypes';
-// Se você precisar do useAnnualData em muitos lugares, importe aqui também.
+
+// Hooks de coleções já existentes
+import useAllCategories from './useAllCategories';
+import useAllTypes from './useAllTypes';
+import useAllTransactions from './useAllTransactions';
+import useAllPlannedTransactions from './useAllPlannedTransactions';
+import useScheduledPayments from './useScheduledPayments';
+
+// (Opcional: outros hooks agregáveis)
+import useAnnualData from './useAnnualData';
+import useMonthClosingStatus from './useMonthClosingStatus';
 
 /**
- * Hook utilitário para combinar, formatar e centralizar dados de metadados da Household.
- * O objetivo é fornecer todas as listas de dados essenciais (categorias, tipos)
- * em um formato fácil de usar (como mapas {id: data}) para a UI.
+ * Hook agregador de todas as coleções-base do Household.
+ * Ideal para dashboards, relatórios e telas que combinam várias fontes simultaneamente.
+ *
+ * Retorna dados, versões otimizadas em Map, e status global de loading/erro.
  */
-const useCombinedHouseholdData = () => {
-    const { categories, loading: categoriesLoading } = useCategories();
-    const { types, loading: typesLoading } = useTypes();
-    
-    // Usa useMemo para recalcular os mapas apenas quando as listas mudam
-    const { categoryMap, typeMap } = useMemo(() => {
-        // Converte as listas de arrays para mapas para buscas rápidas (O(1))
-        const catMap = categories.reduce((acc, cat) => ({ ...acc, [cat.id]: cat }), {});
-        const typMap = types.reduce((acc, type) => ({ ...acc, [type.id]: type }), {});
+const useHouseholdBaseData = (options = {}) => {
+  const { 
+    includeAnnualData = false,
+    includeMonthStatus = false,
+  } = options;
 
-        return {
-            categoryMap: catMap,
-            typeMap: typMap,
-        };
-    }, [categories, types]);
+  // 1️⃣ Dados de referência (sempre carregados)
+  const { categories, loading: categoriesLoading, error: categoriesError } = useAllCategories();
+  const { types, loading: typesLoading, error: typesError } = useAllTypes();
 
-    const loading = categoriesLoading || typesLoading;
+  // 2️⃣ Dados dinâmicos
+  const { transactions, loading: trxLoading, error: trxError } = useAllTransactions();
+  const { transactions: plannedTransactions, loading: plannedLoading, error: plannedError } =
+    useAllPlannedTransactions();
+  const { upcomingPayments, loading: paymentsLoading, error: paymentsError } = useScheduledPayments();
 
-    return {
-        // Dados brutos
-        categories,
-        types,
-        
-        // Dados formatados
-        categoryMap, // { 'id1': {name: 'Aluguel', ...} }
-        typeMap,     // { 'id2': {name: 'Fixo', ...} }
-        
-        loading,
-    };
+  // 3️⃣ Dados complementares (opcionais, apenas se solicitados)
+  const annual = includeAnnualData ? useAnnualData(new Date().getFullYear()) : {};
+  const monthStatus = includeMonthStatus ? useMonthClosingStatus() : {};
+
+  // 4️⃣ Cria mapas otimizados para acesso rápido (O(1))
+  const categoryMap = useMemo(() => {
+    const map = {};
+    for (const cat of categories) map[cat.id] = cat;
+    return map;
+  }, [categories]);
+
+  const typeMap = useMemo(() => {
+    const map = {};
+    for (const t of types) map[t.id] = t;
+    return map;
+  }, [types]);
+
+  const transactionGroupMap = useMemo(() => {
+    const map = {};
+    for (const trx of transactions) {
+      if (!trx.transactionGroupId) continue;
+      if (!map[trx.transactionGroupId]) map[trx.transactionGroupId] = [];
+      map[trx.transactionGroupId].push(trx);
+    }
+    return map;
+  }, [transactions]);
+
+  // 5️⃣ Status global de carregamento e erros
+  const loading =
+    categoriesLoading ||
+    typesLoading ||
+    trxLoading ||
+    plannedLoading ||
+    paymentsLoading ||
+    (includeAnnualData && annual?.loading) ||
+    (includeMonthStatus && monthStatus?.loading);
+
+  const error =
+    categoriesError ||
+    typesError ||
+    trxError ||
+    plannedError ||
+    paymentsError ||
+    (includeAnnualData && annual?.error) ||
+    (includeMonthStatus && monthStatus?.error);
+
+  // 6️⃣ Retorno unificado
+  return {
+    // Dados brutos
+    categories,
+    types,
+    transactions,
+    plannedTransactions,
+    upcomingPayments,
+
+    // Mapas de acesso rápido
+    categoryMap,
+    typeMap,
+    transactionGroupMap,
+
+    // Dados complementares opcionais
+    annualData: annual?.annualData,
+    monthStatus: monthStatus?.needsClosing,
+
+    // Status
+    loading,
+    error,
+  };
 };
 
-export default useCombinedHouseholdData;
+export default useHouseholdBaseData;

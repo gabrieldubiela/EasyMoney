@@ -11,7 +11,7 @@ const Nav = lazy(() => import('../components/layout/Nav'));
 const AuthPage = lazy(() => import('./AuthPage'));
 const DashboardPage = lazy(() => import('./DashboardPage'));
 const UsersPage = lazy(() => import('./UsersPage'));
-const MonthlyBalancePage = lazy(() => import('./MonthlyBalancePage'));
+const BalancePage = lazy(() => import('./BalancePage'));
 const TransactionsPage = lazy(() => import('./TransactionsPage'));
 const AdminPage = lazy(() => import('./AdminPage'));
 const BudgetsPage = lazy(() => import('./BudgetsPage'));
@@ -84,7 +84,7 @@ const AppRoutes = () => {
                     />
                     <Route 
                         path="/monthly-balance" 
-                        element={<ProtectedRoute><MonthlyBalancePage /></ProtectedRoute>} 
+                        element={<ProtectedRoute><BalancePage /></ProtectedRoute>} 
                     />
                     <Route 
                         path="/transactions" 

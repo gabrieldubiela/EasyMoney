@@ -1,12 +1,12 @@
-// src/pages/MonthlyBalancePage.jsx
+// src/pages/BalancePage.jsx
 
 import React, { useState } from 'react';
-import useMonthlyBalance from '../hooks/useMonthlyBalance';
+import useBalance from '../hooks/useBalance';
 import BalanceSummary from '../components/charts/BalanceSummary';
 import TransactionForm from '../components/forms/TransactionForm';
 import PlannedTransactionItem from '../components/ui/PlannedTransactionItem';
 
-const MonthlyBalancePage = () => {
+const BalancePage = () => {
     const today = new Date();
     const [year, setYear] = useState(today.getFullYear());
     const [month, setMonth] = useState(today.getMonth() + 1);
@@ -21,7 +21,7 @@ const MonthlyBalancePage = () => {
         categories, 
         types, 
         refetch
-    } = useMonthlyBalance(year, month, availableFunds);
+    } = useBalance(year, month, availableFunds);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find(c => c.id === categoryId);
@@ -109,4 +109,4 @@ const MonthlyBalancePage = () => {
     );
 };
 
-export default MonthlyBalancePage;
+export default BalancePage;

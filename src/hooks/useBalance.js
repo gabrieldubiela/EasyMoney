@@ -1,11 +1,11 @@
-// src/hooks/useMonthlyBalance.js
+// src/hooks/useBalance.js
 
 import { useState, useEffect, useMemo } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { useAppContext } from '../context/useAppContext';
 
-export default function useMonthlyBalance(year, month) {
+export default function useBalance(year, month) {
     const { householdId } = useAppContext();
     
     const [effectiveTransactions, setEffectiveTransactions] = useState([]);
