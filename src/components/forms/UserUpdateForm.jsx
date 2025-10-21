@@ -1,7 +1,7 @@
 // src/components/ui/forms/UserUpdateForm.jsx
 
 import React from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import ProfileDataForm from './ProfileDataForm'; 
 import EmailUpdateForm from './EmailUpdateForm'; 
 import PasswordUpdateForm from './PasswordUpdateForm'; 

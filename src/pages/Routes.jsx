@@ -2,7 +2,7 @@
 
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 // Componentes UI
 const Nav = lazy(() => import('../components/layout/Nav'));

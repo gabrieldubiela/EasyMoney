@@ -2,7 +2,7 @@
 
 import React from 'react';
 import TransactionForm from '../components/forms/TransactionForm'; 
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 // Simulando a obtenção do ID da URL (necessário React Router no futuro)
 const EditTransactionPage = ({ transactionId }) => { 

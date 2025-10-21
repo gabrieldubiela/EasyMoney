@@ -1,15 +1,13 @@
 // src/components/ui/EditCategoryAndTypeItem.jsx
 
 import React, { useState } from 'react';
-// Importamos os hooks para as funções CRUD
-import useCategories from '../../hooks/useCategories';
-import useTypes from '../../hooks/useTypes';
+import { useAppContext } from '../../context/useAppContext';
+import { updateCategory, deleteCategory } from '../../services/categoryService';
+import { updateType, deleteType } from '../../services/typeService';
 
 // O componente agora aceita o item genérico, a flag isType, e a lista de tipos (se for categoria)
-const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' }) => {
-    // Hooks de Funções CRUD
-    const { updateCategory, deleteCategory } = useCategories();
-    const { deleteType, updateType } = useTypes();
+const EditCategoryAndTypeItem = ({ item, isType }) => {
+    const { householdId } = useAppContext();
     
     // O item pode ser uma Categoria ou um Tipo, mas ambos têm 'id' e 'name'
     const [isEditing, setIsEditing] = useState(false);
@@ -25,9 +23,9 @@ const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' })
         if (window.confirm(`Tem certeza que deseja excluir o ${itemType} "${item.name}"?`)) {
             try {
                 if (isType) {
-                    await deleteType(item.id);
+                    await deleteType(householdId, item.id);
                 } else {
-                    await deleteCategory(item.id);
+                    await deleteCategory(householdId, item.id);
                 }
                 console.log(`${itemType} ${item.name} excluído com sucesso!`);
             } catch (error) {
@@ -56,10 +54,10 @@ const EditCategoryAndTypeItem = ({ item, isType, allTypes = [], typeName = '' })
         try {
             if (isType) {
                 // Se for um Tipo, apenas o nome é editável (usamos updateDoc do hook de types)
-                await updateType(item.id, trimmedName);
+                await updateType(householdId, item.id, trimmedName);
             } else {
                 // Se for Categoria, atualizamos nome e/ou typeId
-                await updateCategory(item.id, nameChanged ? trimmedName : null, typeChanged ? editedTypeId : null);
+                await updateCategory(householdId, item.id, nameChanged ? trimmedName : null);
             }
 
             setIsEditing(false);

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { db } from '../../firebase/firebaseConfig';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import { collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 
 const DataManagement = () => {

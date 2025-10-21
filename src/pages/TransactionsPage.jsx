@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import TransactionList from '../components/tables/TransactionList';
 import TransactionAdder from '../components/ui/TransactionAdder';
 import TransactionFilter from '../components/ui/TransactionFilter';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 

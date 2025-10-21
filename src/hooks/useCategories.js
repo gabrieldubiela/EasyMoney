@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { useAppContext } from '../context/AppContext';
-import { collection, onSnapshot, query, orderBy, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore'; 
+import { useAppContext } from '../context/useAppContext';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'; 
 
 // Hook para buscar, monitorar e gerenciar a coleção de Categorias (CRUD).
 const useCategories = () => {

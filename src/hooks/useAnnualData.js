@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 // Importações necessárias para leitura, escrita (setDoc, addDoc) e data do Firebase
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, getDocs, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore'; 
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 // Define a estrutura padrão de dados para cada categoria/mês
 const INITIAL_CATEGORY_DATA = {

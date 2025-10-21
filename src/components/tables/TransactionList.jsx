@@ -1,7 +1,7 @@
 // src/components/ui/lists/TransactionList.jsx
 
 import React from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import TransactionItem from '../ui/TransactionItem';
 import { useTransactionList } from '../../hooks/useTransactionList';
 

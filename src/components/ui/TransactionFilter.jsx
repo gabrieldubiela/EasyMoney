@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../firebase/firebaseConfig';
 import { collection, query, limit, getDocs } from 'firebase/firestore'; 
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 
 // O componente recebe os IDs de categorias/tipos para popular os dropdowns
 const TransactionFilters = ({ categories, types, onFilterChange }) => {

@@ -1,7 +1,7 @@
 // src/pages/CategoriesAndTypesPage.jsx
 
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import useTypes from '../hooks/useTypes';
 import useCategories from '../hooks/useCategories';
 import AddCategoryForm from '../components/forms/AddCategoryForm'; 
@@ -24,11 +24,6 @@ const CategoriesAndTypesPage = () => {
     if (!householdId) {
         return <div>Você precisa estar em uma família para gerenciar categorias e tipos.</div>;
     }
-    
-    // Funções auxiliares para buscar o nome do Tipo (para exibição)
-    const getTypeName = (typeId) => {
-        return types.find(t => t.id === typeId)?.name || 'TIPO NÃO DEFINIDO';
-    };
 
     return (
         <div style={{ padding: '20px' }}>

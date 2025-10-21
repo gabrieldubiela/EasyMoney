@@ -1,4 +1,4 @@
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 export default function SelectHousehold() {
   const { householdId, changeHousehold } = useAppContext();

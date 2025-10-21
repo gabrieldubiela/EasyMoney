@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/firebaseConfig';
 import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import { saveTransaction } from '../../services/transactionService';
 
 const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned }) => {

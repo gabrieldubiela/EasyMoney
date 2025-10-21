@@ -11,9 +11,9 @@ import {
 import { db } from "../firebase/firebaseConfig";
 
 // Função para buscar as categorias
-export const fetchCategories = async () => {
+export const fetchCategories = async (householdId) => {
   try {
-    const categoriesRef = collection(db, "categories");
+    const categoriesRef = collection(db, `households/${householdId}/categories`);
     const snapshot = await getDocs(categoriesRef);
     const categories = [];
     snapshot.forEach((doc) => {
@@ -27,7 +27,7 @@ export const fetchCategories = async () => {
 };
 
 // Função para adicionar uma nova Categoria
-export const addCategory = async (name) => {
+export const addCategory = async (householdId, name) => {
   if (!householdId || !name.trim()) return;
   try {
     await addDoc(collection(db, `households/${householdId}/categories`), {
@@ -39,7 +39,7 @@ export const addCategory = async (name) => {
 };
 
 // Função para atualizar uma Categoria
-export const updateCategory = async (categoryId, newName) => {
+export const updateCategory = async (householdId, categoryId, newName) => {
   if (!householdId || !categoryId) return;
 
   const updateData = {};
@@ -56,7 +56,7 @@ export const updateCategory = async (categoryId, newName) => {
 };
 
 // Função para deletar uma Categoria
-export const deleteCategory = async (categoryId) => {
+export const deleteCategory = async (householdId, categoryId) => {
   if (!householdId || !categoryId) return;
 
   if (

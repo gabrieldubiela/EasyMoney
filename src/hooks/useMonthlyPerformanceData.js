@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 /**
  * Hook focado exclusivamente em buscar e consolidar dados de performance orçamentária.

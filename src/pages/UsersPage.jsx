@@ -1,7 +1,7 @@
 // src/pages/SettingsPage.jsx
 
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import UserUpdateForm from '../components/forms/UserUpdateForm';
 import HouseholdUpdateForm from '../components/forms/HouseholdUpdateForm';
 import InviteCodeDisplay from '../components/domains/InviteCodeDisplay';

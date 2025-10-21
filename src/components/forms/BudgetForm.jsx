@@ -1,7 +1,7 @@
 // src/components/ui/forms/BudgetForm.jsx
 
 import React, { useState } from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import useCategories from '../../hooks/useCategories';
 import { createAnnualBudget } from '../../services/budgetService';
 

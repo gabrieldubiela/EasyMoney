@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'; 
 
 /**
@@ -38,9 +38,8 @@ const useTypes = () => {
 
         return () => unsubscribe();
     }, [householdId]);
+
+    return { types, loading };
 };
-
-return { types, loading, addType, deleteType, updateType };
-
 
 export default useTypes;

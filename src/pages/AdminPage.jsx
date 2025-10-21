@@ -1,7 +1,7 @@
 // src/pages/AdminDashboardPage.jsx (CORRIGIDO)
 
 import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import UserManagement from '../components/domains/UserManagement';
 import HouseholdManagement from '../components/domains/HouseholdManagement'; 
 import DataManagement from '../components/domains/DataManagement'; 

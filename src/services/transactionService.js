@@ -61,7 +61,7 @@ const deleteTransactionGroup = async (householdId, transactionGroupId) => {
 
 // --- FUNÇÃO PRINCIPAL EXPORTADA ---
 export const saveTransaction = async ({ householdId, userId, formData, editingData }) => {
-  const { description, supplier, amount, category, type, date, installments } = formData;
+  const { description, supplier, amount, category, type, installments } = formData;
   const { transactionId, transactionGroupId } = editingData;
 
   const originalAmount = parseFloat(amount);

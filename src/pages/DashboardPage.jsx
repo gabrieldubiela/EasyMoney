@@ -3,7 +3,7 @@
 import React from 'react';
 
 // Remover todas as importações de Hooks e componentes complexos.
-// import { useAppContext } from '../context/AppContext'; 
+// import { useAppContext } from '../context/useAppContext'; 
 
 const DashboardPage = () => {
     // 🛑 SEM CHAMDAS DE HOOKS 🛑

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { displayNotification } from '../utils/notification';
 import { format } from 'date-fns'; 
 

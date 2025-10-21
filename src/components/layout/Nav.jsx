@@ -2,17 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/useAppContext';
 import { auth } from '../../firebase/firebaseConfig';
 
 const Nav = () => {
-    const { user, familyName, loading } = useAppContext();
+    const { userId, familyName, loading } = useAppContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navRef = useRef(null);
-
-    if (loading || !user) return null;
-
-    const householdName = familyName ? `Família: ${familyName}` : 'Sem Família';
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -29,6 +25,10 @@ const Nav = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isMenuOpen]);
+
+    if (loading || !userId) return null;
+
+    const householdName = familyName ? `Família: ${familyName}` : 'Sem Família';
 
     const handleLinkClick = () => {
         setIsMenuOpen(false);
@@ -59,7 +59,7 @@ const Nav = () => {
                 </button>
                 <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <li className="nav-item">
-                        <Link to="/user" className="nav-link" onClick={handleLinkClick}>{user.name}</Link>
+                        <Link to="/user" className="nav-link" onClick={handleLinkClick}>Perfil</Link>
                     </li>
                     <li className="nav-item">
                         <Link to="/monthly-balance" className="nav-link" onClick={handleLinkClick}>Balanço Mensal</Link>

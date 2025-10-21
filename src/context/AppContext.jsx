@@ -1,23 +1,10 @@
 //src/context/AppContext.jsx
-'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { AppContext } from './appContextValue';
 
-// Criar o contexto
-const AppContext = createContext(null);
-
-// Hook customizado
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useAppContext deve ser usado dentro de um AppProvider');
-  }
-  return context;
-};
-
-// Provider principal
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [householdId, setHouseholdId] = useState(null);

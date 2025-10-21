@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore'; 
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 /**
  * Hook para verificar se o mês anterior foi formalmente fechado (com rollover calculado).

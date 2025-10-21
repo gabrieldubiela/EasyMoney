@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, orderBy, limit, where, onSnapshot } from 'firebase/firestore';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 const PAGE_SIZE = 15; // Aumentado para carregar mais de uma vez
 
