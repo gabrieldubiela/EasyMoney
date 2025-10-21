@@ -3,24 +3,44 @@
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
-import { fetchAllUsers } from '../services/userService';
 
+/**
+ * Hook para escutar todos os usuários em tempo real.
+ * Atualiza automaticamente quando qualquer usuário é adicionado, editado ou removido.
+ *
+ * @returns {object} { users, loading, error }
+ */
 const useAllUsers = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const usersRef = collection(db, 'users');
-        const unsubscribe = onSnapshot(usersRef, async () => {
-            const data = await fetchAllUsers();
-            setUsers(data);
-            setLoading(false);
-        });
+  useEffect(() => {
+    setLoading(true);
 
-        return () => unsubscribe();
-    }, []);
+    const usersRef = collection(db, 'users');
 
-    return { users, loading };
+    const unsubscribe = onSnapshot(
+      usersRef,
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUsers(data);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Erro ao escutar usuários:', err);
+        setError(err);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return { users, loading, error };
 };
 
 export default useAllUsers;
