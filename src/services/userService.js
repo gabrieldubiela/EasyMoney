@@ -4,6 +4,13 @@ import { doc, getDoc, deleteDoc, updateDoc, getDocs, collection } from "firebase
 import { db } from "../firebase/firebaseConfig";
 import { removeUserFromHousehold } from "./householdService";
 
+/** Operações no banco de dados Firestore relacionadas aos usuários.
+ * @param {string} uid - O UID do usuário.
+ * @param {array} householdId - Array de IDs das famílias do usuário.
+ * @param {boolean} isAdmin - Se o usuário é admin do sistema.
+ * @param {string} name - Nome do usuário.
+ */
+
 // Função para buscar todos usuários
 export const fetchAllUsers = async () => {
   try {
@@ -33,6 +40,20 @@ export const fetchUserData = async (uid) => {
     }
   } catch (error) {
     console.error("Erro ao buscar dados do usuário:", error);
+    throw error;
+  }
+};
+
+// Cria usuário
+export const createUserData = async (uid, householdIdArray, isAdmin, name) => {
+  try {
+    await setDoc(doc(db, "users", uid), {
+      householdId: householdIdArray,
+      isAdmin,
+      name,
+    });
+  } catch (error) {
+    console.error("Erro ao criar usuário:", error);
     throw error;
   }
 };

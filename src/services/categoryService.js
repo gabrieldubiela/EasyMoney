@@ -9,9 +9,18 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
+import { useAppContext } from './useAppContext';
+
+/** Operações no banco de dados Firestore relacionadas às categorias.
+ * @param {string} householdId - O ID da família.
+ * @param {string} name - O nome da categoria.
+ * @param {string} categoryId - O ID da categoria.
+ */
+
+const { householdId } = useAppContext();
 
 // Função para buscar as categorias
-export const fetchCategories = async (householdId) => {
+export const fetchAllCategories = async () => {
   try {
     const categoriesRef = collection(db, `households/${householdId}/categories`);
     const snapshot = await getDocs(categoriesRef);
@@ -26,8 +35,24 @@ export const fetchCategories = async (householdId) => {
   }
 };
 
-// Função para adicionar uma nova Categoria
-export const addCategory = async (householdId, name) => {
+// Função para buscar categoria por ID
+export const fetchCategoryById = async (categoryId) => {
+  try {
+    const categoryRef = doc(db, `households/${householdId}/categories`, categoryId);
+    const categorySnap = await getDoc(categoryRef);
+    if (categorySnap.exists()) {
+      return { id: categorySnap.id, ...categorySnap.data() };
+    } else {
+      throw new Error("Categoria não encontrada.");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar categoria:", error);
+    throw error;
+  }
+};
+
+// Função para adicionar Categoria
+export const addCategory = async (name) => {
   if (!householdId || !name.trim()) return;
   try {
     await addDoc(collection(db, `households/${householdId}/categories`), {

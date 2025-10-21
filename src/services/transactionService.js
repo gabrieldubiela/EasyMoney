@@ -11,6 +11,46 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
+/** Operações no banco de dados Firestore relacionadas às transações.
+ * @param {string} householdId - O ID da família.
+ * @param {string} userId - O ID do usuário que está criando ou editando a transação.
+ * @param {object} formData - Dados do formulário da transação.
+ * @param {object} editingData - Dados da transação que está sendo editada (se aplicável).
+ */
+
+// Função para buscar todas as transações de uma família
+export const fetchAllTransactions = async (householdId) => {
+  try {
+    const transactionsRef = collection(db, `households/${householdId}/transactions`);
+    const snapshot = await getDocs(transactionsRef);
+    const transactions = [];
+    snapshot.forEach((doc) => {
+      transactions.push({ id: doc.id, ...doc.data() });
+    });
+    return transactions;
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error);
+    throw error;
+  }
+};
+
+// Função para buscar transação por ID
+export const fetchTransactionById = async (householdId, transactionId) => {
+  try {
+    const transactionRef = doc(db, `households/${householdId}/transactions`, transactionId);
+    const transactionSnap = await getDoc(transactionRef);
+    if (transactionSnap.exists()) {
+      return { id: transactionSnap.id, ...transactionSnap.data() };
+    } else {
+      throw new Error('Transação não encontrada.');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar transação:', error);
+    throw error;
+  }
+};
+
+
 // Função auxiliar interna para criar o grupo de transações (parcelas)
 const createTransactionGroup = async (householdId, userId, data, transactionGroupId) => {
   const { description, supplier, category, type, date, totalAmount, numInstallments } = data;
