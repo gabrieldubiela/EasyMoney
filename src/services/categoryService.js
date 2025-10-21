@@ -9,7 +9,6 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
-import { useAppContext } from './useAppContext';
 
 /** Operações no banco de dados Firestore relacionadas às categorias.
  * @param {string} householdId - O ID da família.
@@ -17,10 +16,8 @@ import { useAppContext } from './useAppContext';
  * @param {string} categoryId - O ID da categoria.
  */
 
-const { householdId } = useAppContext();
-
 // Função para buscar as categorias
-export const fetchAllCategories = async () => {
+export const fetchAllCategories = async (householdId) => {
   try {
     const categoriesRef = collection(db, `households/${householdId}/categories`);
     const snapshot = await getDocs(categoriesRef);
@@ -36,7 +33,7 @@ export const fetchAllCategories = async () => {
 };
 
 // Função para buscar categoria por ID
-export const fetchCategoryById = async (categoryId) => {
+export const fetchCategoryById = async (householdId, categoryId) => {
   try {
     const categoryRef = doc(db, `households/${householdId}/categories`, categoryId);
     const categorySnap = await getDoc(categoryRef);
@@ -52,7 +49,7 @@ export const fetchCategoryById = async (categoryId) => {
 };
 
 // Função para adicionar Categoria
-export const addCategory = async (name) => {
+export const addCategory = async (householdId, name) => {
   if (!householdId || !name.trim()) return;
   try {
     await addDoc(collection(db, `households/${householdId}/categories`), {
