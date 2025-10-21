@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import useTypes from '../hooks/useTypes'; // Importa o hook para Tipos
-import useCategories from '../hooks/useCategories'; // Assumindo que você criou este hook
+import useTypes from '../hooks/useTypes';
+import useCategories from '../hooks/useCategories';
 import AddCategoryForm from '../components/forms/AddCategoryForm'; 
 import AddTypeForm from '../components/forms/AddTypeForm';
 import EditCategoryAndTypeItem from '../components/ui/EditCategoryAndTypeItem';
@@ -36,7 +36,7 @@ const CategoriesAndTypesPage = () => {
 
             {/* PRIMEIRA SEÇÃO: GESTÃO DE TIPOS */}
             <section style={{ marginBottom: '40px' }}>
-                <h2>1. Tipos de Gasto/Receita Atuais ({types.length})</h2>
+                <h2>1. Tipos de Transação Atuais ({types.length})</h2>
                 
                 {/* O AddTypeForm deve receber a função de adicionar e a lista para validação */}
                 <AddTypeForm existingTypes={types} /> 

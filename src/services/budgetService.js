@@ -1,7 +1,6 @@
 // src/services/budgetService.js
 
-import {
-  collection,
+import { collection,
   doc,
   addDoc,
   updateDoc,

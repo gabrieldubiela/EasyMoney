@@ -71,8 +71,6 @@ export const saveTransaction = async ({ householdId, userId, formData, editingDa
     throw new Error("Por favor, preencha todos os campos obrigatórios.");
   }
   
-  // A lógica de sinal (receita/despesa) permanece no formulário por enquanto, 
-  // então assumimos que 'amount' já vem com o sinal correto.
   const signedAmount = originalAmount;
   
   if (transactionId) {
@@ -96,7 +94,7 @@ export const saveTransaction = async ({ householdId, userId, formData, editingDa
     }
   } else {
     // --- LÓGICA DE ADIÇÃO ---
-    const newTransactionGroupId = doc(collection(db, 'households')).id; // Gera um ID único
+    const newTransactionGroupId = doc(collection(db, 'households')).id;
     await createTransactionGroup(householdId, userId, { ...formData, totalAmount: signedAmount, numInstallments }, newTransactionGroupId);
   }
 };

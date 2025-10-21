@@ -36,48 +36,9 @@ const useCategories = () => {
         return () => unsubscribe();
     }, [householdId]);
 
-    // 2. Funções CRUD
+    
 
-    // Adiciona uma nova Categoria,
-    const addCategory = async (name) => {
-        if (!householdId || !name.trim()) return;
-        try {
-            await addDoc(collection(db, `households/${householdId}/categories`), {
-                name: name.trim(),
-            });
-        } catch (e) {
-            console.error("Erro ao adicionar categoria:", e);
-        }
-    };
-
-    // Atualiza o nome ou o Tipo de uma Categoria existente
-    const updateCategory = async (categoryId, newName,) => {
-        if (!householdId || !categoryId) return;
-        
-        const updateData = {};
-        if (newName) updateData.name = newName.trim();
-
-        try {
-            await updateDoc(doc(db, `households/${householdId}/categories`, categoryId), updateData);
-        } catch (e) {
-            console.error("Erro ao atualizar categoria:", e);
-        }
-    };
-
-    // Deleta uma Categoria
-    const deleteCategory = async (categoryId) => {
-        if (!householdId || !categoryId) return;
-        
-        if (!window.confirm("ATENÇÃO: Excluir esta categoria não remove transações antigas. Continuar?")) return;
-
-        try {
-            await deleteDoc(doc(db, `households/${householdId}/categories`, categoryId));
-        } catch (e) {
-            console.error("Erro ao deletar categoria:", e);
-        }
-    };
-
-    return { categories, loading, addCategory, updateCategory, deleteCategory };
+    return { categories, loading };
 };
 
 export default useCategories;

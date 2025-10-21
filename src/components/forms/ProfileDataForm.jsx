@@ -7,25 +7,20 @@ import { db } from '../../firebase/firebaseConfig'; // db do Firestore
 
 const ProfileDataForm = ({ user }) => {
     // user é o objeto completo (Auth + Firestore) passado via prop.
-    const [displayName, setDisplayName] = useState(user?.firstName || ''); 
-    const [lastName, setLastName] = useState(user?.lastName || '');
+    const [displayName, setDisplayName] = useState(user?.name || ''); 
     const [isUpdating, setIsUpdating] = useState(false);
 
     // Sincroniza o estado local com o nome do usuário do contexto
     useEffect(() => {
-        if (user?.firstName) {
-            setDisplayName(user.firstName);
+        if (user?.name) {
+            setDisplayName(user.name);
         }
-        if (user?.lastName) { 
-             setLastName(user.lastName);
-        }
-    }, [user?.firstName, user?.lastName]); 
+    }, [user?.name]); 
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
         
         const newDisplayName = displayName.trim();
-        const newLastName = lastName.trim();
 
         if (!user || newDisplayName === '') {
             alert("O nome de exibição não pode estar vazio.");
@@ -35,11 +30,10 @@ const ProfileDataForm = ({ user }) => {
         setIsUpdating(true);
         
         try {
-            // 1. ATUALIZAÇÃO NO FIRESTORE (firstName e lastName)
+            // 1. ATUALIZAÇÃO NO FIRESTORE (name)
             const userDocRef = doc(db, 'users', user.uid);
             await updateDoc(userDocRef, {
-                firstName: newDisplayName,
-                lastName: newLastName,
+                name: newDisplayName,
             });
 
             // 2. ATUALIZAÇÃO DO FIREBASE AUTH (displayName)
@@ -67,26 +61,14 @@ const ProfileDataForm = ({ user }) => {
                 
                 {/* CAMPO NOME / DISPLAY NAME */}
                 <div>
-                    <label htmlFor="displayName">Nome de Exibição:</label>
+                    <label htmlFor="displayName">Nome:</label>
                     <input
                         id="displayName"
                         type="text"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="Primeiro Nome"
+                        placeholder="Nome"
                         required
-                    />
-                </div>
-
-                {/* CAMPO SOBRENOME / LAST NAME (Firestore) */}
-                <div>
-                    <label htmlFor="lastName">Sobrenome:</label>
-                    <input
-                        id="lastName"
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Sobrenome"
                     />
                 </div>
 

@@ -1,4 +1,4 @@
-// src/services/authService.js
+// src/services/registerService.js
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';

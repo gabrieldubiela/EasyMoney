@@ -59,7 +59,7 @@ const Nav = () => {
                 </button>
                 <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <li className="nav-item">
-                        <Link to="/user" className="nav-link" onClick={handleLinkClick}>{user.firstName}</Link>
+                        <Link to="/user" className="nav-link" onClick={handleLinkClick}>{user.name}</Link>
                     </li>
                     <li className="nav-item">
                         <Link to="/monthly-balance" className="nav-link" onClick={handleLinkClick}>Balanço Mensal</Link>

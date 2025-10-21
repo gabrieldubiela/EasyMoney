@@ -21,6 +21,8 @@ export const useAppContext = () => {
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [householdId, setHouseholdId] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const [familyName, setFamilyName] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Detecta login/logout automaticamente
@@ -40,6 +42,10 @@ export const AppProvider = ({ children }) => {
             const defaultHousehold = Array.isArray(data.households)
               ? data.households[0]
               : data.households || null;
+            const name = data.name || null;
+            setUserName(name);
+            const familyName = data.familyName || null;
+            setFamilyName(familyName);
             setHouseholdId(defaultHousehold);
           }
         } catch (error) {
@@ -66,6 +72,8 @@ export const AppProvider = ({ children }) => {
       value={{
         userId,
         householdId,
+        userName,
+        familyName,
         changeHousehold,
         loading,
       }}
