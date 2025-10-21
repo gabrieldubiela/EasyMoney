@@ -1,71 +1,118 @@
 // src/services/budgetService.js
 
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  getDoc,
+  deleteField,
+} from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-/** Operações no banco de dados Firestore relacionadas aos orçamentos.
- * 
- */ 
-
-// Função para buscar todos orçamentos
-export const fetchAllBudgets = async (householdId) => {
-
-async function addTypeToBudgetInAllCategories(typeId) {
-  const householdIds = await fetchAllHouseholdIds();
-  for (const householdId of householdIds) {
-    const categories = await fetchAllBudgets(householdId);
-    for (const cat of categories) {
-      await updateBudget(householdId, cat.id, typeId, 0);
-    }
-  }
-}
-
-// Função para buscar orçamento por ID
-export const fetchBudgetById = async (householdId, categoryId) => {
+// Busca todas as categorias de orçamento de um orçamento anual
+export const fetchAllBudgets = async (householdId, year) => {
   try {
-    const budgetRef = doc(db, `households/${householdId}/orcamentos`, categoryId);
-    const budgetSnap = await getDoc(budgetRef);
-    if (budgetSnap.exists()) {
-      return { id: budgetSnap.id, ...budgetSnap.data() };
-    } else {
-      throw new Error("Orçamento não encontrado.");
-    }
+    const categoriesRef = collection(db, `households/${householdId}/budgets/${year}/categories`);
+    const snapshot = await getDocs(categoriesRef);
+    const budgets = [];
+    snapshot.forEach((doc) => {
+      budgets.push({ id: doc.id, ...doc.data() });
+    });
+    return budgets;
   } catch (error) {
-    console.error("Erro ao buscar orçamento:", error);
+    console.error("Erro ao buscar categorias do orçamento:", error);
     throw error;
   }
 };
 
-// Função para atualizar um orçamento
-export const updateBudget = async (householdId, categoryId, typeId, newValue) => {
-  if (!householdId || !categoryId || !typeId) return;
+// Busca orçamento de uma categoria específica
+export const fetchBudgetCategory = async (householdId, year, categoryId) => {
   try {
-    const budgetRef = doc(db, `households/${householdId}/orcamentos`, categoryId);
+    const budgetRef = doc(db, `households/${householdId}/budgets/${year}/categories`, categoryId);
     const budgetSnap = await getDoc(budgetRef);
     if (budgetSnap.exists()) {
-      const budgetData = budgetSnap.data();
-      const updatedTypes = {
-        ...budgetData.types,
-        [typeId]: { valor: newValue },
-      };
-      await updateDoc(budgetRef, { types: updatedTypes });
+      return { id: budgetSnap.id, ...budgetSnap.data() };
     } else {
-      throw new Error("Orçamento não encontrado para atualização.");
+      throw new Error("Categoria de orçamento não encontrada.");
     }
-  } catch (e) {
-    console.error("Erro ao atualizar orçamento:", e);
+  } catch (error) {
+    console.error("Erro ao buscar categoria do orçamento:", error);
+    throw error;
   }
 };
 
-async function addCategoryToBudget(householdId, categoryId) {
-  const allTypeIds = await fetchAllTypeIds();
-  const typesMap = {};
-  allTypeIds.forEach(typeId => typesMap[typeId] = { valor: 0 });
-  await setDoc(doc(db, 'households', householdId, 'orcamentos', categoryId), {
-    types: typesMap
-  });
-}
+// Atualiza/define o valor de um tipo na categoria do orçamento
+export const updateBudgetCategoryTypeValue = async (householdId, year, categoryId, typeId, newValue) => {
+  try {
+    const budgetRef = doc(db, `households/${householdId}/budgets/${year}/categories`, categoryId);
+    const budgetSnap = await getDoc(budgetRef);
+    if (budgetSnap.exists()) {
+      const budgetData = budgetSnap.data();
+      const updatedTypes = budgetData.types || {};
+      updatedTypes[typeId] = { valor: newValue };
+      await updateDoc(budgetRef, { types: updatedTypes });
+    } else {
+      throw new Error("Categoria de orçamento não encontrada para atualização.");
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar tipo na categoria do orçamento:", e);
+    throw e;
+  }
+};
 
-async function deleteBudgetCategory(householdId, categoryId) {
-  await deleteDoc(doc(db, 'households', householdId, 'orcamentos', categoryId));
-}
+// Adiciona nova categoria ao orçamento anual, com todos os tipos existentes
+export const addCategoryToBudget = async (householdId, year, categoryId, allTypeIds) => {
+  try {
+    const typesMap = {};
+    allTypeIds.forEach(typeId => typesMap[typeId] = { valor: 0 });
+    await setDoc(doc(db, `households/${householdId}/budgets/${year}/categories`, categoryId), {
+      types: typesMap
+    });
+  } catch (e) {
+    console.error("Erro ao adicionar categoria ao orçamento:", e);
+    throw e;
+  }
+};
+
+// Remove categoria do orçamento anual
+export const deleteBudgetCategory = async (householdId, year, categoryId) => {
+  try {
+    await deleteDoc(doc(db, `households/${householdId}/budgets/${year}/categories`, categoryId));
+  } catch (e) {
+    console.error("Erro ao deletar categoria do orçamento:", e);
+    throw e;
+  }
+};
+
+// Adiciona novo tipo em todas categorias do orçamento do ano para o household
+export const addTypeToBudgetInAllCategories = async (householdId, year, typeId) => {
+  try {
+    const categories = await fetchAllBudgets(householdId, year);
+    for (const cat of categories) {
+      await updateBudgetCategoryTypeValue(householdId, year, cat.id, typeId, 0);
+    }
+  } catch (e) {
+    console.error("Erro ao adicionar novo tipo em todas categorias do orçamento:", e);
+    throw e;
+  }
+};
+
+// Remove tipo de todas categorias do orçamento anual do household
+export const deleteTypeFromBudgetInAllCategories = async (householdId, year, typeId) => {
+  try {
+    const categories = await fetchAllBudgets(householdId, year);
+    for (const cat of categories) {
+      const budgetRef = doc(db, `households/${householdId}/budgets/${year}/categories`, cat.id);
+      await updateDoc(budgetRef, {
+        [`types.${typeId}`]: deleteField()
+      });
+    }
+  } catch (e) {
+    console.error("Erro ao remover tipo de todas categorias do orçamento:", e);
+    throw e;
+  }
+};
