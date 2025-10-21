@@ -1,17 +1,13 @@
 // src/services/userService.js
 
-import { doc, getDoc, deleteDoc, updateDoc, getDocs, collection } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, updateDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { removeUserFromHousehold } from "./householdService";
 
-/** Operações no banco de dados Firestore relacionadas aos usuários.
- * @param {string} uid - O UID do usuário.
- * @param {array} householdId - Array de IDs das famílias do usuário.
- * @param {boolean} isAdmin - Se o usuário é admin do sistema.
- * @param {string} name - Nome do usuário.
+/**
+ * Busca todos os usuários do sistema.
+ * @returns {Promise<Array>} Array de objetos de usuários.
  */
-
-// Função para buscar todos usuários
 export const fetchAllUsers = async () => {
   try {
     const usersRef = collection(db, "users");
@@ -19,8 +15,7 @@ export const fetchAllUsers = async () => {
     const users = [];
     snapshot.forEach((doc) => {
       users.push({ id: doc.id, ...doc.data() });
-    }
-    );
+    });
     return users;
   } catch (error) {
     console.error("Erro ao buscar usuários:", error);
@@ -28,8 +23,12 @@ export const fetchAllUsers = async () => {
   }
 };
 
-// Função para buscar os dados do usuário pelo UID
-export const fetchUserData = async (uid) => {
+/**
+ * Busca os dados do usuário pelo UID.
+ * @param {string} uid - O UID do usuário.
+ * @returns {Promise<Object>} Objeto de dados do usuário.
+ */
+export const fetchUserById = async (uid) => {
   try {
     const userRef = doc(db, "users", uid);
     const userSnap = await getDoc(userRef);
@@ -44,8 +43,15 @@ export const fetchUserData = async (uid) => {
   }
 };
 
-// Cria usuário
-export const createUserData = async (uid, householdIdArray, isAdmin, name) => {
+/**
+ * Cria um novo usuário no Firestore.
+ * @param {string} uid - O UID do usuário.
+ * @param {Array<string>} householdIdArray - Array de IDs de famílias do usuário.
+ * @param {boolean} isAdmin - Se o usuário é admin do sistema.
+ * @param {string} name - Nome do usuário.
+ * @returns {Promise<void>}
+ */
+export const createUser = async (uid, householdIdArray, isAdmin, name) => {
   try {
     await setDoc(doc(db, "users", uid), {
       householdId: householdIdArray,
@@ -58,21 +64,22 @@ export const createUserData = async (uid, householdIdArray, isAdmin, name) => {
   }
 };
 
-/** Função para atualizar os dados do usuário pelo UID
+/**
+ * Atualiza os dados do usuário pelo UID.
  * @param {string} uid - O UID do usuário.
- * @param {array} householdId - Array de IDs das famílias do usuário.
+ * @param {Array<string>|string} householdId - Array de IDs das famílias do usuário (ou string, será convertido).
  * @param {boolean} isAdmin - Se o usuário é admin do sistema.
  * @param {string} name - Nome do usuário.
- * A função recebe todos os campos a serem atualizados como parâmetros.
+ * @returns {Promise<void>}
  */
-export const updateUserData = async (uid, householdId, isAdmin, name) => {
+export const updateUser = async (uid, householdId, isAdmin, name) => {
   try {
     const householdIdArray = Array.isArray(householdId) ? householdId : [householdId];
     const userRef = doc(db, "users", uid);
     await updateDoc(userRef, {
       householdId: householdIdArray,
-      isAdmin: isAdmin,
-      name: name,
+      isAdmin,
+      name,
     });
   } catch (error) {
     console.error("Erro ao atualizar dados do usuário:", error);
@@ -80,12 +87,16 @@ export const updateUserData = async (uid, householdId, isAdmin, name) => {
   }
 };
 
-// Função para excluir o usuário pelo UID
-export const deleteUserData = async (uid) => {
+/**
+ * Exclui o usuário pelo UID.
+ * @param {string} uid - O UID do usuário.
+ * @returns {Promise<void>}
+ */
+export const deleteUser = async (uid) => {
   try {
     const userRef = doc(db, "users", uid);
     await deleteDoc(userRef);
-    await removeUserFromHousehold(uid);
+    await removeUserFromHousehold(uid); // Remove de todas as famílias onde era membro
   } catch (error) {
     console.error("Erro ao excluir dados do usuário:", error);
     throw error;

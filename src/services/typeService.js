@@ -1,83 +1,85 @@
 // src/services/typeService.js
 
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  getDoc
+} from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-/** Operações no banco de dados Firestore relacionadas aos tipos.
+/**
+ * Busca todos os tipos cadastrados de uma família.
+ * @param {string} householdId - O ID da família.
+ * @returns {Promise<Array>} Array de objetos tipo.
+ */
+export const fetchAllTypes = async (householdId) => {
+  const typesRef = collection(db, `households/${householdId}/types`);
+  const snapshot = await getDocs(typesRef);
+  const types = [];
+  snapshot.forEach((doc) => {
+    types.push({ id: doc.id, ...doc.data() });
+  });
+  return types;
+};
+
+/**
+ * Busca tipo por ID.
+ * @param {string} householdId - O ID da família.
+ * @param {string} typeId - O ID do tipo.
+ * @returns {Promise<Object>} Objeto tipo.
+ */
+export const fetchTypeById = async (householdId, typeId) => {
+  const typeRef = doc(db, `households/${householdId}/types`, typeId);
+  const typeSnap = await getDoc(typeRef);
+  if (typeSnap.exists()) {
+    return { id: typeSnap.id, ...typeSnap.data() };
+  } else {
+    throw new Error("Tipo não encontrado.");
+  }
+};
+
+/**
+ * Adiciona um tipo.
  * @param {string} householdId - O ID da família.
  * @param {string} name - O nome do tipo.
- * @param {string} typeId - O ID do tipo.
+ * @param {boolean} isIncome - True para receitas, False para despesas.
+ * @returns {Promise<void>}
  */
-
-// Função para buscar os tipos
-export const fetchAllypes = async (householdId) => {
-  try {
-    const typesRef = collection(db, `households/${householdId}/types`);
-    const snapshot = await getDocs(typesRef);
-    const types = [];
-    snapshot.forEach((doc) => {
-      types.push({ id: doc.id, ...doc.data() });
-    });
-    return types;
-  } catch (error) {
-    console.error("Erro ao buscar tipos:", error);
-    throw error;
-  }
-};
-
-// Função para buscar tipo por ID
-export const fetchTypeById = async (householdId, typeId) => {
-  try {
-    const typeRef = doc(db, `households/${householdId}/types`, typeId);
-    const typeSnap = await getDoc(typeRef);
-    if (typeSnap.exists()) {
-      return { id: typeSnap.id, ...typeSnap.data() };
-    } else {
-      throw new Error("Tipo não encontrado.");
-    }
-  } catch (error) {
-    console.error("Erro ao buscar tipo:", error);
-    throw error;
-  }
-};
-
-// Função para adicionar Tipo
-export const addType = async (householdId, name, isIncome = false) => {
+export const createType = async (householdId, name, isIncome = false) => {
   if (!householdId || !name.trim()) return;
-  try {
-    await addDoc(collection(db, `households/${householdId}/types`), {
-      name: name.trim(),
-      isIncome: isIncome,
-    });
-  } catch (e) {
-    console.error("Erro ao adicionar tipo:", e);
-  }
+  await addDoc(collection(db, `households/${householdId}/types`), {
+    name: name.trim(),
+    isIncome: isIncome,
+  });
 };
 
-// Função para atualizar um Tipo
+/**
+ * Atualiza um tipo.
+ * @param {string} householdId - O ID da família.
+ * @param {string} typeId - O ID do tipo.
+ * @param {string} newName - Novo nome do tipo.
+ * @param {boolean} newIsIncome - Novo valor de receita/despesa.
+ * @returns {Promise<void>}
+ */
 export const updateType = async (householdId, typeId, newName, newIsIncome) => {
   if (!householdId || !typeId) return;
-
   const updateData = {};
   if (newName) updateData.name = newName.trim();
   if (newIsIncome !== undefined) updateData.isIncome = newIsIncome;
-
-  try {
-    await updateDoc(
-      doc(db, `households/${householdId}/types`, typeId),
-      updateData
-    );
-  } catch (e) {
-    console.error("Erro ao atualizar tipo:", e);
-  }
+  await updateDoc(doc(db, `households/${householdId}/types`, typeId), updateData);
 };
 
-// Função para deletar um Tipo
+/**
+ * Deleta um tipo.
+ * @param {string} householdId - O ID da família.
+ * @param {string} typeId - O ID do tipo.
+ * @returns {Promise<void>}
+ */
 export const deleteType = async (householdId, typeId) => {
   if (!householdId || !typeId) return;
-  try {
-    await deleteDoc(doc(db, `households/${householdId}/types`, typeId));
-  } catch (e) {
-    console.error("Erro ao deletar tipo:", e);
-  }
+  await deleteDoc(doc(db, `households/${householdId}/types`, typeId));
 };

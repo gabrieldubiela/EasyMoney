@@ -1,22 +1,31 @@
 // src/services/registerService.js
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase/firebaseConfig';
+import { auth } from '../firebase/firebaseConfig';
+import { createHousehold, addMemberToHousehold, fetchHouseholdById } from './householdService';
+import { createUser } from './userService';
 
 /**
- * Função de serviço para registrar um novo usuário.
- * Contém toda a lógica de negócio para criar o usuário na autenticação,
- * criar/juntar-se a uma família (household) e criar o documento do usuário no Firestore.
- * * @param {object} userData - Os dados do formulário de registro.
- * @param {string} userData.email - O email do usuário.
- * @param {string} userData.password - A senha do usuário.
- * @param {string} userData.name - O nome do usuário.
- * @param {string} [userData.householdId] - O ID de uma família existente (opcional).
- * @param {string} [userData.familyName] - O nome para uma nova família (opcional).
+ * Serviço responsável por registrar usuário e gerenciar vínculo com família.
+ * Realiza a autenticação, cria ou vincula o usuário a uma família (household),
+ * e cria o documento do usuário no Firestore utilizando os services já existentes.
+ *
+ * @param {object} userData - Dados do formulário de registro.
+ * @param {string} userData.email - O e-mail do novo usuário.
+ * @param {string} userData.password - A senha do novo usuário.
+ * @param {string} userData.name - O nome do novo usuário.
+ * @param {string} [userData.householdId] - O ID de uma família existente (para entrar em uma já criada).
+ * @param {string} [userData.familyName] - Nome da nova família (caso crie uma).
+ * @returns {Promise<void>}
  */
-export const registerUserAndHandleHousehold = async ({ email, password, name, householdId, familyName }) => {
-  // 1. Cria o usuário no Firebase Authentication
+export const registerUserAndHandleHousehold = async ({
+  email,
+  password,
+  name,
+  householdId,
+  familyName
+}) => {
+  // 1. Criação do usuário no Firebase Authentication
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
 
@@ -26,47 +35,29 @@ export const registerUserAndHandleHousehold = async ({ email, password, name, ho
   try {
     // 2. Lógica de Família (Household)
     if (householdId) {
-      // Opção A: Entrando com convite/ID existente
-      const householdRef = doc(db, 'households', householdId);
-      const householdSnap = await getDoc(householdRef);
+      // Usuário está entrando em uma família existente
+      const existingHousehold = await fetchHouseholdById(householdId);
 
-      if (householdSnap.exists()) {
-        // Se a família existe, adiciona o novo membro
-        await updateDoc(householdRef, {
-          [`members.${user.uid}`]: false // Novo membro não é admin por padrão
-        });
+      if (existingHousehold) {
+        // Adiciona o usuário como membro comum (não admin)
+        await addMemberToHousehold(householdId, user.uid);
       } else {
-        // Se o código da família é inválido, desfaz a criação do usuário para não deixar lixo
+        // Household inexistente: desfaz criação de auth
         await user.delete();
-        throw new Error('Código de Família inválido.');
+        throw new Error("Código de família inválido. Verifique e tente novamente.");
       }
     } else {
-      // Opção B: Criando uma nova família
-      finalFamilyName = familyName;
-      finalHouseholdId = user.uid; // Define o ID da família como o UID do criador
-
-      await setDoc(doc(db, 'households', finalHouseholdId), {
-        familyName: finalFamilyName,
-        members: {
-          [user.uid]: true // O criador é admin
-        }
-      });
+      // Usuário está criando nova família
+      finalHouseholdId = user.uid; // Cria a família com o UID do usuário
+      await createHousehold(finalHouseholdId, familyName, user.uid); // Adiciona como admin
     }
 
-    // 3. Criação do Documento do Usuário (users)
-    await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
-      email: email,
-      name: name,
-      householdId: [finalHouseholdId],
-      isAdmin: false,
-    });
+    // 3. Criação do documento de usuário no Firestore
+    await createUser(user.uid, [finalHouseholdId], false, name);
 
   } catch (error) {
-    // Se qualquer passo na lógica do Firestore falhar, é uma boa prática
-    // deletar o usuário recém-criado no Auth para evitar inconsistências.
+    // Rollback: exclui usuário do Auth em caso de erro no Firestore
     await user.delete();
-    // Re-lança o erro para que o componente possa pegá-lo e exibir para o usuário.
     throw error;
   }
 };

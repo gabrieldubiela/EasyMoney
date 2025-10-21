@@ -1,4 +1,4 @@
-// src/services/categorieService.js
+// src/services/categoryService.js
 
 import {
   collection,
@@ -7,92 +7,75 @@ import {
   deleteDoc,
   updateDoc,
   doc,
+  getDoc
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-/** Operações no banco de dados Firestore relacionadas às categorias.
+/**
+ * Busca todas as categorias de uma família.
+ * @param {string} householdId - O ID da família.
+ * @returns {Promise<Array>} Array de objetos categoria.
+ */
+export const fetchAllCategories = async (householdId) => {
+  const categoriesRef = collection(db, `households/${householdId}/categories`);
+  const snapshot = await getDocs(categoriesRef);
+  const categories = [];
+  snapshot.forEach((doc) => {
+    categories.push({ id: doc.id, ...doc.data() });
+  });
+  return categories;
+};
+
+/**
+ * Busca categoria por ID.
+ * @param {string} householdId - O ID da família.
+ * @param {string} categoryId - O ID da categoria.
+ * @returns {Promise<Object>} Objeto categoria.
+ */
+export const fetchCategoryById = async (householdId, categoryId) => {
+  const categoryRef = doc(db, `households/${householdId}/categories`, categoryId);
+  const categorySnap = await getDoc(categoryRef);
+  if (categorySnap.exists()) {
+    return { id: categorySnap.id, ...categorySnap.data() };
+  } else {
+    throw new Error("Categoria não encontrada.");
+  }
+};
+
+/**
+ * Adiciona uma nova categoria.
  * @param {string} householdId - O ID da família.
  * @param {string} name - O nome da categoria.
- * @param {string} categoryId - O ID da categoria.
+ * @returns {Promise<void>}
  */
-
-// Função para buscar as categorias
-export const fetchAllCategories = async (householdId) => {
-  try {
-    const categoriesRef = collection(db, `households/${householdId}/categories`);
-    const snapshot = await getDocs(categoriesRef);
-    const categories = [];
-    snapshot.forEach((doc) => {
-      categories.push({ id: doc.id, ...doc.data() });
-    });
-    return categories;
-  } catch (error) {
-    console.error("Erro ao buscar categorias:", error);
-    throw error;
-  }
-};
-
-// Função para buscar categoria por ID
-export const fetchCategoryById = async (householdId, categoryId) => {
-  try {
-    const categoryRef = doc(db, `households/${householdId}/categories`, categoryId);
-    const categorySnap = await getDoc(categoryRef);
-    if (categorySnap.exists()) {
-      return { id: categorySnap.id, ...categorySnap.data() };
-    } else {
-      throw new Error("Categoria não encontrada.");
-    }
-  } catch (error) {
-    console.error("Erro ao buscar categoria:", error);
-    throw error;
-  }
-};
-
-// Função para adicionar Categoria
-export const addCategory = async (householdId, name) => {
+export const createCategory = async (householdId, name) => {
   if (!householdId || !name.trim()) return;
-  try {
-    await addDoc(collection(db, `households/${householdId}/categories`), {
-      name: name.trim(),
-    });
-  } catch (e) {
-    console.error("Erro ao adicionar categoria:", e);
-  }
+  await addDoc(collection(db, `households/${householdId}/categories`), {
+    name: name.trim(),
+  });
 };
 
-// Função para atualizar uma Categoria
+/**
+ * Atualiza uma categoria.
+ * @param {string} householdId - O ID da família.
+ * @param {string} categoryId - O ID da categoria.
+ * @param {string} newName - Novo nome da categoria.
+ * @returns {Promise<void>}
+ */
 export const updateCategory = async (householdId, categoryId, newName) => {
   if (!householdId || !categoryId) return;
-
   const updateData = {};
   if (newName) updateData.name = newName.trim();
-
-  try {
-    await updateDoc(
-      doc(db, `households/${householdId}/categories`, categoryId),
-      updateData
-    );
-  } catch (e) {
-    console.error("Erro ao atualizar categoria:", e);
-  }
+  await updateDoc(doc(db, `households/${householdId}/categories`, categoryId), updateData);
 };
 
-// Função para deletar uma Categoria
+/**
+ * Deleta uma categoria.
+ * @param {string} householdId - O ID da família.
+ * @param {string} categoryId - O ID da categoria.
+ * @returns {Promise<void>}
+ */
 export const deleteCategory = async (householdId, categoryId) => {
   if (!householdId || !categoryId) return;
-
-  if (
-    !window.confirm(
-      "ATENÇÃO: Excluir esta categoria não remove transações antigas. Continuar?"
-    )
-  )
-    return;
-
-  try {
-    await deleteDoc(
-      doc(db, `households/${householdId}/categories`, categoryId)
-    );
-  } catch (e) {
-    console.error("Erro ao deletar categoria:", e);
-  }
+  await deleteDoc(doc(db, `households/${householdId}/categories`, categoryId));
 };
