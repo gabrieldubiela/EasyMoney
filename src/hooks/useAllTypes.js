@@ -14,7 +14,7 @@ const useAllTypes = () => {
   useEffect(() => {
     const typesRef = collection(db, `households/${householdId}/types`);
     const unsubscribe = onSnapshot(typesRef, async () => {
-      const data = await fetchAllTypes();
+      const data = await fetchAllTypes(householdId);
       setTypes(data);
       setLoading(false);
     });

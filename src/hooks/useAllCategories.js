@@ -19,7 +19,7 @@ const useAllCategories = () => {
 
     const categoriesRef = collection(db, `households/${householdId}/categories`);
     const unsubscribe = onSnapshot(categoriesRef, async (snapshot) => {
-      const data = await fetchAllCategories();
+      const data = await fetchAllCategories(householdId);
       setCategories(data);
       setLoading(false);
     });

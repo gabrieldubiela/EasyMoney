@@ -4,7 +4,6 @@ import {
   collection,
   updateDoc,
   addDoc,
-  setDoc,
   deleteDoc,
   doc,
   query,
@@ -16,12 +15,25 @@ import {
 import { db } from "../firebase/firebaseConfig";
 
 /**
+ * Retorna o caminho correto da coleção de transações (reais ou planejadas)
+ * @param {string} householdId - O ID da família.
+ * @param {boolean} planned - Se true, retorna plannedTransactions.
+ * @returns {string} Caminho da coleção.
+ */
+const getCollectionPath = (householdId, planned = false) =>
+  planned
+    ? `households/${householdId}/plannedTransactions`
+    : `households/${householdId}/transactions`;
+
+/**
  * Busca todas as transações de uma família.
  * @param {string} householdId - O ID da família.
+ * @param {boolean} [planned=false] - Se true, busca plannedTransactions.
  * @returns {Promise<Array>} Array de objetos de transações.
  */
-export const fetchAllTransactions = async (householdId) => {
-  const transactionsRef = collection(db, `households/${householdId}/transactions`);
+export const fetchAllTransactions = async (householdId, planned = false) => {
+  const path = getCollectionPath(householdId, planned);
+  const transactionsRef = collection(db, path);
   const snapshot = await getDocs(transactionsRef);
   const transactions = [];
   snapshot.forEach((doc) => {
@@ -34,10 +46,12 @@ export const fetchAllTransactions = async (householdId) => {
  * Busca uma transação por ID.
  * @param {string} householdId - O ID da família.
  * @param {string} transactionId - O ID da transação.
+ * @param {boolean} [planned=false] - Se true, busca plannedTransactions.
  * @returns {Promise<Object>} Objeto transação.
  */
-export const fetchTransactionById = async (householdId, transactionId) => {
-  const transactionRef = doc(db, `households/${householdId}/transactions`, transactionId);
+export const fetchTransactionById = async (householdId, transactionId, planned = false) => {
+  const path = getCollectionPath(householdId, planned);
+  const transactionRef = doc(db, path, transactionId);
   const transactionSnap = await getDoc(transactionRef);
   if (transactionSnap.exists()) {
     return { id: transactionSnap.id, ...transactionSnap.data() };
@@ -49,18 +63,10 @@ export const fetchTransactionById = async (householdId, transactionId) => {
 /**
  * Cria uma transação (única ou parcelada).
  * @param {object} data - Dados da transação.
- * @param {string} data.householdId - O ID da família.
- * @param {string} data.userId - O ID do usuário.
- * @param {string} data.description - Descrição da transação.
- * @param {string} data.supplier - Fornecedor.
- * @param {number} data.amount - Valor total.
- * @param {string} data.category_id - ID da categoria.
- * @param {string} data.type_id - ID do tipo.
- * @param {string} data.date - Data da primeira parcela (aaaa-mm-dd).
- * @param {number} [data.installments_total=1] - Total de parcelas (1 se única).
+ * @param {boolean} [planned=false] - Se true, cria em plannedTransactions.
  * @returns {Promise<void>}
  */
-export const createTransaction = async (data) => {
+export const createTransaction = async (data, planned = false) => {
   const {
     householdId,
     userId,
@@ -73,7 +79,7 @@ export const createTransaction = async (data) => {
     installments_total = 1,
   } = data;
 
-    // Validação dos campos obrigatórios
+  // Validação dos campos obrigatórios
   if (
     !householdId ||
     !userId ||
@@ -88,27 +94,47 @@ export const createTransaction = async (data) => {
   }
 
   if (installments_total > 1) {
-    // Criação parcelada
-    await createInstallmentGroup({
-      householdId, userId, description, supplier, amount, category_id, type_id, date, installments_total
-    });
+    await createInstallmentGroup(
+      {
+        householdId,
+        userId,
+        description,
+        supplier,
+        amount,
+        category_id,
+        type_id,
+        date,
+        installments_total,
+      },
+      planned
+    );
   } else {
-    // Criação única
-    await createSingleTransaction({
-      householdId, userId, description, supplier, amount, category_id, type_id, date,
-      installments_current: 1,
-      installments_total: 1,
-      transactionGroupId: generateGroupId(),
-    });
+    await createSingleTransaction(
+      {
+        householdId,
+        userId,
+        description,
+        supplier,
+        amount,
+        category_id,
+        type_id,
+        date,
+        installments_current: 1,
+        installments_total: 1,
+        transactionGroupId: generateGroupId(),
+      },
+      planned
+    );
   }
 };
 
 /**
  * Cria uma transação unitária.
- * @param {object} data - Os dados da transação.
+ * @param {object} data - Dados da transação.
+ * @param {boolean} [planned=false] - Se true, cria em plannedTransactions.
  * @returns {Promise<void>}
  */
-const createSingleTransaction = async (data) => {
+const createSingleTransaction = async (data, planned = false) => {
   const {
     householdId,
     userId,
@@ -123,10 +149,11 @@ const createSingleTransaction = async (data) => {
     transactionGroupId,
   } = data;
 
-  const yearMonthIndex =
-    new Date(date).getFullYear().toString() + String(new Date(date).getMonth() + 1).padStart(2, "0");
+  const d = new Date(date);
+  const yearMonthIndex = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const path = getCollectionPath(householdId, planned);
 
-  await addDoc(collection(db, `households/${householdId}/transactions`), {
+  await addDoc(collection(db, path), {
     description: description.trim(),
     supplier: supplier.trim(),
     amount,
@@ -143,10 +170,11 @@ const createSingleTransaction = async (data) => {
 
 /**
  * Cria um grupo de transações parceladas.
- * @param {object} data - Os dados da transação parcelada.
+ * @param {object} data - Dados da transação parcelada.
+ * @param {boolean} [planned=false] - Se true, cria em plannedTransactions.
  * @returns {Promise<void>}
  */
-const createInstallmentGroup = async (data) => {
+const createInstallmentGroup = async (data, planned = false) => {
   const {
     householdId,
     userId,
@@ -163,6 +191,7 @@ const createInstallmentGroup = async (data) => {
   const parcelas = dividirParcelas(amount, installments_total);
   const startDate = new Date(date + "T00:00:00");
   const batch = writeBatch(db);
+  const path = getCollectionPath(householdId, planned);
 
   for (let i = 0; i < installments_total; i++) {
     const installmentDate = new Date(
@@ -174,7 +203,7 @@ const createInstallmentGroup = async (data) => {
       installmentDate.getFullYear().toString() +
       String(installmentDate.getMonth() + 1).padStart(2, "0");
 
-    const transactionRef = doc(collection(db, `households/${householdId}/transactions`));
+    const transactionRef = doc(collection(db, path));
     batch.set(transactionRef, {
       description: description.trim(),
       supplier: supplier.trim(),
@@ -202,7 +231,7 @@ const generateGroupId = () => {
 };
 
 /**
- * Divide o valor total das parcelas conforme padrão de cartão de crédito:
+ * Divide o valor total das parcelas conforme padrão de cartão de crédito.
  * A primeira parcela recebe a diferença para fechar o total.
  * @param {number} valorTotal - Valor total a parcelar.
  * @param {number} numParcelas - Total de parcelas.
@@ -225,15 +254,10 @@ const dividirParcelas = (valorTotal, numParcelas) => {
 /**
  * Atualiza uma transação (única ou grupo).
  * @param {object} data - Dados para atualização.
- * @param {string} data.householdId - O ID da família.
- * @param {string} data.transactionId - O ID da transação original.
- * @param {string} data.transactionGroupId - O groupId, se parcelada.
- * @param {boolean} data.editAllInstallments - Se for grupo, editar todas?
- * @param {number} data.installments_total - Novo total de parcelas.
- * @param {...any} restante - Os demais campos atualizados.
+ * @param {boolean} [planned=false] - Se true, altera plannedTransactions.
  * @returns {Promise<void>}
  */
-export const updateTransaction = async (data) => {
+export const updateTransaction = async (data, planned = false) => {
   const {
     householdId,
     transactionId,
@@ -245,64 +269,69 @@ export const updateTransaction = async (data) => {
 
   if (installments_total > 1) {
     if (editAllInstallments) {
-      await deleteInstallmentGroup(householdId, transactionGroupId);
-      await createInstallmentGroup({
-        ...fields,
-        householdId,
-        installments_total,
-        transactionGroupId: transactionGroupId || generateGroupId()
-      });
+      await deleteInstallmentGroup(householdId, transactionGroupId, planned);
+      await createInstallmentGroup(
+        {
+          ...fields,
+          householdId,
+          installments_total,
+          transactionGroupId: transactionGroupId || generateGroupId(),
+        },
+        planned
+      );
     } else {
-      await updateSingleTransaction({ householdId, transactionId, ...fields });
+      await updateSingleTransaction({ householdId, transactionId, ...fields }, planned);
     }
   } else {
-    // Edite para transação única
     if (transactionGroupId) {
-      await deleteInstallmentGroup(householdId, transactionGroupId);
+      await deleteInstallmentGroup(householdId, transactionGroupId, planned);
     }
-    await createSingleTransaction({
-      ...fields,
-      householdId,
-      installments_current: 1,
-      installments_total: 1,
-      transactionGroupId: generateGroupId(),
-    });
+    await createSingleTransaction(
+      {
+        ...fields,
+        householdId,
+        installments_current: 1,
+        installments_total: 1,
+        transactionGroupId: generateGroupId(),
+      },
+      planned
+    );
   }
 };
 
 /**
  * Atualiza uma transação unitária.
- * @param {object} data - Os dados necessários.
- * @param {string} data.householdId - O ID da família.
- * @param {string} data.transactionId - O ID da transação.
- * @param {...any} restante - Mais campos a atualizar.
+ * @param {object} data - Dados necessários.
+ * @param {boolean} [planned=false] - Se true, altera plannedTransactions.
  * @returns {Promise<void>}
  */
-const updateSingleTransaction = async ({ householdId, transactionId, ...fields }) => {
-  await updateDoc(doc(db, `households/${householdId}/transactions`, transactionId), fields);
+const updateSingleTransaction = async ({ householdId, transactionId, ...fields }, planned = false) => {
+  const path = getCollectionPath(householdId, planned);
+  await updateDoc(doc(db, path, transactionId), fields);
 };
 
 /**
  * Apaga uma transação única.
  * @param {string} householdId - O ID da família.
  * @param {string} transactionId - O ID da transação.
+ * @param {boolean} [planned=false] - Se true, deleta em plannedTransactions.
  * @returns {Promise<void>}
  */
-export const deleteTransaction = async (householdId, transactionId) => {
-  await deleteDoc(doc(db, `households/${householdId}/transactions`, transactionId));
+export const deleteTransaction = async (householdId, transactionId, planned = false) => {
+  const path = getCollectionPath(householdId, planned);
+  await deleteDoc(doc(db, path, transactionId));
 };
 
 /**
  * Apaga todas as transações de um grupo parcelado.
  * @param {string} householdId - O ID da família.
  * @param {string} transactionGroupId - O ID do grupo.
+ * @param {boolean} [planned=false] - Se true, deleta em plannedTransactions.
  * @returns {Promise<void>}
  */
-export const deleteInstallmentGroup = async (householdId, transactionGroupId) => {
-  const q = query(
-    collection(db, `households/${householdId}/transactions`),
-    where("transactionGroupId", "==", transactionGroupId)
-  );
+export const deleteInstallmentGroup = async (householdId, transactionGroupId, planned = false) => {
+  const path = getCollectionPath(householdId, planned);
+  const q = query(collection(db, path), where("transactionGroupId", "==", transactionGroupId));
   const snapshot = await getDocs(q);
   if (snapshot.empty) return;
   const batch = writeBatch(db);
