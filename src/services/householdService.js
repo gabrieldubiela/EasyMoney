@@ -1,7 +1,15 @@
 // src/services/householdService.js
 
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 // Função para buscar todos os dados das famílias (households)
 export const fetchAllHouseholds = async () => {
@@ -14,22 +22,26 @@ export const fetchAllHouseholds = async () => {
     });
     return households;
   } catch (error) {
-    console.error('Erro ao buscar famílias:', error);
+    console.error("Erro ao buscar famílias:", error);
     throw error;
   }
 };
 
 // Função para criar uma nova família (household)
-export const createHousehold = async (householdId, familyName, creatorUserId) => {
+export const createHousehold = async (
+  householdId,
+  familyName,
+  creatorUserId
+) => {
   try {
-    await setDoc(doc(db, 'households', householdId), {
+    await setDoc(doc(db, "households", householdId), {
       familyName: familyName,
       members: {
-        [creatorUserId]: true // O criador é admin
-      }
+        [creatorUserId]: true, // O criador é admin
+      },
     });
   } catch (error) {
-    console.error('Erro ao criar família:', error);
+    console.error("Erro ao criar família:", error);
     throw error;
   }
 };
@@ -37,17 +49,17 @@ export const createHousehold = async (householdId, familyName, creatorUserId) =>
 // Função para adicionar um membro a uma família existente
 export const addMemberToHousehold = async (householdId, userId) => {
   try {
-    const householdRef = doc(db, 'households', householdId);
+    const householdRef = doc(db, "households", householdId);
     const householdSnap = await getDoc(householdRef);
     if (householdSnap.exists()) {
       await updateDoc(householdRef, {
-        [`members.${userId}`]: false // Novo membro não é admin por padrão
+        [`members.${userId}`]: false, // Novo membro não é admin por padrão
       });
     } else {
-      throw new Error('Família não encontrada.');
+      throw new Error("Família não encontrada.");
     }
-    } catch (error) {
-    console.error('Erro ao adicionar membro à família:', error);
+  } catch (error) {
+    console.error("Erro ao adicionar membro à família:", error);
     throw error;
   }
 };
@@ -55,15 +67,15 @@ export const addMemberToHousehold = async (householdId, userId) => {
 // Função para buscar os dados de uma família pelo ID
 export const fetchHouseholdData = async (householdId) => {
   try {
-    const householdRef = doc(db, 'households', householdId);
+    const householdRef = doc(db, "households", householdId);
     const householdSnap = await getDoc(householdRef);
     if (householdSnap.exists()) {
       return householdSnap.data();
     } else {
-      throw new Error('Família não encontrada.');
+      throw new Error("Família não encontrada.");
     }
-    } catch (error) {
-    console.error('Erro ao buscar dados da família:', error);
+  } catch (error) {
+    console.error("Erro ao buscar dados da família:", error);
     throw error;
   }
 };
@@ -74,14 +86,14 @@ export const fetchHouseholdData = async (householdId) => {
  * @param {map} members - O novo mapa de membros da família.
  */
 export const updateHouseholdData = async (householdId, familyName, members) => {
-    try {
-    const householdRef = doc(db, 'households', householdId);
+  try {
+    const householdRef = doc(db, "households", householdId);
     await updateDoc(householdRef, {
       familyName: familyName,
-      members: members
+      members: members,
     });
   } catch (error) {
-    console.error('Erro ao atualizar dados da família:', error);
+    console.error("Erro ao atualizar dados da família:", error);
     throw error;
   }
 };
@@ -89,36 +101,40 @@ export const updateHouseholdData = async (householdId, familyName, members) => {
 // Função para alterar se um membro é admin ou não. O map possui um boolean para cada membro, true=admin, false=não admin
 export const updateMemberAdminStatus = async (householdId, members) => {
   try {
-    const householdRef = doc(db, 'households', householdId);
+    const householdRef = doc(db, "households", householdId);
     await updateDoc(householdRef, {
-      members: members
+      members: members,
     });
   } catch (error) {
-    console.error('Erro ao atualizar status de admin dos membros:', error);
+    console.error("Erro ao atualizar status de admin dos membros:", error);
     throw error;
   }
 };
 
-// Função para excluir um membro de uma família. Os membros da família em um map com userId como chave.
+// Função para excluir um membro de uma família. Os membros da família em um map com userId como chave. Caso não sobre nenhum membro, a família é excluída.
 export const removeMemberFromHousehold = async (householdId, userId) => {
   try {
-    const householdRef = doc(db, 'households', householdId);
+    const householdRef = doc(db, "households", householdId);
     const householdSnap = await getDoc(householdRef);
     if (householdSnap.exists()) {
       const members = householdSnap.data().members;
-        if (hasOwnProperty(members, userId)) {
-            delete members[userId];
-            await updateDoc(householdRef, {
-                members: members
-            });
+      if (Object.prototype.hasOwnProperty.call(members, userId)) {
+        delete members[userId];
+        if (Object.keys(members).length === 0) {
+          await deleteDoc(householdRef);
         } else {
-            throw new Error('Membro não encontrado na família.');
+          await updateDoc(householdRef, {
+            members: members,
+          });
         }
+      } else {
+        throw new Error("Membro não encontrado na família.");
+      }
     } else {
-      throw new Error('Família não encontrada.');
-    }  
-    } catch (error) {
-    console.error('Erro ao remover membro da família:', error);
+      throw new Error("Família não encontrada.");
+    }
+  } catch (error) {
+    console.error("Erro ao remover membro da família:", error);
     throw error;
   }
 };
@@ -126,10 +142,10 @@ export const removeMemberFromHousehold = async (householdId, userId) => {
 // Função para excluir uma família pelo ID
 export const deleteHousehold = async (householdId) => {
   try {
-    const householdRef = doc(db, 'households', householdId);
+    const householdRef = doc(db, "households", householdId);
     await deleteDoc(householdRef);
   } catch (error) {
-    console.error('Erro ao excluir família:', error);
+    console.error("Erro ao excluir família:", error);
     throw error;
   }
 };

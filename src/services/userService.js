@@ -2,6 +2,7 @@
 
 import { doc, getDoc, deleteDoc, updateDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
+import { removeUserFromHousehold } from "./householdService";
 
 // Função para buscar todos usuários
 export const fetchAllUsers = async () => {
@@ -45,9 +46,10 @@ export const fetchUserData = async (uid) => {
  */
 export const updateUserData = async (uid, householdId, isAdmin, name) => {
   try {
+    const householdIdArray = Array.isArray(householdId) ? householdId : [householdId];
     const userRef = doc(db, "users", uid);
     await updateDoc(userRef, {
-      [householdId]: householdId,
+      householdId: householdIdArray,
       isAdmin: isAdmin,
       name: name,
     });
@@ -62,7 +64,7 @@ export const deleteUserData = async (uid) => {
   try {
     const userRef = doc(db, "users", uid);
     await deleteDoc(userRef);
-    // Chama a função de exclusão do usuário de uma família
+    await removeUserFromHousehold(uid);
   } catch (error) {
     console.error("Erro ao excluir dados do usuário:", error);
     throw error;
