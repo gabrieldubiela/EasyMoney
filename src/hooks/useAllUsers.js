@@ -30,7 +30,6 @@ const useAllUsers = () => {
             setLoading(false);
         });
 
-        // Limpeza
         return () => unsubscribe();
     }, []);
 

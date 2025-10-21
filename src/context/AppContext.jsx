@@ -1,9 +1,10 @@
-//src/context/AppContext.jsx
+// src/context/AppContext.jsx
 import React, { useState, useEffect } from 'react';
-import { auth, db } from '../firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '../firebase/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { AppContext } from './appContextValue';
+import { fetchUserData } from '../services/userService';
+import { fetchHouseholdData } from '../services/householdService';
 
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
@@ -12,36 +13,47 @@ export const AppProvider = ({ children }) => {
   const [familyName, setFamilyName] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Detecta login/logout automaticamente
+  // Detecta login/logout
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoading(true);
       if (user) {
         const uid = user.uid;
         setUserId(uid);
 
-        // Busca householdId padrão do Firestore
         try {
-          const userRef = doc(db, 'users', uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            // O campo 'households' pode ser um array de ids
-            const defaultHousehold = Array.isArray(data.households)
-              ? data.households[0]
-              : data.households || null;
-            const name = data.name || null;
-            setUserName(name);
-            const familyName = data.familyName || null;
-            setFamilyName(familyName);
-            setHouseholdId(defaultHousehold);
+          // Busca dados do usuário via userService
+          const userData = await fetchUserData(uid);
+          const defaultHousehold = Array.isArray(userData.households)
+            ? userData.households[0]
+            : userData.households || null;
+          setUserName(userData.name || null);
+          setHouseholdId(defaultHousehold);
+
+          // Busca dados da família via householdService, se houver householdId
+          if (defaultHousehold) {
+            try {
+              const householdData = await fetchHouseholdData(defaultHousehold);
+              setFamilyName(householdData.family_name || null);
+            } catch (error) {
+              setFamilyName(null);
+              console.error('Erro ao buscar dados da família:', error);
+            }
+          } else {
+            setFamilyName(null);
           }
         } catch (error) {
-          console.error('Erro ao buscar householdId:', error);
+          setUserName(null);
+          setHouseholdId(null);
+          setFamilyName(null);
+          console.error('Erro ao buscar dados do usuário:', error);
         }
       } else {
         // Logout
         setUserId(null);
         setHouseholdId(null);
+        setUserName(null);
+        setFamilyName(null);
       }
       setLoading(false);
     });
@@ -49,9 +61,18 @@ export const AppProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Função para trocar de família manualmente
-  const changeHousehold = (newHouseholdId) => {
+  // Troca manual de família (id)
+  const changeHousehold = async (newHouseholdId) => {
     setHouseholdId(newHouseholdId);
+    setLoading(true);
+    try {
+      const householdData = await fetchHouseholdData(newHouseholdId);
+      setFamilyName(householdData.family_name || null);
+    } catch (error) {
+      setFamilyName(null);
+      console.error('Erro ao trocar família:', error);
+    }
+    setLoading(false);
   };
 
   return (
