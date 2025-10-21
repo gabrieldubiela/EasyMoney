@@ -1,6 +1,6 @@
 // src/services/householdService.js
 
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, hasOwnProperty, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
 // Função para buscar todos os dados das famílias (households)
