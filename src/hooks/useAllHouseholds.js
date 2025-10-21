@@ -11,7 +11,7 @@ const useAllHouseholds = () => {
 
     useEffect(() => {
         const householdsRef = collection(db, 'households');
-        const q = query(householdsRef, orderBy('family_name', 'asc'));
+        const q = query(householdsRef, orderBy('familyName', 'asc'));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const householdsList = snapshot.docs.map(doc => ({

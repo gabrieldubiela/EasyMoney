@@ -24,17 +24,17 @@ export const AppProvider = ({ children }) => {
         try {
           // Busca dados do usuário via userService
           const userData = await fetchUserData(uid);
-          const defaultHousehold = Array.isArray(userData.households)
-            ? userData.households[0]
-            : userData.households || null;
+          const defaultHouseholdId = Array.isArray(userData.householdId)
+            ? userData.householdId[0]
+            : userData.householdId || null;
           setUserName(userData.name || null);
-          setHouseholdId(defaultHousehold);
+          setHouseholdId(defaultHouseholdId);
 
           // Busca dados da família via householdService, se houver householdId
-          if (defaultHousehold) {
+          if (defaultHouseholdId) {
             try {
-              const householdData = await fetchHouseholdData(defaultHousehold);
-              setFamilyName(householdData.family_name || null);
+              const householdData = await fetchHouseholdData(defaultHouseholdId);
+              setFamilyName(householdData.familyName || null);
             } catch (error) {
               setFamilyName(null);
               console.error('Erro ao buscar dados da família:', error);
@@ -61,13 +61,13 @@ export const AppProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Troca manual de família (id)
+  // Troca manual de família
   const changeHousehold = async (newHouseholdId) => {
     setHouseholdId(newHouseholdId);
     setLoading(true);
     try {
       const householdData = await fetchHouseholdData(newHouseholdId);
-      setFamilyName(householdData.family_name || null);
+      setFamilyName(householdData.familyName || null);
     } catch (error) {
       setFamilyName(null);
       console.error('Erro ao trocar família:', error);

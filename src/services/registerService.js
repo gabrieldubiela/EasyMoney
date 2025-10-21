@@ -46,7 +46,7 @@ export const registerUserAndHandleHousehold = async ({ email, password, name, ho
       finalHouseholdId = user.uid; // Define o ID da família como o UID do criador
 
       await setDoc(doc(db, 'households', finalHouseholdId), {
-        family_name: finalFamilyName,
+        familyName: finalFamilyName,
         members: {
           [user.uid]: true // O criador é admin
         }

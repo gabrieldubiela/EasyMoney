@@ -23,7 +23,7 @@ export const fetchAllHouseholds = async () => {
 export const createHousehold = async (householdId, familyName, creatorUserId) => {
   try {
     await setDoc(doc(db, 'households', householdId), {
-      family_name: familyName,
+      familyName: familyName,
       members: {
         [creatorUserId]: true // O criador é admin
       }
@@ -77,7 +77,7 @@ export const updateHouseholdData = async (householdId, familyName, members) => {
     try {
     const householdRef = doc(db, 'households', householdId);
     await updateDoc(householdRef, {
-      family_name: familyName,
+      familyName: familyName,
       members: members
     });
   } catch (error) {
