@@ -1,26 +1,34 @@
 // src/services/userService.js
 
-import { doc, getDoc, setDoc, deleteDoc, updateDoc, getDocs, collection } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, updateDoc, getDocs, collection, where, query } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { removeUserFromHousehold } from "./householdService";
 
 /**
- * Busca todos os usuários do sistema.
- * @returns {Promise<Array>} Array de objetos de usuários.
+ * Busca usuários do sistema com filtros dinâmicos.
+ * @param {object} [filters={}] - Filtros opcionais (ex: isAdmin, householdId, isActive, name).
+ * @param {string} [filters.householdId] - ID da família.
+ * @param {boolean} [filters.isAdmin] - Filtrar apenas admins.
+ * @param {boolean} [filters.isActive] - Filtrar apenas ativos.
+ * @param {string} [filters.name] - Buscar por nome exato.
+ * @returns {Promise<Array>} Lista de usuários filtrados.
  */
-export const fetchAllUsers = async () => {
-  try {
-    const usersRef = collection(db, "users");
-    const snapshot = await getDocs(usersRef);
-    const users = [];
-    snapshot.forEach((doc) => {
-      users.push({ id: doc.id, ...doc.data() });
-    });
-    return users;
-  } catch (error) {
-    console.error("Erro ao buscar usuários:", error);
-    throw error;
+export const fetchAllUsers = async (filters = {}) => {
+  const usersRef = collection(db, "users");
+  const conditions = [];
+
+  if (filters.householdId) {
+    // householdId pode ser array; usamos array-contains
+    conditions.push(where("householdId", "array-contains", filters.householdId));
   }
+  if (filters.isAdmin !== undefined) conditions.push(where("isAdmin", "==", filters.isAdmin));
+  if (filters.isActive !== undefined) conditions.push(where("isActive", "==", filters.isActive));
+  if (filters.name) conditions.push(where("name", "==", filters.name));
+
+  const q = conditions.length > 0 ? query(usersRef, ...conditions) : usersRef;
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 /**

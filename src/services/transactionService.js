@@ -26,20 +26,58 @@ const getCollectionPath = (householdId, planned = false) =>
     : `households/${householdId}/transactions`;
 
 /**
- * Busca todas as transações de uma família.
+ * Busca todas as transações de uma família, com filtros dinâmicos opcionais.
  * @param {string} householdId - O ID da família.
- * @param {boolean} [planned=false] - Se true, busca plannedTransactions.
- * @returns {Promise<Array>} Array de objetos de transações.
+ * @param {object} [filters={}] - Filtros opcionais.
+ * @param {boolean} [filters.planned=false] - Busca plannedTransactions se true.
+ * @param {string} [filters.categoryId] - Filtra por categoria.
+ * @param {string} [filters.typeId] - Filtra por tipo.
+ * @param {string} [filters.userId] - Filtra por usuário.
+ * @param {string} [filters.yearMonth] - Filtra por mês (ex. '202510').
+ * @param {Date} [filters.startDate] - Data inicial no intervalo.
+ * @param {Date} [filters.endDate] - Data final no intervalo.
+ * @param {number} [filters.minAmount] - Valor mínimo.
+ * @param {number} [filters.maxAmount] - Valor máximo.
+ * @param {string} [filters.orderByField] - Campo para ordenar.
+ * @param {'asc' | 'desc'} [filters.orderDirection] - Ordem de classificação.
+ * @returns {Promise<Array>} Lista de transações filtradas.
  */
-export const fetchAllTransactions = async (householdId, planned = false) => {
+export const fetchAllTransactions = async (householdId, filters = {}) => {
+  const {
+    planned = false,
+    categoryId,
+    typeId,
+    userId,
+    yearMonth,
+    startDate,
+    endDate,
+    minAmount,
+    maxAmount,
+    orderByField,
+    orderDirection = 'asc',
+  } = filters;
+
   const path = getCollectionPath(householdId, planned);
   const transactionsRef = collection(db, path);
-  const snapshot = await getDocs(transactionsRef);
-  const transactions = [];
-  snapshot.forEach((doc) => {
-    transactions.push({ id: doc.id, ...doc.data() });
-  });
-  return transactions;
+  const conditions = [];
+
+  // Filtros dinâmicos
+  if (categoryId) conditions.push(where('category_id', '==', categoryId));
+  if (typeId) conditions.push(where('type_id', '==', typeId));
+  if (userId) conditions.push(where('user_id', '==', userId));
+  if (yearMonth) conditions.push(where('yearMonth', '==', yearMonth));
+  if (minAmount) conditions.push(where('amount', '>=', minAmount));
+  if (maxAmount) conditions.push(where('amount', '<=', maxAmount));
+  if (startDate) conditions.push(where('date', '>=', new Date(startDate)));
+  if (endDate) conditions.push(where('date', '<=', new Date(endDate)));
+
+  const q =
+    conditions.length > 0
+      ? query(transactionsRef, ...conditions, orderBy(orderByField || 'date', orderDirection))
+      : query(transactionsRef, orderBy(orderByField || 'date', orderDirection));
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 /**

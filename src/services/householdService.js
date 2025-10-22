@@ -8,20 +8,37 @@ import {
   deleteDoc,
   collection,
   getDocs,
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
 /**
- * Busca todas as famílias cadastradas no sistema.
- * @returns {Promise<Array>} Array de objetos família.
+ * Busca todas as famílias cadastradas, com opcionais filtros.
+ * @param {object} [filters={}] - Filtros opcionais. Ex: userId, familyName, minMembers.
+ * @param {string} [filters.userId] - Filtra famílias onde o usuário é membro.
+ * @param {string} [filters.familyName] - Filtrar nome exato.
+ * @param {number} [filters.minMembers] - Filtra famílias com ao menos X membros.
+ * @returns {Promise<Array>} Array de famílias filtradas.
  */
-export const fetchAllHouseholds = async () => {
+export const fetchAllHouseholds = async (filters = {}) => {
   const householdsRef = collection(db, "households");
-  const snapshot = await getDocs(householdsRef);
-  const households = [];
-  snapshot.forEach((doc) => {
-    households.push({ id: doc.id, ...doc.data() });
-  });
+  const conditions = [];
+
+  if (filters.userId) {
+    conditions.push(where(`members.${filters.userId}`, "!=", null));
+  }
+  if (filters.familyName) conditions.push(where("familyName", "==", filters.familyName));
+
+  const q = conditions.length > 0 ? query(householdsRef, ...conditions) : householdsRef;
+  const snapshot = await getDocs(q);
+
+  // Filtragem extra se usar minMembers
+  let households = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  if (filters.minMembers) {
+    households = households.filter(h => Object.keys(h.members || {}).length >= filters.minMembers);
+  }
+
   return households;
 };
 

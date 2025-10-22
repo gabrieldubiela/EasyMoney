@@ -8,23 +8,35 @@ import {
   updateDoc,
   doc,
   getDoc,
-  deleteField
+  deleteField,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
 /**
- * Busca todas as categorias de orçamento para um ano.
+ * Busca categorias de orçamento para um ano, com filtro opcional.
  * @param {string} householdId - O ID da família.
  * @param {string|number} year - O ano do orçamento.
+ * @param {object} [filters={}] - Filtros opcionais, ex: tipos ou valor diferente de zero.
+ * @param {string} [filters.typeId] - Apenas categorias que incluem esse tipo.
+ * @param {boolean} [filters.hasGoal] - Apenas categorias com valor maior que zero (meta definida) para qualquer tipo.
  * @returns {Promise<Array>} Array de objetos categoria do orçamento.
  */
-export const fetchAllBudgets = async (householdId, year) => {
+export const fetchAllBudgets = async (householdId, year, filters = {}) => {
   const categoriesRef = collection(db, `households/${householdId}/budgets/${year}/categories`);
   const snapshot = await getDocs(categoriesRef);
-  const budgets = [];
-  snapshot.forEach((doc) => {
-    budgets.push({ id: doc.id, ...doc.data() });
-  });
+  let budgets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  // Filtros customizáveis via JS (Firestore não permite em subcampos dinâmicos)
+  if (filters.typeId) {
+    budgets = budgets.filter(b => b.types && Object.keys(b.types).includes(filters.typeId));
+  }
+  if (filters.hasGoal) {
+    budgets = budgets.filter(b => {
+      if (!b.types) return false;
+      return Object.values(b.types).some(t => t.valor > 0);
+    });
+  }
+
   return budgets;
 };
 
