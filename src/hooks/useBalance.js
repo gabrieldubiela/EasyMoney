@@ -1,125 +1,108 @@
 // src/hooks/useBalance.js
 
-import { useState, useEffect, useMemo } from 'react';
-import { db } from '../firebase/firebaseConfig';
-import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
-import { useAppContext } from '../context/useAppContext';
+import { useMemo } from 'react';
+import useAllTransactions from './useAllTransactions';
+import useAllPlannedTransactions from './useAllPlannedTransactions';
+import useAllCategories from './useAllCategories';
+import useAllTypes from './useAllTypes';
 
+/**
+ * Hook responsável por calcular o balanço financeiro mensal da família,
+ * combinando os dados de diferentes coleções do Firestore:
+ *   - useAllTransactions: transações efetivas (realizadas)
+ *   - useAllPlannedTransactions: transações planejadas (a realizar)
+ *   - useAllCategories: categorias de transações
+ *   - useAllTypes: tipos (ex: receita, despesa, fixa, variável)
+ *
+ * @param {number|string} year - Ano de referência (ex: 2025).
+ * @param {number|string} month - Mês de referência (1 a 12).
+ * @returns {object} Dados consolidados do balanço:
+ *    { effectiveTransactions, plannedTransactions, categories, types, incomeEffective,
+ *      expenseEffective, incomePlanned, expensePlanned, netEffective, netPlanned, loading }
+ */
 export default function useBalance(year, month) {
-    const { householdId } = useAppContext();
-    
-    const [effectiveTransactions, setEffectiveTransactions] = useState([]);
-    const [plannedTransactions, setPlannedTransactions] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [types, setTypes] = useState([]);
-    const [loading, setLoading] = useState(true);
+  /** ---------------------------
+   * 1. Hooks de dados Firestore
+   * --------------------------*/
 
-    // Fetch com onSnapshot
-    useEffect(() => {
-        if (!householdId || !year || !month) {
-            setLoading(false);
-            return;
-        }
+  // Transações efetivas do mês
+  const {
+    transactions: effectiveTransactions,
+    loading: loadingEffective,
+  } = useAllTransactions({
+    yearMonth: `${year}${String(month).padStart(2, '0')}`,
+    planned: false,
+  });
 
-        setLoading(true);
+  // Transações planejadas
+  const {
+    transactions: plannedTransactions,
+    loading: loadingPlanned,
+  } = useAllPlannedTransactions();
 
-        const startOfMonth = new Date(year, month - 1, 1);
-        const endOfMonth = new Date(year, month, 0, 23, 59, 59);
-        const startTimestamp = Timestamp.fromDate(startOfMonth);
-        const endTimestamp = Timestamp.fromDate(endOfMonth);
+  // Categorias e Tipos
+  const { categories, loading: loadingCategories } = useAllCategories();
+  const { types, loading: loadingTypes } = useAllTypes();
 
-        // Listener para transações efetivas
-        const effectiveQuery = query(
-            collection(db, `households/${householdId}/transactions`),
-            where('date', '>=', startTimestamp),
-            where('date', '<=', endTimestamp)
-        );
+  /** ----------------------------------------
+   * 2. Cálculos de balanço consolidado
+   * ---------------------------------------*/
+  const financialData = useMemo(() => {
+    // Caso ainda não esteja carregado
+    if (!effectiveTransactions || !plannedTransactions) {
+      return {
+        incomeEffective: 0,
+        expenseEffective: 0,
+        incomePlanned: 0,
+        expensePlanned: 0,
+        netEffective: 0,
+        netPlanned: 0,
+      };
+    }
 
-        const unsubEffective = onSnapshot(effectiveQuery, (snapshot) => {
-            const transactions = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            setEffectiveTransactions(transactions);
-        });
+    // Transações realizadas
+    const incomeEffective = effectiveTransactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
 
-        // Listener para transações planejadas
-        const plannedQuery = query(
-            collection(db, `households/${householdId}/plannedTransactions`),
-            where('paymentDate', '>=', startTimestamp),
-            where('paymentDate', '<=', endTimestamp)
-        );
+    const expenseEffective = effectiveTransactions
+      .filter((t) => t.amount < 0)
+      .reduce((sum, t) => sum + t.amount, 0);
 
-        const unsubPlanned = onSnapshot(plannedQuery, (snapshot) => {
-            const transactions = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            setPlannedTransactions(transactions);
-        });
+    // Transações planejadas
+    const incomePlanned = plannedTransactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
 
-        // Listener para categorias
-        const categoriesQuery = collection(db, `households/${householdId}/categories`);
-        const unsubCategories = onSnapshot(categoriesQuery, (snapshot) => {
-            const cats = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            setCategories(cats);
-        });
-
-        // Listener para tipos
-        const typesQuery = collection(db, `households/${householdId}/types`);
-        const unsubTypes = onSnapshot(typesQuery, (snapshot) => {
-            const typs = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            setTypes(typs);
-            setLoading(false);
-        });
-
-        // Cleanup - desinscrever de todos os listeners
-        return () => {
-            unsubEffective();
-            unsubPlanned();
-            unsubCategories();
-            unsubTypes();
-        };
-    }, [householdId, year, month]);
-
-    // Separar receitas e despesas usando useMemo
-    const financialData = useMemo(() => {
-        const incomeEffective = effectiveTransactions
-            .filter(t => t.amount > 0)
-            .reduce((sum, t) => sum + t.amount, 0);
-        
-        const expenseEffective = effectiveTransactions
-            .filter(t => t.amount < 0)
-            .reduce((sum, t) => sum + t.amount, 0);
-
-        const incomePlanned = plannedTransactions
-            .filter(t => t.amount > 0)
-            .reduce((sum, t) => sum + t.amount, 0);
-        
-        const expensePlanned = plannedTransactions
-            .filter(t => t.amount < 0)
-            .reduce((sum, t) => sum + t.amount, 0);
-
-        return {
-            incomeEffective,
-            expenseEffective,
-            incomePlanned,
-            expensePlanned
-        };
-    }, [effectiveTransactions, plannedTransactions]);
+    const expensePlanned = plannedTransactions
+      .filter((t) => t.amount < 0)
+      .reduce((sum, t) => sum + t.amount, 0);
 
     return {
-        effectiveTransactions,
-        plannedTransactions,
-        categories,
-        types,
-        ...financialData,
-        loading
+      incomeEffective,
+      expenseEffective,
+      incomePlanned,
+      expensePlanned,
+      netEffective: incomeEffective + expenseEffective,
+      netPlanned: incomePlanned + expensePlanned,
     };
+  }, [effectiveTransactions, plannedTransactions]);
+
+  /** ---------------------------
+   * 3. Estado de carregamento unificado
+   * --------------------------*/
+  const loading =
+    loadingEffective || loadingPlanned || loadingCategories || loadingTypes;
+
+  /** ---------------------------
+   * 4. Dados retornados pelo hook
+   * --------------------------*/
+  return {
+    effectiveTransactions,
+    plannedTransactions,
+    categories,
+    types,
+    ...financialData,
+    loading,
+  };
 }

@@ -1,66 +1,131 @@
 // src/hooks/useDashboardData.js
 
-import { useState, useMemo } from 'react';
-import useAnnualData from './useAnnualData';
-import useCombinedHouseholdData from './useCombinedHouseholdData';
-import useMonthlyBalance from './useMonthlyBalance';
+import { useMemo } from 'react';
+import useHouseholdBaseData from './useHouseholdBaseData';
 import useMonthlyPerformanceData from './useMonthlyPerformanceData';
-import useScheduledPayments from './useScheduledPayments';
+import useBalance from './useBalance';
+import useAnnualData from './useAnnualData';
 import useMonthClosingStatus from './useMonthClosingStatus';
 
-// Hook container que orquestra todos os dados necessários para o Dashboard.
+/**
+ * Hook agregador e analítico para o Dashboard principal.
+ * 
+ * - Combina múltiplos hooks de dados (via useHouseholdBaseData)
+ * - Deriva métricas simplificadas para exibição (saldo, alertas, metas, investimentos)
+ * - Calcula indicadores de desempenho mensal e anual
+ */
 export default function useDashboardData() {
-    const today = new Date();
-    const currentYear = today.getFullYear().toString();
-    const currentMonth = today.getMonth() + 1;
-    const currentYearMonth = `${currentYear}${String(currentMonth).padStart(2, '0')}`;
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const yearMonth = `${year}${String(month).padStart(2, '0')}`;
 
-    // 1. Estado local da UI que pertence ao dashboard
-    const [availableFunds, setAvailableFunds] = useState(0);
+  // 1️⃣ Fonte unificada de dados base
+  const {
+    categories,
+    types,
+    transactions,
+    plannedTransactions,
+    alerts,
+    budgets,
+    goals,
+    investments,
+    investmentsHistory,
+    loading: baseLoading,
+    error: baseError,
+  } = useHouseholdBaseData({
+    includeAnnualData: true,
+    includeMonthStatus: true,
+  });
 
-    // 2. Hooks de dados base
-    const { categories, types, categoryMap, loading: metadataLoading } = useCombinedHouseholdData();
-    const { annualData, loading: annualLoading } = useAnnualData(currentYear);
-    const { upcomingPayments, loading: paymentsLoading } = useScheduledPayments();
-    const { needsClosing, loading: closingLoading } = useMonthClosingStatus();
-    
-    // 3. Hooks que dependem de outros dados
-    const { balance, totalEffective, totalPlanned, loading: balanceLoading } = useMonthlyBalance(currentYear, currentMonth, availableFunds);
-    const { performance, loading: performanceLoading } = useMonthlyPerformanceData({ yearMonth: currentYearMonth, annualData, categories, types });
+  // 2️⃣ Relatórios e cálculos derivados
+  const { performance, loading: performanceLoading } = useMonthlyPerformanceData({
+    yearMonth,
+    annualData: budgets, // or budgets from AnnualData if needed
+    categories,
+    types,
+  });
 
-    // 4. Cálculos derivados (memoizados para performance) 
-    const { criticalCategories } = useMemo(() => {
-        // Categorias críticas
-        const critical = Object.values(performance).filter(item => 
-            item.isOverBudget || (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2)
-        );
+  const { incomeEffective, expenseEffective, netEffective, loading: balanceLoading } = useBalance(
+    year,
+    month
+  );
 
-        return { criticalCategories: critical };
-    }, [performance]);
+  const { annualData, loading: annualLoading } = useAnnualData(year);
+  const { monthStatus, loading: closingLoading } = useMonthClosingStatus();
 
-    const isLoading = metadataLoading || annualLoading || paymentsLoading || closingLoading || balanceLoading || performanceLoading;
+  // 3️⃣ Cálculos derivados e insights para exibição (Memo para performance)
+  const criticalCategories = useMemo(() => {
+    if (!performance || Object.keys(performance).length === 0) return [];
 
-    return {
-        // Estado e Setters
-        availableFunds,
-        setAvailableFunds,
-        // Dados brutos e calculados
-        balance,
-        totalEffective,
-        totalPlanned,
-        upcomingPayments,
-        needsClosing,
-        criticalCategories,
-        annualData,
-        // Dados para passar para o serviço de fechamento de mês
-        performanceDataForClosing: {
-            performance,
-            categories,
-            types,
-            yearMonth: currentYearMonth
-        },
-        // Status
-        isLoading,
-        categoryMap
-    };
+    return Object.values(performance)
+      .filter(
+        (item) =>
+          item.isOverBudget ||
+          (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2)
+      )
+      .sort((a, b) => Math.abs(a.remaining) - Math.abs(b.remaining))
+      .slice(0, 5); // top 5 categorias mais críticas
+  }, [performance]);
+
+  const recentTransactions = useMemo(() => {
+    return transactions
+      .sort((a, b) => b.date?.toDate() - a.date?.toDate())
+      .slice(0, 6);
+  }, [transactions]);
+
+  const recentAlerts = useMemo(() => {
+    return alerts
+      .sort((a, b) => b.createdAt?.toDate() - a.createdAt?.toDate())
+      .slice(0, 5);
+  }, [alerts]);
+
+  const investmentSummary = useMemo(() => {
+    const totalInvestments = investments.reduce(
+      (sum, i) => sum + (i.currentValue || 0),
+      0
+    );
+    const goalInvestments = goals
+      .filter((g) => g.type === 'investment')
+      .reduce((sum, g) => sum + (g.targetValue || 0), 0);
+    const gainPercent =
+      goalInvestments > 0
+        ? ((totalInvestments - goalInvestments) / goalInvestments) * 100
+        : 0;
+
+    return { totalInvestments, gainPercent };
+  }, [investments, goals]);
+
+  // 4️⃣ Indicadores e estados de carregamento
+  const isLoading =
+    baseLoading ||
+    performanceLoading ||
+    balanceLoading ||
+    annualLoading ||
+    closingLoading;
+
+  return {
+    // Principais blocos de dados
+    balance: {
+      incomeEffective,
+      expenseEffective,
+      netEffective,
+    },
+    annualData,
+    performance,
+    monthStatus,
+
+    // Painel de destaques e avisos
+    criticalCategories,
+    recentTransactions,
+    recentAlerts,
+
+    // Resumo de metas e investimentos
+    investmentSummary,
+    goals,
+
+    // Controle global (UI)
+    isLoading,
+    error: baseError,
+  };
 }

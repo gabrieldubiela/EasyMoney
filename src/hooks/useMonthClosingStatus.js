@@ -2,57 +2,65 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore'; 
+import { doc, getDoc } from 'firebase/firestore';
 import { useAppContext } from '../context/useAppContext';
 
 /**
- * Hook para verificar se o mês anterior foi formalmente fechado (com rollover calculado).
- * A verificação é feita buscando um documento de monthlyBudget com a flag 'isClosed'.
+ * Hook responsável por verificar o status de fechamento do mês anterior.
+ * 
+ * - Verifica se o documento de orçamento (`monthlyBudgets/{yearMonth}`) do mês anterior
+ *   existe e contém a flag `isClosed: true`.
+ * - Caso contrário, sinaliza que o fechamento é necessário.
+ * 
+ * Utilidade:
+ *   Garante integridade contábil antes de cálculos de rollover e performance.
+ * 
+ * @returns {object} { needsClosing, loading }
+ *    - needsClosing: { yearMonth, monthName, hasData } ou false
+ *    - loading: boolean
  */
-const useMonthClosingStatus = () => {
-    const { householdId } = useAppContext();
-    const [needsClosing, setNeedsClosing] = useState(false);
-    const [loading, setLoading] = useState(true);
+export default function useMonthClosingStatus() {
+  const { householdId } = useAppContext();
+  const [needsClosing, setNeedsClosing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!householdId) return;
+  useEffect(() => {
+    if (!householdId) return;
 
-        const checkStatus = async () => {
-            setLoading(true);
-            const today = new Date();
-            // Calcula o mês anterior
-            const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-            
-            const yearMonth = `${prevMonthDate.getFullYear()}${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
-            const monthName = prevMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-            
-            // 1. Busca qualquer documento do mês anterior.
-            // A premissa é que o closeMonthAndCalculateRollover cria/atualiza o documento do mês anterior com isClosed: true.
-            const budgetRef = doc(db, `households/${householdId}/monthlyBudgets`, yearMonth);
+    const checkStatus = async () => {
+      try {
+        setLoading(true);
 
-            try {
-                const docSnap = await getDoc(budgetRef);
-                
-                // Se o documento existe e NÃO está marcado como isClosed: true, precisa fechar.
-                // Se não existe, também precisamos fechar (é a primeira vez).
-                if (!docSnap.exists() || docSnap.data().isClosed !== true) {
-                    setNeedsClosing({ yearMonth, monthName, hasData: docSnap.exists() });
-                } else {
-                    setNeedsClosing(false);
-                }
-            } catch (error) {
-                console.error("Erro ao verificar status de fechamento de mês:", error);
-                setNeedsClosing(false); 
-            } finally {
-                setLoading(false);
-            }
-        };
+        const today = new Date();
+        const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const yearMonth = `${prevMonthDate.getFullYear()}${String(
+          prevMonthDate.getMonth() + 1
+        ).padStart(2, '0')}`;
+        const monthName = prevMonthDate.toLocaleDateString('pt-BR', {
+          month: 'long',
+          year: 'numeric',
+        });
 
-        checkStatus();
-    }, [householdId]);
+        // Referência direta ao documento do mês anterior
+        const budgetRef = doc(db, `households/${householdId}/monthlyBudgets`, yearMonth);
+        const docSnap = await getDoc(budgetRef);
 
-    // Retorna { yearMonth, monthName, hasData } se precisar fechar, ou false se OK
-    return { needsClosing, loading };
-};
+        // Se não houver doc ou não estiver fechado, precisa de fechamento
+        if (!docSnap.exists() || docSnap.data().isClosed !== true) {
+          setNeedsClosing({ yearMonth, monthName, hasData: docSnap.exists() });
+        } else {
+          setNeedsClosing(false);
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status de fechamento:', error);
+        setNeedsClosing(false);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-export default useMonthClosingStatus;
+    checkStatus();
+  }, [householdId]);
+
+  return { needsClosing, loading };
+}

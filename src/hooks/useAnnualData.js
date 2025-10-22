@@ -6,22 +6,16 @@ import { fetchAllBudgets } from '../services/budgetService';
 import { fetchAllTransactions } from '../services/transactionService';
 
 /**
- * Estrutura padrão de dados para inicialização de categorias.
- * Contém o orçamento e os totais mensais.
- */
-const INITIAL_CATEGORY_DATA = {
-  budgeted: 0,
-  monthlyActuals: Array(12).fill(0),
-};
-
-/**
- * Hook responsável por consolidar os dados anuais de orçamento e transações,
- * calculando métricas como total de receitas, despesas e desempenho mensal.
+ * Hook responsável por consolidar dados anuais de orçamento e transações.
  *
- * @param {string|number} selectedYear - Ano selecionado para análise (ex: '2025').
- * @returns {object} Retorna dados consolidados, status de carregamento e erros.
+ * - Busca budgets e transactions via serviços externos.
+ * - Agrega todas as transações do ano (1º jan → 31 dez).
+ * - Calcula receitas, despesas, saldo líquido e médias mensais.
+ *
+ * @param {string|number} selectedYear - Ano selecionado, ex: "2025".
+ * @returns {object} { annualData, loading, error }
  */
-const useAnnualData = (selectedYear) => {
+export default function useAnnualData(selectedYear) {
   const { householdId } = useAppContext();
   const [annualData, setAnnualData] = useState({
     summary: {},
@@ -32,75 +26,64 @@ const useAnnualData = (selectedYear) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Garante que só executa se existir householdId e ano válido
     if (!householdId || !selectedYear) return;
 
-    /**
-     * Busca dados de orçamento e transações e realiza a consolidação.
-     */
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
       try {
-        // 1. Busca dados dos budgets e transactions via services
-        const budgets = await fetchAllBudgets(householdId, selectedYear);
-        const transactions = await fetchAllTransactions(householdId, {
-          startDate: new Date(`${selectedYear}-01-01`),
-          endDate: new Date(`${selectedYear}-12-31`),
-        });
+        // 1. Busca budgets e transações do ano selecionado
+        const [budgets, transactions] = await Promise.all([
+          fetchAllBudgets(householdId, selectedYear),
+          fetchAllTransactions(householdId, {
+            startDate: new Date(`${selectedYear}-01-01`),
+            endDate: new Date(`${selectedYear}-12-31`),
+          }),
+        ]);
 
-        // 2. Monta estrutura base dos dados de orçamento
-        const budgetsMap = {};
+        // 2. Estrutura inicial
+        const dataMap = {};
         budgets.forEach((cat) => {
-          budgetsMap[cat.id] = {
-            ...INITIAL_CATEGORY_DATA,
+          dataMap[cat.id] = {
             budgeted: cat.totalBudget || 0,
-            docId: cat.id,
+            monthlyActuals: Array(12).fill(0),
           };
         });
 
-        // 3. Integra transações mensais ao mapa de categorias
+        // 3. Soma transações de cada mês
         transactions.forEach((t) => {
-          const { category_id, amount, yearMonth } = t;
-          const monthIndex = parseInt(yearMonth.substring(4, 6), 10) - 1;
-          if (!budgetsMap[category_id])
-            budgetsMap[category_id] = { ...INITIAL_CATEGORY_DATA, docId: null };
-
-          budgetsMap[category_id].monthlyActuals[monthIndex] += amount;
+          const monthIndex = parseInt(t.yearMonth.substring(4, 6), 10) - 1;
+          if (!dataMap[t.category_id])
+            dataMap[t.category_id] = { budgeted: 0, monthlyActuals: Array(12).fill(0) };
+          dataMap[t.category_id].monthlyActuals[monthIndex] += t.amount;
         });
 
-        // 4. Calcula métricas anuais (YTD)
+        // 4. Calcula somatórios YTD
+        let totalRevenueYTD = 0;
+        let totalExpenseYTD = 0;
         const currentYear = new Date().getFullYear();
         const monthsInPeriod =
-          currentYear === parseInt(selectedYear, 10)
+          parseInt(selectedYear, 10) === currentYear
             ? new Date().getMonth() + 1
             : 12;
 
-        let totalRevenueYTD = 0;
-        let totalExpenseYTD = 0;
+        const performance = Object.entries(dataMap).reduce((acc, [catId, entry]) => {
+          const spentYTD = entry.monthlyActuals
+            .slice(0, monthsInPeriod)
+            .reduce((a, b) => a + b, 0);
 
-        const performance = Object.entries(budgetsMap).reduce(
-          (acc, [catId, data]) => {
-            const spentYTD = data.monthlyActuals
-              .slice(0, monthsInPeriod)
-              .reduce((a, b) => a + b, 0);
+          if (spentYTD > 0) totalRevenueYTD += spentYTD;
+          else totalExpenseYTD += spentYTD;
 
-            if (spentYTD > 0) totalRevenueYTD += spentYTD;
-            else totalExpenseYTD += spentYTD;
+          acc[catId] = {
+            categoryId: catId,
+            ...entry,
+            spentYTD,
+            annualBudget: entry.budgeted,
+          };
+          return acc;
+        }, {});
 
-            acc[catId] = {
-              categoryId: catId,
-              ...data,
-              spentYTD,
-              annualBudget: data.budgeted,
-            };
-
-            return acc;
-          },
-          {}
-        );
-
-        // 5. Define estrutura final dos dados anuais
+        // 5. Define dados consolidados
         setAnnualData({
           summary: {
             totalRevenueYTD,
@@ -108,16 +91,14 @@ const useAnnualData = (selectedYear) => {
             netBalanceYTD: totalRevenueYTD + totalExpenseYTD,
             monthsInPeriod,
             avgMonthlySpent:
-              monthsInPeriod > 0
-                ? Math.abs(totalExpenseYTD / monthsInPeriod)
-                : 0,
+              monthsInPeriod > 0 ? Math.abs(totalExpenseYTD / monthsInPeriod) : 0,
           },
           performanceByCategories: performance,
-          rawAnnualData: budgetsMap,
+          rawAnnualData: dataMap,
         });
       } catch (err) {
-        console.error('Erro ao buscar dados anuais:', err);
-        setError('Falha ao carregar dados anuais.');
+        console.error('Erro ao carregar dados anuais:', err);
+        setError('Falha ao buscar dados anuais.');
       } finally {
         setLoading(false);
       }
@@ -127,6 +108,4 @@ const useAnnualData = (selectedYear) => {
   }, [householdId, selectedYear]);
 
   return { annualData, loading, error };
-};
-
-export default useAnnualData;
+}
