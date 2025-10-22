@@ -1,4 +1,4 @@
-// src/hooks/useAlerts.js
+// src/hooks/useAllAlerts.js
 
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
@@ -12,7 +12,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
  * @param {object} [filters] - Filtros opcionais ({ type, status }).
  * @returns {object} { alerts, loading, error }
  */
-const useAlerts = (filters = {}) => {
+const useAllAlerts = (filters = {}) => {
   const { householdId } = useAppContext();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,4 +58,4 @@ const useAlerts = (filters = {}) => {
   return { alerts, loading, error };
 };
 
-export default useAlerts;
+export default useAllAlerts;
