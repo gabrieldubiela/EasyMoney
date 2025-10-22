@@ -124,10 +124,10 @@ const useRealtimeAlertManager = ({ selectedYear, yearMonth, annualData }) => {
           const refStr = referenceDate.toISOString().split('T')[0];
 
           const duePayments = plannedTransactions.filter((p) => {
-            if (!p.paymentDate) return false;
-            const payDate = p.paymentDate.toDate
-              ? p.paymentDate.toDate()
-              : p.paymentDate;
+            if (!p.date) return false;
+            const payDate = p.date.toDate
+              ? p.date.toDate()
+              : p.date;
             const payStr = payDate.toISOString().split('T')[0];
             return payStr === refStr;
           });

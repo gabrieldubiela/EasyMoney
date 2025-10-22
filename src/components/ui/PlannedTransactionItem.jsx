@@ -24,7 +24,7 @@ const PlannedTransactionItem = ({ transaction, categoryName, typeName, onConvert
 
         try {
             // 1. Prepara dados para a Despesa Efetiva
-            const transactionDate = transaction.paymentDate.toDate().toISOString().substring(0, 10);
+            const transactionDate = transaction.date.toDate().toISOString().substring(0, 10);
             const startDate = new Date(transactionDate + 'T00:00:00'); 
             const yearMonthIndex = startDate.getFullYear().toString() + String(startDate.getMonth() + 1).padStart(2, '0');
 
@@ -34,7 +34,7 @@ const PlannedTransactionItem = ({ transaction, categoryName, typeName, onConvert
                 amount: transaction.amount, 
                 category_id: transaction.category_id,
                 type_id: transaction.type_id,
-                date: transaction.paymentDate, // Usa a data planeada como data de pagamento
+                date: transaction.date, // Usa a data planeada como data de pagamento
                 installments_total: 1,
                 installments_current: 1, 
                 user_id: user.uid,
@@ -75,7 +75,7 @@ const PlannedTransactionItem = ({ transaction, categoryName, typeName, onConvert
             <div>
                 <strong>{transaction.description}</strong> - R$ {transaction.amount.toFixed(2)}
                 <p style={{ margin: 0, fontSize: '0.9em' }}>
-                    Data Planejada: {formatDate(transaction.paymentDate)} | 
+                    Data Planejada: {formatDate(transaction.date)} | 
                     Categoria: {categoryName} | 
                     Tipo: {typeName}
                 </p>

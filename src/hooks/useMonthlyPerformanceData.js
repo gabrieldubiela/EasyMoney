@@ -1,5 +1,3 @@
-// src/hooks/useMonthlyPerformanceData.js
-
 import { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -8,41 +6,31 @@ import { useAppContext } from '../context/useAppContext';
 /**
  * Hook responsável por consolidar dados de performance orçamentária mensal.
  * 
- * - Escuta mudanças em tempo real de `transactions` e `monthlyBudgets`.
- * - Calcula o desempenho de gastos por categoria.
- * - Retorna estrutura consolidada com status de carregamento.
+ * Observa em tempo real transações para o mês e orçamentos anuais por categoria.
+ * Retorna estrutura consolidada para cálculo de gastos, metas e saldo disponível.
  *
- * Observação:
- *   As medições usam o padrão esperado:
- *   - `category_id`: categoria vinculada à transação
- *   - `type.isIncome`: define receitas (ignora no cálculo de despesas)
- *
- * @param {object} params 
- * @param {string} params.yearMonth - Mês no formato YYYYMM.
- * @param {object} params.annualData - Dados anuais (com metas).
- * @param {Array<object>} params.categories - Lista de categorias.
- * @param {Array<object>} params.types - Lista de tipos de transações.
+ * @param {object} params
+ * @param {string} params.yearMonth - Mês no formato 'YYYYMM'.
+ * @param {object} params.annualData - Dados anuais com metas por categoria.
+ * @param {Array} params.categories - Lista de categorias.
+ * @param {Array} params.types - Lista de tipos de transação (receita/despesa).
+ * 
  * @returns {object} { performance, loading }
  */
 export default function useMonthlyPerformanceData({
   yearMonth,
   annualData,
   categories,
-  types
+  types,
 }) {
   const { householdId } = useAppContext();
+
   const [performance, setPerformance] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Bloqueia execução enquanto dependências essenciais não estão prontas
-    if (
-      !householdId ||
-      !yearMonth ||
-      !annualData ||
-      categories.length === 0 ||
-      types.length === 0
-    ) {
+    // Bloqueia execução se dados essenciais não estiverem prontos
+    if (!householdId || !yearMonth || !annualData || !categories.length || !types.length) {
       setPerformance({});
       setLoading(false);
       return;
@@ -50,44 +38,43 @@ export default function useMonthlyPerformanceData({
 
     setLoading(true);
 
-    // Queries Firestore
+    // Query transações do mês
     const transactionsRef = collection(db, `households/${householdId}/transactions`);
-    const monthlyBudgetsRef = collection(db, `households/${householdId}/monthlyBudgets`);
-
     const transactionsQuery = query(transactionsRef, where('yearMonth', '==', yearMonth));
-    const budgetsQuery = query(monthlyBudgetsRef, where('yearMonth', '==', yearMonth));
 
-    // Listener principal de transações
+    // Refere-se ao orçamento anual por categorias (não query, collection direta)
+    const budgetsCollectionRef = collection(db, `households/${householdId}/budgets/${yearMonth.slice(0, 4)}/categories`);
+
+    // Listener para transações do mês
     const unsubscribeTransactions = onSnapshot(
       transactionsQuery,
       (transactionsSnap) => {
         const realSpentByCategory = {};
 
-        transactionsSnap.docs.forEach((doc) => {
+        transactionsSnap.docs.forEach(doc => {
           const transaction = doc.data();
-          const typeInfo = types.find((t) => t.id === transaction.type_id);
+          const typeInfo = types.find(t => t.id === transaction.type_id);
 
-          // Acumula valores apenas de despesas
+          // Acumula valores apenas para despesas
           if (transaction.category_id && typeInfo && !typeInfo.isIncome) {
-            realSpentByCategory[transaction.category_id] =
-              (realSpentByCategory[transaction.category_id] || 0) + transaction.amount;
+            realSpentByCategory[transaction.category_id] = (realSpentByCategory[transaction.category_id] || 0) + transaction.amount;
           }
         });
 
-        // Listener dos orçamentos mensais
+        // Listener para orçamentos do ano (categoria)
         const unsubscribeBudgets = onSnapshot(
-          budgetsQuery,
+          budgetsCollectionRef,
           (budgetsSnap) => {
             const budgetsMap = Object.fromEntries(
-              budgetsSnap.docs.map((doc) => [
-                doc.data().categoryId,
-                { id: doc.id, ...doc.data() }
-              ])
+              budgetsSnap.docs.map(doc => {
+                const data = doc.data();
+                return [data.categoryId, { id: doc.id, ...data }];
+              })
             );
 
             const newPerformance = {};
 
-            categories.forEach((category) => {
+            categories.forEach(category => {
               const catId = category.id;
               const annualGoal = annualData[catId]?.goalAmount || 0;
               const monthlyBaseGoal = annualGoal / 12;
@@ -107,7 +94,7 @@ export default function useMonthlyPerformanceData({
                 rollover,
                 totalAvailable,
                 realSpent,
-                remaining: totalAvailable + realSpent, // realSpent é negativo
+                remaining: totalAvailable + realSpent, // gasto é negativo
                 isOverBudget: -realSpent > totalAvailable,
                 monthlyBudgetId: monthlyBudget?.id || null,
               };
@@ -116,22 +103,22 @@ export default function useMonthlyPerformanceData({
             setPerformance(newPerformance);
             setLoading(false);
           },
-          (err) => {
-            console.error('Erro ao carregar budgets mensais:', err);
+          (error) => {
+            console.error('Erro ao carregar orçamentos anuais:', error);
             setLoading(false);
           }
         );
 
-        // Cleanup do listener de budgets
+        // Cleanup do budget listener
         return () => unsubscribeBudgets();
       },
-      (err) => {
-        console.error('Erro ao carregar transações do mês:', err);
+      (error) => {
+        console.error('Erro ao carregar transações do mês:', error);
         setLoading(false);
       }
     );
 
-    // Cleanup principal (transactions + budgets)
+    // Cleanup do transactions listener
     return () => unsubscribeTransactions();
   }, [householdId, yearMonth, annualData, categories, types]);
 

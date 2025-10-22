@@ -8,16 +8,13 @@ households
   └─ {householdId}
       ├─ familyName: string
       ├─ members: { [userId]: boolean }
-
       ├─ categories (subcoleção)
       │    └─ {categoryId}
       │         └─ name: string
-
       ├─ types (subcoleção)
       │    └─ {typeId}
       │         ├─ name: string
       │         └─ isIncome: boolean
-
       ├─ plannedTransactions (subcoleção)
       │    └─ {plannedTransactionId}
       │         ├─ amount: number
@@ -30,8 +27,7 @@ households
       │         ├─ installments_current: number
       │         ├─ installments_total: number
       │         ├─ transactionGroupId: string
-      │         └─ yearMonth: string
-
+      │         └─ yearMonth: string   // ex.: "202510"
       ├─ transactions (subcoleção)
       │    └─ {transactionId}
       │         ├─ amount: number
@@ -45,13 +41,15 @@ households
       │         ├─ installments_total: number
       │         ├─ transactionGroupId: string
       │         └─ yearMonth: string
-
       ├─ budgets (subcoleção)
       │   └─ {year}
       │        └─ categories (subcoleção)
       │             └─ {categoryId}
       │                  └─ types: { [typeId]: { valor: number } }
-
+      ├─ alerts (subcoleção)
+      │    └─ {alertId}
+      │         ├─ alertType: string
+      │         ├─ ... (demais campos definidos no app)
       ├─ investments (subcoleção)
       │    └─ {investmentId}
       │         ├─ name: string
@@ -59,32 +57,18 @@ households
       │         ├─ initialAmount: number
       │         ├─ currentAmount: number
       │         ├─ annualYield: number
-      │         ├─ projection5y: number
-      │         ├─ projection10y: number
-      │         ├─ projection20y: number
-      │         ├─ projection30y: number
-      │         ├─ allocations: { [goalId]: number } // { "goalA": 0.5, "goalB": 0.5 }
-      │
+      │         ├─ projection5y/projection10y/...: number
+      │         ├─ allocations: { [goalId]: number }
       │         └─ history (subcoleção)
       │              └─ {historyId}
       │                   ├─ date: timestamp
       │                   ├─ value: number
       │                   └─ returnRate: number
-
       ├─ goals (subcoleção)
       │    └─ {goalId}
-      │         ├─ name: string
-      │         ├─ startDate: timestamp           
-      │         ├─ targetAmount: number
-      │         ├─ targetDate: timestamp
-      │         ├─ progress: number
-      │         ├─ status: string                  // 'active' | 'achieved' | 'exceeded' | 'cancelled'
-      │         ├─ expectedReturnRate: number
-      │         ├─ linkedInvestments: [array de strings]
-      │         └─ surplusAmount: number           // valor excedente acima da meta (se houver)
-
-      └─ investmentAllocations (subcoleção)
-           └─ {allocationId}
-                ├─ investmentId: string
-                ├─ goalId: string
-                └─ percentage: number
+      │         ├─ name, startDate, targetAmount, targetDate, progress, status, expectedReturnRate, linkedInvestments, surplusAmount
+      ├─ investmentAllocations (subcoleção)
+      │    └─ {allocationId}
+      │         ├─ investmentId: string
+      │         ├─ goalId: string
+      │         └─ percentage: number

@@ -58,8 +58,8 @@ const DataManagement = () => {
 
             const plannedQuery = query(
                 plannedRef,
-                where('paymentDate', '>=', startTimestamp),
-                where('paymentDate', '<', endTimestamp)
+                where('date', '>=', startTimestamp),
+                where('date', '<', endTimestamp)
             );
             const plannedSnapshot = await getDocs(plannedQuery);
             

@@ -79,7 +79,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           amount: signedAmount,
           category_id: category,
           type_id: type,
-          paymentDate: new Date(`${date}T00:00:00`),
+          date: new Date(`${date}T00:00:00`),
           user_id: user.uid,
           isPaid: false,
           createdAt: serverTimestamp(),
