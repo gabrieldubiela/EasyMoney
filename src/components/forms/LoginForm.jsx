@@ -1,23 +1,18 @@
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase/firebaseConfig';
+import React, { useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+export default function LoginForm({ onSuccess, onError }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, loading, error } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login realizado com sucesso.');
-
-    } catch (firebaseError) {
-      setError(firebaseError.message);
-      console.error('Erro ao fazer login:', firebaseError.message);
+    const ok = await login(email, password);
+    if (ok) {
+      onSuccess?.("Login realizado!");
+    } else {
+      onError?.(error);
     }
   };
 
@@ -32,6 +27,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
+            disabled={loading}
           />
         </div>
         <div className="form-group">
@@ -41,13 +37,14 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Senha"
             required
+            disabled={loading}
           />
         </div>
-        <button type="submit" className="primary">Entrar</button>
+        <button type="submit" className="primary" disabled={loading}>
+          {loading ? "Entrando..." : "Entrar"}
+        </button>
       </form>
       {error && <p className="auth-error">{error}</p>}
     </div>
   );
-};
-
-export default Login;
+}

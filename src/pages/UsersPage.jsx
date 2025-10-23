@@ -1,44 +1,40 @@
-// src/pages/SettingsPage.jsx
+// src/pages/UsersPage.jsx
 
 import React from 'react';
 import { useAppContext } from '../context/useAppContext';
-import UserUpdateForm from '../components/forms/UserUpdateForm';
+import UserProfilePanel from '../components/ui/UserProfilePanel';
 import HouseholdUpdateForm from '../components/forms/HouseholdUpdateForm';
 import InviteCodeDisplay from '../components/domains/InviteCodeDisplay';
 
-const SettingsPage = () => {
-    const { user, householdId } = useAppContext();
+export default function UsersPage() {
+  const { user, householdId } = useAppContext();
 
-    if (!user) {
-        return <div className="loading">Carregando dados do usuário...</div>;
-    }
+  if (!user) {
+    return <div className="loading">Carregando dados do usuário...</div>;
+  }
 
-    return (
-        <div className="container">
-            <div className="page-header">
-                <h1 className="page-title">Configurações de Perfil</h1>
-            </div>
-
-            <section className="section">
-                <h2 className="section-title">Dados Pessoais</h2>
-                <div className="card">
-                    <UserUpdateForm />
-                </div>
-            </section>
-
-            {householdId && (
-                <section className="section">
-                    <h2 className="section-title">Dados da Família</h2>
-                    <div className="card">
-                        <HouseholdUpdateForm householdId={householdId} />
-                    </div>
-                    <div className="card mt-md">
-                        <InviteCodeDisplay householdId={householdId} />
-                    </div>
-                </section>
-            )}
+  return (
+    <div className="container">
+      <div className="page-header">
+        <h1 className="page-title">Configurações de Perfil</h1>
+      </div>
+      <section className="section">
+        <h2 className="section-title">Dados Pessoais</h2>
+        <div className="card">
+          <UserProfilePanel />
         </div>
-    );
-};
-
-export default SettingsPage;
+      </section>
+      {householdId && (
+        <section className="section">
+          <h2 className="section-title">Dados da Família</h2>
+          <div className="card">
+            <HouseholdUpdateForm householdId={householdId} />
+          </div>
+          <div className="card mt-md">
+            <InviteCodeDisplay householdId={householdId} />
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}

@@ -1,16 +1,14 @@
-// src/pages/AnnualBudgetSheetPage.jsx
+// src/pages/BudgetsPage.jsx
 
 import React from 'react';
-import AnnualBudgetSheet from '../components/tables/AnnualBudgetSheet';
+import BudgetSheet from '../components/ui/BudgetSheet';
 import BudgetForm from '../components/forms/BudgetForm';
 
-const AnnualBudgetSheetPage = () => {
-    return (
-        <div className="annual-sheet-page">
-            <AnnualBudgetSheet />
-            <BudgetForm />
-        </div>
-    );
-};
+const BudgetsPage = () => (
+  <div className="annual-sheet-page">
+    <BudgetSheet />
+    <BudgetForm />
+  </div>
+);
 
-export default AnnualBudgetSheetPage;
+export default BudgetsPage;

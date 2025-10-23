@@ -1,61 +1,60 @@
-// src/pages/TransactionListPage.jsx
+// src/pages/TransactionPage.jsx
 
-import React, { useState, useEffect, useMemo } from 'react';
-import TransactionList from '../components/tables/TransactionList';
+import React, { useState, useMemo } from 'react';
+import TransactionList from '../components/lists/TransactionList';
 import TransactionAdder from '../components/ui/TransactionAdder';
-import TransactionFilter from '../components/ui/TransactionFilter';
+import TransactionFilters from '../components/ui/TransactionFilters';
 import { useAppContext } from '../context/useAppContext';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
-const TransactionListPage = () => {
+const TransactionPage = () => {
   const { householdId } = useAppContext();
-  
-  // Filtros individuais para evitar recriação de objeto
+
+  // Filtros (com presets novos)
   const [categoryFilter, setCategoryFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
-  
+
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
 
-  // Busca Categorias e Tipos
-  useEffect(() => {
+  // Busca metadados de categoria/tipo
+  React.useEffect(() => {
     if (!householdId) return;
-
     const catRef = collection(db, `households/${householdId}/categories`);
     const unsubCat = onSnapshot(catRef, (snapshot) => {
       setCategories(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-
     const typeRef = collection(db, `households/${householdId}/types`);
     const unsubType = onSnapshot(typeRef, (snapshot) => {
       setTypes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-
     return () => {
       unsubCat();
       unsubType();
     };
   }, [householdId]);
 
-  // Cria o objeto filters apenas quando os valores mudam
+  // Novo formato padrão para filtros (compatível com hook/service)
   const filters = useMemo(() => ({
-    category: categoryFilter,
-    type: typeFilter,
-    searchTerm: searchTerm,
-    minDate: minDate,
-    maxDate: maxDate
+    categoryId: categoryFilter,
+    typeId: typeFilter,
+    searchTerm,
+    startDate: minDate,
+    endDate: maxDate,
+    limit: 15 // scroll infinito, aumenta conforme carregamento
   }), [categoryFilter, typeFilter, searchTerm, minDate, maxDate]);
 
+  // Callback dos filtros
   const handleFilterChange = (newFilters) => {
-    setCategoryFilter(newFilters.category || '');
-    setTypeFilter(newFilters.type || '');
+    setCategoryFilter(newFilters.categoryId || '');
+    setTypeFilter(newFilters.typeId || '');
     setSearchTerm(newFilters.searchTerm || '');
-    setMinDate(newFilters.minDate || '');
-    setMaxDate(newFilters.maxDate || '');
+    setMinDate(newFilters.startDate || '');
+    setMaxDate(newFilters.endDate || '');
   };
 
   return (
@@ -66,7 +65,7 @@ const TransactionListPage = () => {
 
       <TransactionAdder />
 
-      <TransactionFilter
+      <TransactionFilters
         categories={categories}
         types={types}
         onFilterChange={handleFilterChange}
@@ -81,4 +80,4 @@ const TransactionListPage = () => {
   );
 };
 
-export default TransactionListPage;
+export default TransactionPage;

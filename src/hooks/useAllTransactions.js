@@ -8,32 +8,32 @@ import {
   where,
   orderBy,
   limit,
-  startAfter
+  startAfter,
+  getDocs
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { useAppContext } from '../context/useAppContext';
 
 /**
- * Hook responsável por buscar todas as transações (reais ou planejadas),
- * com suporte a filtros dinâmicos e paginação opcional.
- *
- * - Mantém atualização em tempo real via onSnapshot.
- * - Permite paginação usando cursores Firestore (limit, startAfter).
- * - Suporta filtros por categoria, tipo, usuário, intervalo de datas e valores.
- *
+ * Retorna o caminho correto da coleção de transações (reais ou planejadas)
+ */
+function getCollectionPath(householdId, planned = false) {
+  return planned
+    ? `households/${householdId}/plannedTransactions`
+    : `households/${householdId}/transactions`;
+}
+
+/**
+ * Hook para buscar transações com filtros, scroll infinito e soma total global (do filtro).
+ * 
  * @param {object} filters - Parâmetros opcionais:
  *   planned: boolean
  *   categoryId, typeId, userId, yearMonth
  *   startDate, endDate, minAmount, maxAmount
  *   orderByField, orderDirection
- *   limit: número máximo de resultados por página
- * @returns {object} { transactions, loading, error, loadMore, hasMore }
+ *   limit: máximo exibido por página (scroll)
+ * @returns {object} { transactions, totalAmount, loading, error, hasMore, loadMore, reset }
  */
-const getCollectionPath = (householdId, planned = false) =>
-  planned
-    ? `households/${householdId}/plannedTransactions`
-    : `households/${householdId}/transactions`;
-
 export default function useAllTransactions(filters = {}) {
   const { householdId } = useAppContext();
   const [transactions, setTransactions] = useState([]);
@@ -41,21 +41,19 @@ export default function useAllTransactions(filters = {}) {
   const [error, setError] = useState(null);
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const unsubscribeRef = useRef(null);
 
-  /**
-   * Função auxiliar para construir a query base com filtros atuais.
-   */
+  // Query builder do Firestore
   const buildQuery = useCallback(
-    (startAfterDoc = null) => {
+    (startAfterDoc = null, customLimit) => {
       if (!householdId) return null;
 
       const path = getCollectionPath(householdId, filters.planned || false);
       const colRef = collection(db, path);
       const conditions = [];
 
-      // Filtros dinâmicos
       if (filters.categoryId) conditions.push(where('category_id', '==', filters.categoryId));
       if (filters.typeId) conditions.push(where('type_id', '==', filters.typeId));
       if (filters.userId) conditions.push(where('user_id', '==', filters.userId));
@@ -65,10 +63,9 @@ export default function useAllTransactions(filters = {}) {
       if (filters.minAmount) conditions.push(where('amount', '>=', filters.minAmount));
       if (filters.maxAmount) conditions.push(where('amount', '<=', filters.maxAmount));
 
-      // Ordenação e paginação
       const orderField = filters.orderByField || 'date';
       const orderDirection = filters.orderDirection || 'desc';
-      const pageLimit = filters.limit || 20;
+      const pageLimit = customLimit || filters.limit || 15;
 
       const queryConstraints = [
         ...conditions,
@@ -83,24 +80,20 @@ export default function useAllTransactions(filters = {}) {
     [householdId, filters]
   );
 
-  /**
-   * Função principal: executa a query inicial e inscreve listener em tempo real.
-   */
+  // Listener paginado/tempo real
   useEffect(() => {
     if (!householdId) {
       setTransactions([]);
       setLoading(false);
       return;
     }
-
     setLoading(true);
 
     const q = buildQuery();
 
     if (unsubscribeRef.current) {
-      unsubscribeRef.current(); // limpa listeners anteriores
+      unsubscribeRef.current(); // limpa listeners antigos
     }
-
     if (!q) return;
 
     unsubscribeRef.current = onSnapshot(
@@ -109,11 +102,10 @@ export default function useAllTransactions(filters = {}) {
         const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTransactions(docs);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        setHasMore(snapshot.docs.length === (filters.limit || 20));
+        setHasMore(snapshot.docs.length === (filters.limit || 15));
         setLoading(false);
       },
       (err) => {
-        console.error('Erro ao buscar transações:', err);
         setError(err);
         setLoading(false);
       }
@@ -124,12 +116,43 @@ export default function useAllTransactions(filters = {}) {
     };
   }, [householdId, buildQuery]);
 
-  /**
-   * Paginação: carrega mais resultados (próxima página)
-   */
-  const loadMore = async () => {
-    if (!lastDoc) return;
+  // Soma total global dos filtrados (sem limite!)
+  useEffect(() => {
+    async function fetchTotal() {
+      if (!householdId) {
+        setTotalAmount(0);
+        return;
+      }
+      try {
+        const path = getCollectionPath(householdId, filters.planned || false);
+        const colRef = collection(db, path);
+        const conditions = [];
 
+        if (filters.categoryId) conditions.push(where('category_id', '==', filters.categoryId));
+        if (filters.typeId) conditions.push(where('type_id', '==', filters.typeId));
+        if (filters.userId) conditions.push(where('user_id', '==', filters.userId));
+        if (filters.yearMonth) conditions.push(where('yearMonth', '==', filters.yearMonth));
+        if (filters.startDate) conditions.push(where('date', '>=', new Date(filters.startDate)));
+        if (filters.endDate) conditions.push(where('date', '<=', new Date(filters.endDate)));
+        if (filters.minAmount) conditions.push(where('amount', '>=', filters.minAmount));
+        if (filters.maxAmount) conditions.push(where('amount', '<=', filters.maxAmount));
+
+        const q = conditions.length ? query(colRef, ...conditions) : colRef;
+        const snapshot = await getDocs(q);
+
+        const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        setTotalAmount(total);
+      } catch (err) {
+        setTotalAmount(0);
+      }
+    }
+    fetchTotal();
+  }, [householdId, filters]);
+
+  // Scroll infinito - carregar mais
+  const loadMore = useCallback(() => {
+    if (!lastDoc || !hasMore) return;
+    setLoading(true);
     const q = buildQuery(lastDoc);
 
     onSnapshot(
@@ -138,11 +161,20 @@ export default function useAllTransactions(filters = {}) {
         const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTransactions((prev) => [...prev, ...moreDocs]);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        setHasMore(snapshot.docs.length === (filters.limit || 20));
+        setHasMore(snapshot.docs.length === (filters.limit || 15));
+        setLoading(false);
       },
-      (err) => console.error('Erro ao carregar mais transações:', err)
+      (err) => setLoading(false)
     );
-  };
+  }, [buildQuery, lastDoc, hasMore, filters.limit]);
 
-  return { transactions, loading, error, hasMore, loadMore };
+  // Permite reset externo
+  const reset = useCallback(() => {
+    setTransactions([]);
+    setLastDoc(null);
+    setHasMore(false);
+    setLoading(true);
+  }, []);
+
+  return { transactions, totalAmount, loading, error, hasMore, loadMore, reset };
 }

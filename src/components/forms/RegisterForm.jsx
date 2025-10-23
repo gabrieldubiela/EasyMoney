@@ -1,46 +1,34 @@
-// src/components/ui/auth/Register.jsx
+// src/components/forms/RegisterForm.jsx
 
-import React, { useState } from 'react';
-import { registerUserAndHandleHousehold } from '../../services/registerService';
+import React, { useState } from "react";
+import useRegister from "../../hooks/useRegister";
 
-const Register = () => {
-  const [name, setname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [householdIdInput, setHouseholdIdInput] = useState('');
-  const [familyName, setFamilyName] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+/**
+ * Formulário de registro com opção de família nova ou vínculo a já existente.
+ */
+export default function RegisterForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [householdIdInput, setHouseholdIdInput] = useState("");
+  const [familyName, setFamilyName] = useState("");
+  const { register, loading, error, success } = useRegister();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
-
-    try {
-      await registerUserAndHandleHousehold({
-        email,
-        password,
-        name,
-        householdId: householdIdInput,
-        familyName,
-      });
-
-      setSuccess('Usuário registrado com sucesso!');
-
-      setname('');
-      setEmail('');
-      setPassword('');
-      setHouseholdIdInput('');
-      setFamilyName('');
-
-    } catch (firebaseError) {
-      setError(firebaseError.message);
-      console.error('Erro ao registrar:', firebaseError.message);
-    } finally {
-      setLoading(false);
+    const ok = await register({
+      email,
+      password,
+      name,
+      householdId: householdIdInput,
+      familyName,
+    });
+    if (ok) {
+      setName("");
+      setEmail("");
+      setPassword("");
+      setHouseholdIdInput("");
+      setFamilyName("");
     }
   };
 
@@ -54,7 +42,7 @@ const Register = () => {
           <input
             type="text"
             value={name}
-            onChange={(e) => setname(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Nome"
             required
           />
@@ -96,11 +84,9 @@ const Register = () => {
           </div>
         )}
         <button type="submit" disabled={loading} className="primary">
-          {loading ? 'Cadastrando...' : 'Cadastrar'}
+          {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
       </form>
     </div>
   );
-};
-
-export default Register;
+}

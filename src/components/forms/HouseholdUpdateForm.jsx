@@ -1,72 +1,54 @@
-// src/components/ui/forms/HouseholdUpdateForm.jsx
+// src/components/forms/HouseholdUpdateForm.jsx
 
-import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
-import { doc, updateDoc, getDoc } from 'firebase/firestore'; 
+import React, { useEffect, useState } from 'react';
+import useHouseholdUpdater from '../../hooks/useHouseholdUpdater';
 
-const HouseholdUpdateForm = ({ householdId }) => {
-    const [householdName, setHouseholdName] = useState('');
-    const [householdLoading, setHouseholdLoading] = useState(false);
+export default function HouseholdUpdateForm({ householdId, showToast, canEdit }) {
+  const { household, loading, error, fetch, updateHouseholdName } = useHouseholdUpdater(householdId);
+  const [householdName, setHouseholdName] = useState('');
 
-    // Carregar o Nome da Família
-    useEffect(() => {
-        if (!householdId) return;
+  // Carrega dados atuais da família
+  useEffect(() => {
+    if (householdId) fetch();
+  }, [householdId, fetch]);
 
-        const fetchHouseholdName = async () => {
-            setHouseholdLoading(true);
-            try {
-                const docRef = doc(db, 'households', householdId);
-                const docSnap = await getDoc(docRef);
+  useEffect(() => {
+    if (household && household.familyName) {
+      setHouseholdName(household.familyName);
+    }
+  }, [household]);
 
-                if (docSnap.exists()) {
-                    setHouseholdName(docSnap.data().familyName || 'Minha Família');
-                }
-            } catch (error) {
-                console.error("Erro ao buscar nome da household:", error);
-            } finally {
-                setHouseholdLoading(false);
-            }
-        };
+  // Atualiza nome da família
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!householdId || householdName.trim() === "") {
+      showToast?.("error", "Nome não pode ser vazio.");
+      return;
+    }
+    const success = await updateHouseholdName(householdName.trim());
+    if (success) {
+      showToast?.({ type: "success", message: "Nome da família atualizado!" });
+    } else {
+      showToast?.({ type: "error", message: "Erro ao atualizar nome!" });
+    }
+  };
 
-        fetchHouseholdName();
-    }, [householdId]);
-
-    const handleUpdateHouseholdName = async (e) => {
-        e.preventDefault();
-        if (!householdId || householdName.trim() === '') {
-            alert("O nome da Família não pode estar vazio.");
-            return;
-        }
-
-        setHouseholdLoading(true);
-        try {
-            const docRef = doc(db, 'households', householdId);
-            await updateDoc(docRef, { name: householdName.trim() });
-            alert('Nome da Família atualizado com sucesso!');
-        } catch (error) {
-            console.error("Erro ao atualizar nome da household:", error);
-            alert('Falha ao atualizar nome da Família. Tente novamente.');
-        } finally {
-            setHouseholdLoading(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleUpdateHouseholdName}>
-            <label>Nome da Família:</label>
-            <input
-                type="text"
-                value={householdName}
-                onChange={(e) => setHouseholdName(e.target.value)}
-                placeholder="Ex: Silva"
-                required
-                disabled={householdLoading}
-            />
-            <button type="submit" disabled={householdLoading}>
-                {householdLoading ? 'Atualizando...' : 'Atualizar Nome da Família'}
-            </button>
-        </form>
-    );
-};
-
-export default HouseholdUpdateForm;
+  return (
+    <form onSubmit={handleUpdate}>
+      <label>Nome da Família:</label>
+      <input
+        type="text"
+        value={householdName}
+        onChange={e => setHouseholdName(e.target.value)}
+        placeholder="Ex: Silva"
+        required
+        disabled={loading || !canEdit}
+      />
+      <button type="submit" disabled={loading || !canEdit}>
+        {loading ? "Atualizando..." : "Atualizar Nome"}
+      </button>
+      {!canEdit && <p style={{ color: '#888', fontSize: 13 }}>Somente administradores podem editar a família.</p>}
+      {error && <p style={{ color: 'red', fontSize: 13 }}>Erro: {error.message}</p>}
+    </form>
+  );
+}

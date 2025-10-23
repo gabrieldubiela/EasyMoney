@@ -1,30 +1,66 @@
-// src/components/ui/lists/TransactionList.jsx
+// src/components/lists/TransactionList.jsx
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import TransactionItem from '../ui/TransactionItem';
-import { useTransactionList } from '../../hooks/useTransactionList';
+import useAllTransactions from '../../hooks/useAllTransactions';
 
+/**
+ * Lista de transações com filtragem, scroll infinito e soma total do filtro.
+ *
+ * @param {object} filters
+ * @param {Array} categories
+ * @param {Array} types
+ */
 const TransactionList = ({ filters, categories, types }) => {
   const { users } = useAppContext();
-  const { transactions, loading, hasMore, loadMore } = useTransactionList(filters);
-  const categoryMap = React.useMemo(() => Object.fromEntries((categories || []).map(c => [c.id, c.name])), [categories]);
-  const typeMap = React.useMemo(() => Object.fromEntries((types || []).map(t => [t.id, t.name])), [types]);
-  const userMap = React.useMemo(() => Object.fromEntries((users || []).map(u => [u.uid, u.displayName])), [users]);
+  const {
+    transactions,
+    loading,
+    hasMore,
+    loadMore,
+    totalAmount
+  } = useAllTransactions(filters);
 
-  // Calcula o total apenas das transações visíveis
-  const totalAmount = (transactions || []).reduce((sum, transaction) => sum + transaction.amount, 0);
+  // Mapas para lookup rápido
+  const categoryMap = React.useMemo(
+    () => Object.fromEntries((categories || []).map(c => [c.id, c.name])), [categories]
+  );
+  const typeMap = React.useMemo(
+    () => Object.fromEntries((types || []).map(t => [t.id, t.name])), [types]
+  );
+  const userMap = React.useMemo(
+    () => Object.fromEntries((users || []).map(u => [u.uid, u.displayName])), [users]
+  );
 
+  // Scroll infinito nativo (carrega mais ao chegar ao fundo)
+  const scrollRef = useRef(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!hasMore || loading) return;
+      const el = scrollRef.current;
+      if (el && el.getBoundingClientRect().bottom <= window.innerHeight + 60) {
+        loadMore();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loading, loadMore]);
+
+  // Estado inicial de carregamento
   if (loading && transactions.length === 0) {
     return <div className="loading">Carregando transações...</div>;
   }
 
   return (
-    <div>
+    <div ref={scrollRef}>
       <div className="card">
-        <h3>Total: {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</h3>
+        <h3>
+          Total Filtrado: {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </h3>
       </div>
 
+      {/* Estado vazio */}
       {transactions.length === 0 && !loading && (
         <div className="empty-state">
           <div className="empty-state-title">Nenhuma transação encontrada</div>
@@ -32,6 +68,7 @@ const TransactionList = ({ filters, categories, types }) => {
         </div>
       )}
 
+      {/* Lista */}
       <div className="transaction-list">
         {transactions.map(transaction => (
           <TransactionItem
@@ -44,13 +81,10 @@ const TransactionList = ({ filters, categories, types }) => {
         ))}
       </div>
 
-      {hasMore && !loading && (
-        <div className="text-center mt-lg">
-          <button onClick={loadMore} className="primary">Carregar Mais</button>
-        </div>
+      {/* Scroll feedback */}
+      {loading && transactions.length > 0 && (
+        <div className="loading">Carregando mais...</div>
       )}
-
-      {loading && transactions.length > 0 && <div className="loading">Carregando mais...</div>}
     </div>
   );
 };

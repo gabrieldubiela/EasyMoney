@@ -1,11 +1,11 @@
-// src/components/ui/AnnualBudgetSheet.jsx
+// src/components/ui/BudgetSheet.jsx
 
 import React, { useState, useMemo } from 'react';
 import useAnnualData from '../../hooks/useAnnualData';
 import useCombinedHouseholdData from '../../hooks/useCombinedHouseholdData';
 
 const MONTH_NAMES = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 
+    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
     'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
@@ -13,7 +13,7 @@ const MONTH_NAMES = [
 const EditableBudgetCell = React.memo(({ categoryId, currentGoal, formatBRL, updateAnnualGoal }) => {
     const [isEditing, setIsEditing] = useState(false);
     // Usa o valor do goal atual como estado inicial e para o input
-    const [inputValue, setInputValue] = useState(currentGoal); 
+    const [inputValue, setInputValue] = useState(currentGoal);
 
     const saveGoal = () => {
         // Só atualiza se o valor mudou
@@ -31,14 +31,14 @@ const EditableBudgetCell = React.memo(({ categoryId, currentGoal, formatBRL, upd
                 // Garante que o valor seja salvo ao ser digitado
                 onChange={(e) => setInputValue(parseFloat(e.target.value))}
                 // Salva o valor quando o usuário clica fora
-                onBlur={saveGoal} 
+                onBlur={saveGoal}
                 // Salva o valor quando o usuário pressiona ENTER
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') saveGoal();
                 }}
                 // Foca automaticamente no campo
                 autoFocus
-                style={{width: '90%', textAlign: 'right'}}
+                style={{ width: '90%', textAlign: 'right' }}
             />
         );
     }
@@ -51,12 +51,12 @@ const EditableBudgetCell = React.memo(({ categoryId, currentGoal, formatBRL, upd
     );
 });
 
-const AnnualBudgetSheet = () => {
+const BudgetSheet = () => {
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-    
+
     const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
-    
+
     const { categoryMap, loading: metadataLoading } = useCombinedHouseholdData();
 
     const formatBRL = (value) => {
@@ -67,14 +67,14 @@ const AnnualBudgetSheet = () => {
 
     const sheetData = useMemo(() => {
         if (!annualData.rawAnnualData || Object.keys(categoryMap).length === 0) return [];
-        
+
         return Object.entries(annualData.rawAnnualData).map(([categoryId, data]) => ({
             id: categoryId,
             name: categoryMap[categoryId]?.name || 'Categoria Desconhecida',
             ...data,
         }));
     }, [annualData.rawAnnualData, categoryMap]);
-    
+
     const totals = useMemo(() => {
         const initialTotals = { budgeted: 0, actual: 0, monthlyActuals: Array(12).fill(0) };
         return sheetData.reduce((acc, row) => {
@@ -112,13 +112,18 @@ const AnnualBudgetSheet = () => {
                         <th>Categoria</th>
                         <th>Estimativa Anual</th>
                         {MONTH_NAMES.map(month => <th key={month}>{month}</th>)}
-                        <th>Total</th>
+                        <th>Total Realizado</th>
+                        <th>% Realizado</th>
+                        <th>Ideal/Mês Restante</th>
                         <th>Diferença</th>
                     </tr>
                 </thead>
                 <tbody>
                     {sheetData.map(row => {
                         const rowTotalActual = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
+                        const mesesRestantes = 12 - (new Date().getMonth() + 1); // meses após o mês corrente
+                        const idealMesRestante = mesesRestantes > 0 ? (row.budgeted - rowTotalActual) / mesesRestantes : 0;
+                        const percentRealizado = row.budgeted ? (rowTotalActual / row.budgeted) * 100 : 0;
                         return (
                             <tr key={row.id}>
                                 <td>{row.name}</td>
@@ -134,19 +139,35 @@ const AnnualBudgetSheet = () => {
                                     <td key={index}>{formatBRL(actual)}</td>
                                 ))}
                                 <td>{formatBRL(rowTotalActual)}</td>
-                                <td>{formatBRL(row.budgeted + rowTotalActual)}</td>
+                                <td>{Math.round(percentRealizado)}%</td>
+                                <td>{formatBRL(idealMesRestante)}</td>
+                                <td>{formatBRL(row.budgeted - rowTotalActual)}</td>
                             </tr>
                         );
                     })}
                     {/* Linha de Totais */}
-                    <tr style={{fontWeight: 'bold', borderTop: '2px solid black'}}>
+                    <tr style={{ fontWeight: 'bold', borderTop: '2px solid black' }}>
                         <td>TOTAL</td>
                         <td>{formatBRL(totals.budgeted)}</td>
                         {totals.monthlyActuals.map((actual, index) => (
                             <td key={index}>{formatBRL(actual)}</td>
                         ))}
                         <td>{formatBRL(totals.actual)}</td>
-                        <td>{formatBRL(totals.budgeted + totals.actual)}</td>
+                        <td>
+                            {totals.budgeted
+                                ? Math.round((totals.actual / totals.budgeted) * 100)
+                                : 0
+                            }%
+                        </td>
+                        <td>
+                            {(() => {
+                                const mesesRestantes = 12 - (new Date().getMonth() + 1);
+                                return mesesRestantes > 0
+                                    ? formatBRL((totals.budgeted - totals.actual) / mesesRestantes)
+                                    : formatBRL(0);
+                            })()}
+                        </td>
+                        <td>{formatBRL(totals.budgeted - totals.actual)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -154,4 +175,4 @@ const AnnualBudgetSheet = () => {
     );
 };
 
-export default AnnualBudgetSheet;
+export default BudgetSheet;

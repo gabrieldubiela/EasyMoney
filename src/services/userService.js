@@ -18,7 +18,6 @@ export const fetchAllUsers = async (filters = {}) => {
   const conditions = [];
 
   if (filters.householdId) {
-    // householdId pode ser array; usamos array-contains
     conditions.push(where("householdId", "array-contains", filters.householdId));
   }
   if (filters.isAdmin !== undefined) conditions.push(where("isAdmin", "==", filters.isAdmin));
@@ -37,17 +36,12 @@ export const fetchAllUsers = async (filters = {}) => {
  * @returns {Promise<Object>} Objeto de dados do usuário.
  */
 export const fetchUserById = async (uid) => {
-  try {
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      return userSnap.data();
-    } else {
-      throw new Error("Usuário não encontrado.");
-    }
-  } catch (error) {
-    console.error("Erro ao buscar dados do usuário:", error);
-    throw error;
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+  if (userSnap.exists()) {
+    return userSnap.data();
+  } else {
+    throw new Error("Usuário não encontrado.");
   }
 };
 
@@ -60,39 +54,24 @@ export const fetchUserById = async (uid) => {
  * @returns {Promise<void>}
  */
 export const createUser = async (uid, householdIdArray, isAdmin, name) => {
-  try {
-    await setDoc(doc(db, "users", uid), {
-      householdId: householdIdArray,
-      isAdmin,
-      name,
-    });
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    throw error;
-  }
+  await setDoc(doc(db, "users", uid), {
+    householdId: householdIdArray,
+    isAdmin,
+    name,
+  });
 };
 
 /**
- * Atualiza os dados do usuário pelo UID.
- * @param {string} uid - O UID do usuário.
- * @param {Array<string>|string} householdId - Array de IDs das famílias do usuário (ou string, será convertido).
- * @param {boolean} isAdmin - Se o usuário é admin do sistema.
- * @param {string} name - Nome do usuário.
+ * Atualiza qualquer campo(s) do usuário pelo UID.
+ * Ex: updateUser(uid, { name: "Novo Nome" }) atualiza só o nome.
+ * Ex: updateUser(uid, { householdId: ["123", "456"], isAdmin: true }) atualiza grupos/admin.
+ * @param {string} uid
+ * @param {object} fields - Campos e valores para atualizar.
  * @returns {Promise<void>}
  */
-export const updateUser = async (uid, householdId, isAdmin, name) => {
-  try {
-    const householdIdArray = Array.isArray(householdId) ? householdId : [householdId];
-    const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, {
-      householdId: householdIdArray,
-      isAdmin,
-      name,
-    });
-  } catch (error) {
-    console.error("Erro ao atualizar dados do usuário:", error);
-    throw error;
-  }
+export const updateUser = async (uid, fields) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, { ...fields });
 };
 
 /**
@@ -101,12 +80,7 @@ export const updateUser = async (uid, householdId, isAdmin, name) => {
  * @returns {Promise<void>}
  */
 export const deleteUser = async (uid) => {
-  try {
-    const userRef = doc(db, "users", uid);
-    await deleteDoc(userRef);
-    await removeUserFromHousehold(uid); // Remove de todas as famílias onde era membro
-  } catch (error) {
-    console.error("Erro ao excluir dados do usuário:", error);
-    throw error;
-  }
+  const userRef = doc(db, "users", uid);
+  await deleteDoc(userRef);
+  await removeUserFromHousehold(uid); // Remove de todas as famílias onde era membro
 };

@@ -338,6 +338,31 @@ export const updateTransaction = async (data, planned = false) => {
 };
 
 /**
+ * Converte uma transação planejada em efetiva.
+ * Cria como efetiva e exclui a planejada.
+ * @param {string} householdId
+ * @param {object} transaction
+ * @param {string} userId
+ */
+export async function convertPlannedToEffective(householdId, transaction, userId) {
+  // Calcula yearMonth e fecha os campos conforme efetivação
+  const tDate = transaction.date.toDate
+    ? transaction.date.toDate()
+    : new Date(transaction.date);
+  const yearMonthIndex = tDate.getFullYear().toString() + String(tDate.getMonth() + 1).padStart(2, '0');
+  await addDoc(collection(db, `households/${householdId}/transactions`), {
+    ...transaction,
+    user_id: userId,
+    yearMonth: yearMonthIndex,
+    installments_total: 1,
+    installments_current: 1,
+    transactionId: transaction.id,
+    createdAt: new Date(), // Ou serverTimestamp() se quiser só server-side
+  });
+  await deleteTransaction(householdId, transaction.id, true);
+}
+
+/**
  * Atualiza uma transação unitária.
  * @param {object} data - Dados necessários.
  * @param {boolean} [planned=false] - Se true, altera plannedTransactions.
