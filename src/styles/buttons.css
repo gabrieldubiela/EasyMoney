@@ -1,0 +1,90 @@
+/* src/styles/buttons.css */
+
+/* ================================
+   EasyMoney - Buttons (Botões)
+   ================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+  white-space: nowrap;
+}
+.btn:focus {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Variações */
+.btn-primary,
+.btn {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover:not(:disabled),
+.btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-border);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  color: #fff;
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 80%, black);
+  color: #fff;
+}
+
+.btn-success {
+  background: var(--color-success);
+  color: #fff;
+}
+.btn-success:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-success) 80%, black);
+}
+
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Tamanho reduzido */
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.91rem;
+}
+
+/* Margem automática entre botões */
+.btn + .btn {
+  margin-left: var(--spacing-sm);
+}
+

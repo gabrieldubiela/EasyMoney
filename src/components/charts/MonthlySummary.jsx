@@ -1,19 +1,11 @@
-// src/components/charts/MonthlySummary.jsx
+// src/components/charts/CategorySummaryTable.jsx
 
 import React from "react";
 import PropTypes from "prop-types";
+import "../../styles/cards.css";
 
 /**
- * Componente de resumo financeiro do mês atual.
- * - Saldo atual
- * - Total de receitas
- * - Total de despesas
- * - Saldo projetado (inclui planejados)
- *
- * @prop {number} balance - Saldo atual.
- * @prop {number} totalIncome - Receitas do mês.
- * @prop {number} totalExpense - Despesas do mês.
- * @prop {number} projectedBalance - Projeção do saldo final do mês.
+ * Resumo financeiro do mês atual, com saldo, entradas, saídas e projeção.
  */
 export default function MonthlySummary({
   balance,
@@ -29,29 +21,25 @@ export default function MonthlySummary({
     });
 
   return (
-    <div className="monthly-summary-container" style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
-      {/* Saldo atual */}
-      <div className="monthly-summary-card" style={{ background: "#e6f7ee", padding: "1em 2em", borderRadius: 8, minWidth: 180 }}>
-        <h3 style={{ color: "#226654", marginBottom: 6 }}>Saldo do mês</h3>
-        <span style={{ fontSize: 22, fontWeight: "bold" }}>{formatValue(balance)}</span>
+    <div className="summary-container monthly-summary-container">
+      <div className="card summary-card monthly-summary-card balance">
+        <h3 className="card-title">Saldo do mês</h3>
+        <span className="card-value">{formatValue(balance)}</span>
       </div>
 
-      {/* Receitas */}
-      <div className="monthly-summary-card" style={{ background: "#f3fff3", padding: "1em 2em", borderRadius: 8, minWidth: 180 }}>
-        <h3 style={{ color: "#188710", marginBottom: 6 }}>Entradas</h3>
-        <span style={{ fontSize: 22, fontWeight: "bold" }}>{formatValue(totalIncome)}</span>
+      <div className="card summary-card monthly-summary-card income">
+        <h3 className="card-title">Entradas</h3>
+        <span className="card-value">{formatValue(totalIncome)}</span>
       </div>
 
-      {/* Despesas */}
-      <div className="monthly-summary-card" style={{ background: "#fbecec", padding: "1em 2em", borderRadius: 8, minWidth: 180 }}>
-        <h3 style={{ color: "#a22525", marginBottom: 6 }}>Saídas</h3>
-        <span style={{ fontSize: 22, fontWeight: "bold" }}>{formatValue(totalExpense)}</span>
+      <div className="card summary-card monthly-summary-card expense">
+        <h3 className="card-title">Saídas</h3>
+        <span className="card-value">{formatValue(totalExpense)}</span>
       </div>
 
-      {/* Projeção de saldo */}
-      <div className="monthly-summary-card" style={{ background: "#e9ecfb", padding: "1em 2em", borderRadius: 8, minWidth: 180 }}>
-        <h3 style={{ color: "#284aa2", marginBottom: 6 }}>Saldo projetado</h3>
-        <span style={{ fontSize: 22, fontWeight: "bold" }}>{formatValue(projectedBalance)}</span>
+      <div className="card summary-card monthly-summary-card projected">
+        <h3 className="card-title">Saldo projetado</h3>
+        <span className="card-value">{formatValue(projectedBalance)}</span>
       </div>
     </div>
   );

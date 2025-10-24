@@ -1,82 +1,70 @@
-// src/components/charts/InvestmentProgress.jsx
+// src/components/charts/CategorySummaryTable.jsx
 
 import React from "react";
 import PropTypes from "prop-types";
+// Importa tudo o que precisa para resumo/card, progress bar e layout geral
+import "../../styles/cards.css";
+import "../../styles/progress-bars.css";
 
 /**
  * Painel de visão geral de investimentos e metas financeiras.
- * Mostra saldo aplicado, rentabilidade atual, progresso das metas.
- *
- * @prop {number} totalPortfolio - Valor investido atual
- * @prop {number} roi - Rentabilidade acumulada (%)
- * @prop {Array} goalStatus - [{ goalId, name, percent, achieved }]
+ * Mostra saldo aplicado, rentabilidade atual e andamento das metas.
  */
 export default function InvestmentProgress({ totalPortfolio, roi, goalStatus }) {
   const formatValue = (value) =>
     value.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     });
 
   return (
-    <div className="investment-progress" style={{ marginTop: "2em", maxWidth: 500 }}>
-      <strong style={{ fontSize: 16, marginBottom: 12, display: "block" }}>
-        Investments & Goals
-      </strong>
-      <div style={{ display: "flex", gap: "2em", marginBottom: 18 }}>
-        <div style={{ background: "#e6f7ee", padding: "1em 2em", borderRadius: 8 }}>
-          <span style={{ color: "#187488", fontWeight: "bold" }}>Portfolio</span>
-          <div style={{ fontSize: 20 }}>{formatValue(totalPortfolio)}</div>
+    <div className="card investment-progress">
+      <strong className="card-title">Investments & Goals</strong>
+      <div className="investment-summary">
+        <div className="investment-card summary-card">
+          <span className="card-title">Portfolio</span>
+          <div className="card-value">{formatValue(totalPortfolio)}</div>
         </div>
-        <div style={{ background: "#f3fff3", padding: "1em 2em", borderRadius: 8 }}>
-          <span style={{ color: "#228a1c", fontWeight: "bold" }}>ROI</span>
-          <div style={{ fontSize: 20 }}>
+        <div className="investment-card summary-card">
+          <span className="card-title">ROI</span>
+          <div className="card-value">
             {typeof roi === "number" ? roi.toFixed(2) : "0.00"}%
           </div>
         </div>
       </div>
-
-      <div style={{ marginTop: 12 }}>
-        <strong style={{ fontSize: 14, marginBottom: 6, display: "block" }}>
-          Goal progress:
-        </strong>
+      <div className="goal-section">
+        <strong>Goal Progress:</strong>
         {goalStatus && goalStatus.length > 0 ? (
-          <ul style={{ paddingLeft: 0, margin: 0, listStyle: "none" }}>
-            {goalStatus.map(goal => (
-              <li key={goal.goalId} style={{ marginBottom: 14 }}>
-                <div style={{ fontWeight: "bold", color: "#143b6d", marginBottom: 2 }}>
-                  {goal.name}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div
-                    style={{
-                      width: "140px",
-                      height: "14px",
-                      borderRadius: 8,
-                      background: "#e1e6f8",
-                      overflow: "hidden",
-                      marginRight: 8
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${Math.min(goal.percent, 100)}%`,
-                        background: goal.percent >= 100 ? "#40ba4f" : "#418fd1"
-                      }}
-                    />
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {goalStatus.map((goal) => {
+              const fillClass =
+                goal.percent >= 100
+                  ? "goal-progress-fill success"
+                  : "goal-progress-fill primary";
+              return (
+                <li key={goal.goalId} className="goal-item">
+                  <div className="goal-name">{goal.name}</div>
+                  <div className="goal-progress-wrapper progress-bar-container">
+                    <div className="goal-progress-bg progress-bar-bg">
+                      <div
+                        className={fillClass}
+                        style={{
+                          width: `${Math.min(goal.percent, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <span>{goal.percent}%</span>
+                    <span className="goal-meta">
+                      ({formatValue(goal.achieved)} atingido)
+                    </span>
                   </div>
-                  <span>{goal.percent}%</span>
-                  <span style={{ fontSize: 13, marginLeft: 8, color: "#555" }}>
-                    ({formatValue(goal.achieved)} atingido)
-                  </span>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         ) : (
-          <div style={{ color: "#999" }}>No active goals.</div>
+          <div className="no-goals">No active goals.</div>
         )}
       </div>
     </div>
@@ -91,7 +79,7 @@ InvestmentProgress.propTypes = {
       goalId: PropTypes.string.isRequired,
       name: PropTypes.string,
       percent: PropTypes.number,
-      achieved: PropTypes.number
+      achieved: PropTypes.number,
     })
-  ).isRequired
+  ).isRequired,
 };

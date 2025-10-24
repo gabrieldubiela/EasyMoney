@@ -1,178 +1,222 @@
-// src/components/ui/BudgetSheet.jsx
+// src/components/tables/BudgetSheet.jsx
 
-import React, { useState, useMemo } from 'react';
-import useAnnualData from '../../hooks/useAnnualData';
-import useCombinedHouseholdData from '../../hooks/useCombinedHouseholdData';
+import React, { useState, useMemo } from "react";
+import useAnnualData from "../../hooks/useAnnualData";
+import useAllCategories from "../../hooks/useAllCategories";
+import useAllTypes from "../../hooks/useAllTypes";
+import "../../styles/tables.css";
+import "../../styles/buttons.css";
+import "../../styles/lists.css";
 
+// Para facilitar: nomes dos meses
 const MONTH_NAMES = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
 ];
 
-// Componente para a célula editável
-const EditableBudgetCell = React.memo(({ categoryId, currentGoal, formatBRL, updateAnnualGoal }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    // Usa o valor do goal atual como estado inicial e para o input
-    const [inputValue, setInputValue] = useState(currentGoal);
+// Célula editável para cada tipo na categoria
+const EditableBudgetCell = React.memo(({ value, onSave }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
 
-    const saveGoal = () => {
-        // Só atualiza se o valor mudou
-        if (inputValue !== currentGoal) {
-            updateAnnualGoal(categoryId, inputValue);
-        }
-        setIsEditing(false); // Sai do modo de edição
-    };
+  const handleSave = () => {
+    if (inputValue !== value) onSave(inputValue);
+    setIsEditing(false);
+  };
 
-    if (isEditing) {
-        return (
-            <input
-                type="number"
-                value={inputValue}
-                // Garante que o valor seja salvo ao ser digitado
-                onChange={(e) => setInputValue(parseFloat(e.target.value))}
-                // Salva o valor quando o usuário clica fora
-                onBlur={saveGoal}
-                // Salva o valor quando o usuário pressiona ENTER
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') saveGoal();
-                }}
-                // Foca automaticamente no campo
-                autoFocus
-                style={{ width: '90%', textAlign: 'right' }}
-            />
-        );
-    }
-
+  if (isEditing) {
     return (
-        // Entra no modo de edição ao clicar
-        <span onClick={() => setIsEditing(true)}>
-            {formatBRL(currentGoal)}
-        </span>
+      <input
+        type="number"
+        value={inputValue}
+        onChange={(e) => setInputValue(Number(e.target.value))}
+        onBlur={handleSave}
+        onKeyDown={e => {
+          if (e.key === "Enter") handleSave();
+          if (e.key === "Escape") setIsEditing(false);
+        }}
+        autoFocus
+        className="editable-cell-input"
+      />
     );
+  }
+  return (
+    <span
+      className="editable-cell-display"
+      onClick={() => setIsEditing(true)}
+      title="Clique para editar"
+    >
+      {value?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+    </span>
+  );
 });
 
 const BudgetSheet = () => {
-    const currentYear = new Date().getFullYear();
-    const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+  const [editingCategory, setEditingCategory] = useState(null);
 
-    const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
+  const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
+  const { categories, loading: loadingCategories } = useAllCategories();
+  const { types, loading: loadingTypes } = useAllTypes();
 
-    const { categoryMap, loading: metadataLoading } = useCombinedHouseholdData();
+  const categoryMap = useMemo(
+    () => Object.fromEntries(categories.map((c) => [c.id, c.name])), [categories]
+  );
+  const typeMap = useMemo(
+    () => Object.fromEntries(types.map((t) => [t.id, t.name])), [types]
+  );
 
-    const formatBRL = (value) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency', currency: 'BRL', minimumFractionDigits: 2,
-        }).format(value || 0);
-    };
-
-    const sheetData = useMemo(() => {
-        if (!annualData.rawAnnualData || Object.keys(categoryMap).length === 0) return [];
-
-        return Object.entries(annualData.rawAnnualData).map(([categoryId, data]) => ({
-            id: categoryId,
-            name: categoryMap[categoryId]?.name || 'Categoria Desconhecida',
-            ...data,
+  // Monta a tabela: cada categoria, cada tipo (mesmo zerado ao editar)
+  const sheetData = useMemo(() => {
+    if (!annualData.rawAnnualData || categories.length === 0 || types.length === 0) return [];
+    return categories.map((cat) => {
+      const budgetCat = annualData.rawAnnualData[cat.id] || {};
+      const tiposLançados = Object.entries(budgetCat.types || {})
+        .filter(([, dat]) => dat.valor > 0)
+        .map(([typeId, typeData]) => ({
+          typeId,
+          valor: typeData.valor || 0
         }));
-    }, [annualData.rawAnnualData, categoryMap]);
+      const todosTipos = types.map((t) => ({
+        typeId: t.id,
+        valor: budgetCat.types?.[t.id]?.valor || 0
+      }));
+      return {
+        id: cat.id,
+        name: cat.name,
+        typesToShow: editingCategory === cat.id ? todosTipos : tiposLançados,
+        monthlyActuals: budgetCat.monthlyActuals || Array(12).fill(0),
+        budgeted: budgetCat.types
+          ? Object.values(budgetCat.types).reduce((a, t) => a + (t.valor || 0), 0)
+          : 0,
+      };
+    });
+  }, [annualData.rawAnnualData, categories, types, editingCategory]);
 
-    const totals = useMemo(() => {
-        const initialTotals = { budgeted: 0, actual: 0, monthlyActuals: Array(12).fill(0) };
-        return sheetData.reduce((acc, row) => {
-            acc.budgeted += row.budgeted;
-            const totalActualForRow = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
-            acc.actual += totalActualForRow;
-            row.monthlyActuals.forEach((actual, index) => {
-                acc.monthlyActuals[index] += actual;
-            });
-            return acc;
-        }, initialTotals);
-    }, [sheetData]);
+  const totals = useMemo(() => {
+    const initialTotals = { budgeted: 0, actual: 0, monthlyActuals: Array(12).fill(0) };
+    return sheetData.reduce((acc, row) => {
+      acc.budgeted += row.budgeted;
+      const totalActualForRow = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
+      acc.actual += totalActualForRow;
+      row.monthlyActuals.forEach((actual, index) => {
+        acc.monthlyActuals[index] += actual;
+      });
+      return acc;
+    }, initialTotals);
+  }, [sheetData]);
 
-    const isLoading = annualDataLoading || metadataLoading;
+  const isLoading = annualDataLoading || loadingCategories || loadingTypes;
 
-    if (isLoading) return <div>Carregando Planilha Anual de Orçamento para {selectedYear}...</div>;
-    if (error) return <div>Erro ao carregar dados: {error}</div>;
-    if (sheetData.length === 0) {
-        return <div>Não há dados de orçamento ou transações para o ano de {selectedYear}.</div>;
-    }
+  if (isLoading) return <div>Carregando Planilha Anual de Orçamento para {selectedYear}...</div>;
+  if (error) return <div className="error-table-row">Erro ao carregar dados: {error}</div>;
+  if (sheetData.length === 0) {
+    return <div className="empty-table-row">Não há dados de orçamento ou transações para o ano de {selectedYear}.</div>;
+  }
 
-    return (
-        <div>
-            <h2>Planilha de Orçamento Anual - {selectedYear}</h2>
+  const handleSaveCell = (categoryId, typeId, newValue) => {
+    updateAnnualGoal(categoryId, typeId, newValue);
+  };
 
-            <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
-                {Array.from({ length: 5 }, (_, i) => (currentYear - 2) + i).map(y => (
-                    <option key={y} value={y.toString()}>{y}</option>
+  return (
+    <div className="table-wrapper budget-sheet">
+      <h2>Planilha de Orçamento Anual - {selectedYear}</h2>
+      <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className="form-select">
+        {Array.from({ length: 5 }, (_, i) => (currentYear - 2) + i).map(y => (
+          <option key={y} value={y.toString()}>{y}</option>
+        ))}
+      </select>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            {types.map((t) => <th key={t.id}>{t.name}</th>)}
+            {MONTH_NAMES.map((month) => <th key={month}>{month}</th>)}
+            <th>Total Realizado</th>
+            <th>% Realizado</th>
+            <th>Ideal/Mês Restante</th>
+            <th>Diferença</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sheetData.map((row) => {
+            const rowTotalActual = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
+            const mesesRestantes = 12 - (new Date().getMonth() + 1);
+            const idealMesRestante =
+              mesesRestantes > 0 ? (row.budgeted - rowTotalActual) / mesesRestantes : 0;
+            const percentRealizado = row.budgeted ? (rowTotalActual / row.budgeted) * 100 : 0;
+            return (
+              <tr key={row.id}>
+                <td>{row.name}</td>
+                {types.map((t) => {
+                  const typeObj = row.typesToShow.find((x) => x.typeId === t.id);
+                  return (
+                    <td key={t.id}>
+                      {typeObj
+                        ? (editingCategory === row.id
+                          ? <EditableBudgetCell
+                            value={typeObj.valor}
+                            onSave={val => handleSaveCell(row.id, t.id, val)}
+                          />
+                          : typeObj.valor > 0
+                            ? typeObj.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+                            : "")
+                        : (editingCategory === row.id ? (
+                          <EditableBudgetCell value={0} onSave={val => handleSaveCell(row.id, t.id, val)} />
+                        ) : "")
+                      }
+                    </td>
+                  );
+                })}
+                {row.monthlyActuals.map((actual, idx) => (
+                  <td key={idx}>
+                    {actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </td>
                 ))}
-            </select>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Categoria</th>
-                        <th>Estimativa Anual</th>
-                        {MONTH_NAMES.map(month => <th key={month}>{month}</th>)}
-                        <th>Total Realizado</th>
-                        <th>% Realizado</th>
-                        <th>Ideal/Mês Restante</th>
-                        <th>Diferença</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sheetData.map(row => {
-                        const rowTotalActual = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
-                        const mesesRestantes = 12 - (new Date().getMonth() + 1); // meses após o mês corrente
-                        const idealMesRestante = mesesRestantes > 0 ? (row.budgeted - rowTotalActual) / mesesRestantes : 0;
-                        const percentRealizado = row.budgeted ? (rowTotalActual / row.budgeted) * 100 : 0;
-                        return (
-                            <tr key={row.id}>
-                                <td>{row.name}</td>
-                                <td>
-                                    <EditableBudgetCell
-                                        categoryId={row.id}
-                                        currentGoal={row.budgeted}
-                                        formatBRL={formatBRL}
-                                        updateAnnualGoal={updateAnnualGoal}
-                                    />
-                                </td>
-                                {row.monthlyActuals.map((actual, index) => (
-                                    <td key={index}>{formatBRL(actual)}</td>
-                                ))}
-                                <td>{formatBRL(rowTotalActual)}</td>
-                                <td>{Math.round(percentRealizado)}%</td>
-                                <td>{formatBRL(idealMesRestante)}</td>
-                                <td>{formatBRL(row.budgeted - rowTotalActual)}</td>
-                            </tr>
-                        );
-                    })}
-                    {/* Linha de Totais */}
-                    <tr style={{ fontWeight: 'bold', borderTop: '2px solid black' }}>
-                        <td>TOTAL</td>
-                        <td>{formatBRL(totals.budgeted)}</td>
-                        {totals.monthlyActuals.map((actual, index) => (
-                            <td key={index}>{formatBRL(actual)}</td>
-                        ))}
-                        <td>{formatBRL(totals.actual)}</td>
-                        <td>
-                            {totals.budgeted
-                                ? Math.round((totals.actual / totals.budgeted) * 100)
-                                : 0
-                            }%
-                        </td>
-                        <td>
-                            {(() => {
-                                const mesesRestantes = 12 - (new Date().getMonth() + 1);
-                                return mesesRestantes > 0
-                                    ? formatBRL((totals.budgeted - totals.actual) / mesesRestantes)
-                                    : formatBRL(0);
-                            })()}
-                        </td>
-                        <td>{formatBRL(totals.budgeted - totals.actual)}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    );
+                <td>{rowTotalActual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td>{Math.round(percentRealizado)}%</td>
+                <td>{idealMesRestante.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td>{(row.budgeted - rowTotalActual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td>
+                  {editingCategory === row.id
+                    ? <button className="btn" onClick={() => setEditingCategory(null)}>Salvar</button>
+                    : <button className="btn" onClick={() => setEditingCategory(row.id)}>Editar</button>
+                  }
+                </td>
+              </tr>
+            );
+          })}
+          <tr className="table-row--totals">
+            <td>TOTAL</td>
+            {types.map((t) => <td key={t.id}></td>)}
+            {totals.monthlyActuals.map((actual, index) => (
+              <td key={index}>
+                {actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </td>
+            ))}
+            <td>{totals.actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+            <td>
+              {totals.budgeted
+                ? Math.round((totals.actual / totals.budgeted) * 100)
+                : 0
+              }%
+            </td>
+            <td>
+              {(() => {
+                const mesesRestantes = 12 - (new Date().getMonth() + 1);
+                return mesesRestantes > 0
+                  ? ((totals.budgeted - totals.actual) / mesesRestantes).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+                  : (0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+              })()}
+            </td>
+            <td>{(totals.budgeted - totals.actual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default BudgetSheet;

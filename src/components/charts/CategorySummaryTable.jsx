@@ -2,83 +2,81 @@
 
 import React from "react";
 import PropTypes from "prop-types";
+import "../../styles/tables.css";
+import "../../styles/progress-bars.css";
 
 /**
  * Tabela analítica de desempenho das categorias no mês atual.
- * Exibe, para cada categoria:
- * - Nome
- * - Orçado do mês (planned)
- * - Realizado do mês (spent)
- * - % do orçado realizado (barra visual, colorida)
- * - Saldo restante do orçamento desse mês
- *
- * @prop {Array} categories - [{ id, name, typeId, ... }]
- * @prop {Object} summary - useBudgetSummary()[catId].months[monthIdx] + info agregada
- * @prop {string|null} typeFilter - Filtra por tipo ("fixed", "variable") — null mostra todas
+ * Exibe orçamento planejado, gasto, percentual de execução e saldo.
  */
 export default function CategorySummaryTable({ categories, summary, typeFilter }) {
   const monthIdx = new Date().getMonth();
 
-  // Helper: valor formatado pt-BR
-  const formatValue = v =>
+  const formatValue = (v) =>
     v.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     });
 
   const filteredCategories = typeFilter
-    ? categories.filter(cat => cat.typeId === typeFilter)
+    ? categories.filter((cat) => cat.typeId === typeFilter)
     : categories;
 
+  // Adaptação para progress bar padronizada
+  const getProgressClass = (percent) => {
+    if (percent < 80) return "progress-fill-success";
+    if (percent < 100) return "progress-fill-warning";
+    return "progress-fill-danger";
+  };
+
+  // Adaptação para linha de alerta
+  const getRowClass = (percent, idx) =>
+    percent >= 90
+      ? "table-row--critical"
+      : idx % 2 === 1
+        ? "table-row--zebra"
+        : "";
+
   return (
-    <div className="category-summary-table" style={{ marginTop: "1.5em" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <div className="table-wrapper category-summary-table">
+      <table className="table">
         <thead>
-          <tr style={{ background: "#f3f3fa" }}>
-            <th style={{ padding: "0.5em 1em" }}>Categoria</th>
-            <th style={{ padding: "0.5em 1em" }}>Orçado Mês</th>
-            <th style={{ padding: "0.5em 1em" }}>Realizado Mês</th>
-            <th style={{ padding: "0.5em 1em" }}>% Realizado</th>
-            <th style={{ padding: "0.5em 1em" }}>Saldo Restante</th>
+          <tr>
+            <th>Categoria</th>
+            <th>Orçado Mês</th>
+            <th>Realizado Mês</th>
+            <th>% Realizado</th>
+            <th>Saldo Restante</th>
           </tr>
         </thead>
         <tbody>
-          {filteredCategories.map(cat => {
+          {filteredCategories.map((cat, idx) => {
             const monthsArr = summary?.[cat.id]?.months || [];
             const data = monthsArr[monthIdx] || {};
             const percent = data.percent || 0;
+            const remaining = (data.planned || 0) - (data.spent || 0);
+            const progressClass = getProgressClass(percent);
+            const rowClass = getRowClass(percent, idx);
+
             return (
-              <tr key={cat.id} style={{ background: percent >= 90 ? "#ffe8e8" : "white" }}>
-                <td style={{ padding: "0.5em 1em", fontWeight: "bold" }}>{cat.name}</td>
-                <td style={{ padding: "0.5em 1em" }}>{formatValue(data.planned || 0)}</td>
-                <td style={{ padding: "0.5em 1em" }}>{formatValue(data.spent || 0)}</td>
-                <td style={{ padding: "0.5em 1em", minWidth: 120 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <tr key={cat.id} className={rowClass}>
+                <td><strong>{cat.name}</strong></td>
+                <td>{formatValue(data.planned || 0)}</td>
+                <td>{formatValue(data.spent || 0)}</td>
+                <td>
+                  <div className="progress-bar-container">
                     <span>{percent}%</span>
-                    <div style={{
-                      width: "60px",
-                      height: "8px",
-                      borderRadius: 4,
-                      background: "#eee",
-                      position: "relative",
-                      overflow: "hidden"
-                    }}>
-                      <div style={{
-                        width: `${Math.min(percent, 100)}%`,
-                        height: "100%",
-                        background:
-                          percent < 80
-                            ? "#188710"
-                            : percent < 100
-                            ? "#e69915"
-                            : "#b51a1a"
-                      }} />
+                    <div className="progress-bar-bg">
+                      <div
+                        className={`progress-bar-fill ${progressClass}`}
+                        style={{ width: `${Math.min(percent, 100)}%` }}
+                      />
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: "0.5em 1em", color: percent >= 100 ? "#b51a1a" : "#226654" }}>
-                  {formatValue((data.planned || 0) - (data.spent || 0))}
+                <td className={remaining >= 0 ? "cell-positive" : "cell-negative"}>
+                  {formatValue(remaining)}
                 </td>
               </tr>
             );
@@ -92,5 +90,5 @@ export default function CategorySummaryTable({ categories, summary, typeFilter }
 CategorySummaryTable.propTypes = {
   categories: PropTypes.array.isRequired,
   summary: PropTypes.object.isRequired,
-  typeFilter: PropTypes.string
+  typeFilter: PropTypes.string,
 };

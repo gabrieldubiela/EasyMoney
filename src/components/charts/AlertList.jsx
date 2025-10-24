@@ -2,31 +2,29 @@
 
 import React from "react";
 import PropTypes from "prop-types";
+import "../../styles/alerts.css";
 
 /**
  * Painel de alertas recentes/ativos do sistema.
- * 
+ *
  * @prop {Array} alerts - Array de objetos de alerta: { id, title, message, alertType, createdAt, urgency }
  *
  * alertType: "budgetExceeded" | "plannedTransaction" | "lowBalance" | ...
- * urgency:  "critical" | "warning" | "info"
+ * urgency:  "critical" | "warning" | "info"
  */
 export default function AlertList({ alerts }) {
   if (!alerts || alerts.length === 0) {
     return (
-      <div className="alert-list" style={{ margin: "2em 0" }}>
-        <span style={{ color: "#999" }}>No active alerts for now 🎉</span>
+      <div className="alert-list">
+        <div className="alert-empty">No active alerts for now 🎉</div>
       </div>
     );
   }
 
-  // Cor/símbolo segundo tipo/urgência
-  function getStyle(type, urgency) {
-    if (urgency === "critical" || type === "budgetExceeded")
-      return { borderLeft: "6px solid #b51a1a", background: "#ffeaea" };
-    if (urgency === "warning" || type === "lowBalance")
-      return { borderLeft: "6px solid #e69915", background: "#fffbe4" };
-    return { borderLeft: "6px solid #1d4ca1", background: "#e9f3ff" };
+  function getUrgency(urgency, type) {
+    if (urgency === "critical" || type === "budgetExceeded") return "critical";
+    if (urgency === "warning" || type === "lowBalance") return "warning";
+    return "info";
   }
 
   function getIcon(type, urgency) {
@@ -49,38 +47,20 @@ export default function AlertList({ alerts }) {
   }
 
   return (
-    <div className="alert-list" style={{ margin: "2em 0", maxWidth: 600 }}>
-      {alerts.map((alert) => (
-        <div
-          key={alert.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 18,
-            marginBottom: 18,
-            padding: "1em 1.5em",
-            borderRadius: 8,
-            ...getStyle(alert.alertType, alert.urgency),
-          }}
-        >
-          <span style={{ fontSize: 26, lineHeight: "28px" }}>
-            {getIcon(alert.alertType, alert.urgency)}
-          </span>
-          <div>
-            <strong style={{ fontSize: 15 }}>
-              {alert.title || alert.alertType}
-            </strong>
-            <div style={{ color: "#333", marginTop: 2, fontSize: 14 }}>
-              {alert.message}
+    <div className="alert-list">
+      {alerts.map((alert) => {
+        const urgencyClass = `alert-${getUrgency(alert.urgency, alert.alertType)}`;
+        return (
+          <div key={alert.id} className={`alert-item ${urgencyClass}`}>
+            <span className="alert-icon">{getIcon(alert.alertType, alert.urgency)}</span>
+            <div className="alert-content">
+              <strong>{alert.title || alert.alertType}</strong>
+              <p>{alert.message}</p>
+              {alert.createdAt && <time>{formatDate(alert.createdAt)}</time>}
             </div>
-            {alert.createdAt && (
-              <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>
-                {formatDate(alert.createdAt)}
-              </div>
-            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

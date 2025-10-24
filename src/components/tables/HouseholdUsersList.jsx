@@ -2,6 +2,8 @@
 
 import React from "react";
 import useHouseholdMembers from "../../hooks/useHouseholdMembers";
+import "../../styles/tables.css";
+import "../../styles/buttons.css";
 
 export default function HouseholdUsersList({ householdId, isAdmin, showToast }) {
   const { members, loading, error, setAdminStatus, removeMember } = useHouseholdMembers(householdId);
@@ -17,34 +19,54 @@ export default function HouseholdUsersList({ householdId, isAdmin, showToast }) 
   };
 
   if (loading) return <div>Carregando membros...</div>;
-  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  if (error) return <div className="error-table-row">{error}</div>;
 
   return (
-    <table style={{ width: "100%" }}>
-      <thead>
-        <tr><th>Usuário (UID)</th><th>Admin</th>{isAdmin && <th>Ações</th>}</tr>
-      </thead>
-      <tbody>
-        {members.map((m) => (
-          <tr key={m.uid}>
-            <td>{m.uid}</td>
-            <td>{m.isAdmin ? "✅" : ""}</td>
-            {isAdmin && (
-              <td>
-                {!m.isAdmin && (
-                  <button onClick={() => handleAdmin(m.uid, true)}>Promover a admin</button>
-                )}
-                {m.isAdmin && (
-                  <button onClick={() => handleAdmin(m.uid, false)}>Remover admin</button>
-                )}
-                <button style={{ marginLeft: 10, color: "#a22525" }} onClick={() => handleRemove(m.uid)}>
-                  Remover membro
-                </button>
-              </td>
-            )}
+    <div className="table-wrapper household-users-list">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Usuário (UID)</th>
+            <th>Admin</th>
+            {isAdmin && <th>Ações</th>}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {members.map((m) => (
+            <tr key={m.uid}>
+              <td>{m.uid}</td>
+              <td>{m.isAdmin ? "✅" : ""}</td>
+              {isAdmin && (
+                <td>
+                  {!m.isAdmin && (
+                    <button
+                      className="btn"
+                      onClick={() => handleAdmin(m.uid, true)}
+                    >
+                      Promover a admin
+                    </button>
+                  )}
+                  {m.isAdmin && (
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handleAdmin(m.uid, false)}
+                    >
+                      Remover admin
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-danger"
+                    style={{ marginLeft: 8 }}
+                    onClick={() => handleRemove(m.uid)}
+                  >
+                    Remover membro
+                  </button>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

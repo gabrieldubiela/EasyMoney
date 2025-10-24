@@ -2,76 +2,75 @@
 
 import React from "react";
 import PropTypes from "prop-types";
+import "../../styles/tables.css";
 
 /**
- * Lista as transações recentes mostrando só a primeira parcela (installments_current === 1) ou transações únicas.
- * Exibe usuário, categoria, valor, tipo e data.
- *
- * @prop {Array} transactions - [{ id, amount, ... }]
- * @prop {number} maxItems - Máx. de itens a exibir (default: 10)
+ * Lista de transações recentes do usuário.
+ * Exibe somente transações únicas ou a primeira parcela.
  */
 export default function RecentExpenses({ transactions, maxItems = 10 }) {
-  if (!transactions || transactions.length === 0) {
+  if (!transactions || transactions.length === 0)
     return (
-      <div className="recent-expenses" style={{ marginTop: "2em", color: "#999" }}>
-        No transactions to show.
+      <div className="table-wrapper recent-expenses">
+        <div className="empty-table-row">No transactions to show.</div>
       </div>
     );
-  }
 
-  // Mostra só a 1ª parcela ou não parceladas
   const filtered = transactions.filter(
-    tx => !tx.installments_current || tx.installments_current === 1
+    (tx) => !tx.installments_current || tx.installments_current === 1
   );
 
-  // Mais recentes primeiro, limitado a maxItems
   const sorted = filtered
     .slice()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, maxItems);
 
   return (
-    <div className="recent-expenses" style={{ marginTop: "2em", maxWidth: 600 }}>
-      <strong style={{ fontSize: 15, marginBottom: 8, display: "block" }}>
-        Recent transactions:
-      </strong>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+    <div className="table-wrapper recent-expenses">
+      <strong>Recent transactions:</strong>
+      <table className="table">
         <thead>
-          <tr style={{ background: "#f3f3fa" }}>
-            <th style={{ padding: "0.5em" }}>Date</th>
-            <th style={{ padding: "0.5em" }}>Description</th>
-            <th style={{ padding: "0.5em" }}>Category</th>
-            <th style={{ padding: "0.5em" }}>Type</th>
-            <th style={{ padding: "0.5em" }}>User</th>
-            <th style={{ padding: "0.5em" }}>Amount</th>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>User</th>
+            <th>Amount</th>
           </tr>
         </thead>
         <tbody>
-          {sorted.map(tx => (
-            <tr key={tx.id} style={{
-              background: tx.amount < 0 ? "#ffeaea" : "#e6f7ee"
-            }}>
-              <td style={{ padding: "0.5em" }}>{formatDate(tx.date)}</td>
-              <td style={{ padding: "0.5em" }}>{tx.description}</td>
-              <td style={{ padding: "0.5em" }}>{tx.categoryName}</td>
-              <td style={{ padding: "0.5em" }}>{tx.typeName}</td>
-              <td style={{ padding: "0.5em" }}>{tx.userName}</td>
-              <td style={{
-                padding: "0.5em",
-                color: tx.amount < 0 ? "#a22525" : "#188710",
-                fontWeight: "bold"
-              }}>
-                {formatValue(tx.amount)}
+          {sorted.length === 0 ? (
+            <tr>
+              <td className="empty-table-row" colSpan="6">
+                No transactions to show.
               </td>
             </tr>
-          ))}
+          ) : (
+            sorted.map((tx, idx) => {
+              const isExpense = tx.amount < 0;
+              const rowClass =
+                isExpense
+                  ? "table-row--critical"
+                  : idx % 2 === 1
+                    ? "table-row--zebra"
+                    : "";
+              return (
+                <tr key={tx.id} className={rowClass}>
+                  <td>{formatDate(tx.date)}</td>
+                  <td>{tx.description}</td>
+                  <td>{tx.categoryName}</td>
+                  <td>{tx.typeName}</td>
+                  <td>{tx.userName}</td>
+                  <td className={isExpense ? "amount-negative" : "amount-positive"}>
+                    {formatValue(tx.amount)}
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
-      {sorted.length === 0 && (
-        <div style={{ margin: "1em", color: "#999" }}>
-          No transactions to show.
-        </div>
-      )}
     </div>
   );
 }
@@ -87,7 +86,7 @@ function formatValue(value) {
   return value.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
-    minimumFractionDigits: 2
+    minimumFractionDigits: 2,
   });
 }
 
@@ -101,8 +100,8 @@ RecentExpenses.propTypes = {
       typeName: PropTypes.string,
       userName: PropTypes.string,
       date: PropTypes.any,
-      installments_current: PropTypes.number
+      installments_current: PropTypes.number,
     })
   ),
-  maxItems: PropTypes.number
+  maxItems: PropTypes.number,
 };

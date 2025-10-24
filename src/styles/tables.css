@@ -1,0 +1,66 @@
+/* src/styles/tables.css */
+
+/* ================================
+  EasyMoney - Tabelas Analíticas
+  ================================ */
+
+.table-wrapper {
+    margin-top: var(--spacing-xl);
+    max-width: 720px;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+}
+
+.table th,
+.table td {
+    padding: 0.75em 1em;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+    font-weight: var(--font-weight-medium);
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.table-row--zebra {
+    background: color-mix(in srgb, var(--color-primary-light) 4%, var(--color-surface));
+}
+
+.table-row--critical {
+    background: color-mix(in srgb, var(--color-danger) 7%, var(--color-surface));
+}
+
+.table-row:hover {
+    background: color-mix(in srgb, var(--color-primary-light) 12%, var(--color-bg));
+    transition: background var(--transition-fast);
+}
+
+.amount-positive,
+.cell-positive {
+    color: var(--color-success);
+    font-weight: var(--font-weight-medium);
+}
+
+.amount-negative,
+.cell-negative {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-medium);
+}
+
+.empty-table-row {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    padding: var(--spacing-lg);
+}

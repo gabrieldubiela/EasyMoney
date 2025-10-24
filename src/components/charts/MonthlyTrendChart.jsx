@@ -10,120 +10,128 @@ import {
   CategoryScale,
   LinearScale,
   Legend,
-  Tooltip
+  Tooltip,
 } from "chart.js";
+import "../../styles/charts.css";
 
-/**
- * Gráfico de tendência mensal: saldo, receitas ou despesas ao longo dos últimos 12 meses.
- *
- * @prop {Array<number>} incomeData - Receitas mês a mês
- * @prop {Array<number>} expenseData - Despesas mês a mês
- * @prop {Array<number>} balanceData - Saldo mês a mês
- * @prop {string} metric - "balance" | "income" | "expense"
- * @prop {function} onChangeMetric - Troca a métrica visualizada
- */
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Legend, Tooltip);
 
-const COLORS = {
-  balance: "#4392f1",
-  income: "#40ba4f",
-  expense: "#f55c48"
-};
-
-const LABELS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
-
+/**
+ * Gráfico de tendência mensal: saldo, receitas e despesas dos 12 últimos meses.
+ */
 export default function MonthlyTrendChart({
   incomeData,
   expenseData,
   balanceData,
   metric,
-  onChangeMetric
+  onChangeMetric,
 }) {
-  // Seleciona a série para mostrar
+  const style = getComputedStyle(document.documentElement);
+  const COLORS = {
+    balance: style.getPropertyValue("--color-primary").trim() || "#4392f1",
+    income: style.getPropertyValue("--color-success").trim() || "#40ba4f",
+    expense: style.getPropertyValue("--color-danger").trim() || "#f55c48",
+  };
+
+  const LABELS = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
   const datasets = {
     balance: {
       label: "Saldo",
       data: balanceData,
       borderColor: COLORS.balance,
-      backgroundColor: COLORS.balance + "11",
-      tension: 0.32,
-      fill: true,
+      backgroundColor: `${COLORS.balance}22`,
+      tension: 0.35,
       pointRadius: 4,
-      pointHoverRadius: 7
+      pointHoverRadius: 7,
+      fill: true,
     },
     income: {
       label: "Entradas",
       data: incomeData,
       borderColor: COLORS.income,
-      backgroundColor: COLORS.income + "11",
-      tension: 0.32,
-      fill: true,
+      backgroundColor: `${COLORS.income}22`,
+      tension: 0.35,
       pointRadius: 4,
-      pointHoverRadius: 7
+      pointHoverRadius: 7,
+      fill: true,
     },
     expense: {
       label: "Saídas",
       data: expenseData,
       borderColor: COLORS.expense,
-      backgroundColor: COLORS.expense + "11",
-      tension: 0.32,
-      fill: true,
+      backgroundColor: `${COLORS.expense}22`,
+      tension: 0.35,
       pointRadius: 4,
-      pointHoverRadius: 7
+      pointHoverRadius: 7,
+      fill: true,
     }
   };
 
   const chartData = {
     labels: LABELS,
-    datasets: [datasets[metric]]
+    datasets: [datasets[metric]],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
+        backgroundColor: style.getPropertyValue("--color-surface"),
+        borderColor: style.getPropertyValue("--color-border"),
+        borderWidth: 1,
+        titleColor: style.getPropertyValue("--color-text"),
+        bodyColor: style.getPropertyValue("--color-text-muted"),
         callbacks: {
           label: (context) =>
             context.parsed.y?.toLocaleString("pt-BR", {
               style: "currency",
-              currency: "BRL"
-            })
-        }
-      }
+              currency: "BRL",
+            }),
+        },
+      },
     },
     scales: {
+      x: {
+        grid: { color: "rgba(100,100,100,0.08)" },
+        ticks: { color: style.getPropertyValue("--color-text-muted") },
+      },
       y: {
+        grid: { color: "rgba(100,100,100,0.08)" },
         ticks: {
-          callback: function (value) {
-            return value.toLocaleString("pt-BR", {
+          color: style.getPropertyValue("--color-text-muted"),
+          callback: (value) =>
+            value.toLocaleString("pt-BR", {
               style: "currency",
-              currency: "BRL"
-            });
-          }
-        }
-      }
-    }
+              currency: "BRL",
+            }),
+        },
+      },
+    },
   };
 
   return (
-    <div style={{ marginTop: "2em" }}>
-      <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 12 }}>
-        <strong style={{ fontSize: 16 }}>Evolução (últimos 12 meses):</strong>
+    <div className="chart-wrapper monthly-trend">
+      <div className="monthly-trend-header">
+        <strong className="chart-title">Evolução (últimos 12 meses):</strong>
         <select
+          className="monthly-trend-select"
           value={metric}
           onChange={e => onChangeMetric(e.target.value)}
-          style={{ padding: "4px 16px", fontSize: "1em", borderRadius: 6, border: "1px solid #ddd" }}
         >
           <option value="balance">Saldo</option>
           <option value="income">Entradas</option>
           <option value="expense">Saídas</option>
         </select>
       </div>
-      <Line data={chartData} options={chartOptions} height={320} />
+      <div style={{ height: 320 }}>
+        <Line data={chartData} options={chartOptions} />
+      </div>
     </div>
   );
 }
@@ -133,5 +141,5 @@ MonthlyTrendChart.propTypes = {
   expenseData: PropTypes.arrayOf(PropTypes.number).isRequired,
   balanceData: PropTypes.arrayOf(PropTypes.number).isRequired,
   metric: PropTypes.oneOf(["balance", "income", "expense"]).isRequired,
-  onChangeMetric: PropTypes.func.isRequired
+  onChangeMetric: PropTypes.func.isRequired,
 };

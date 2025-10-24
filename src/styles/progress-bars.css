@@ -1,0 +1,56 @@
+/* src/styles/progress-bars.css */
+
+/* ================================
+  EasyMoney - Barra de Progresso
+  ================================ */
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    min-width: 120px;
+}
+
+.progress-bar-bg {
+    width: 60px;
+    height: 8px;
+    border-radius: var(--radius-sm);
+    background: var(--color-border);
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-base), background var(--transition-base);
+}
+
+.progress-fill-success {
+    background: var(--color-success);
+}
+
+.progress-fill-warning {
+    background: var(--color-warning);
+}
+
+.progress-fill-danger {
+    background: var(--color-danger);
+}
+
+/* Progress bar para goals/metas (cards, dashboard) */
+.goal-progress-bg {
+    width: 140px;
+    height: 12px;
+    border-radius: var(--radius-xl);
+    background: var(--color-border);
+    overflow: hidden;
+}
+
+.goal-progress-fill.success {
+    background: var(--color-success);
+}
+
+.goal-progress-fill.primary {
+    background: var(--color-primary);
+}

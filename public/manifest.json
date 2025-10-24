@@ -4,18 +4,18 @@
   "description": "Plataforma completa de gestão de finanças pessoais e familiares",
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
-      "type": "image/png",
+      "src": "logo72.svg",
+      "type": "image/svg+xml",
       "sizes": "72x72"
     },
     {
-      "src": "/icons/icon-192x192.png",
-      "type": "image/png", 
+      "src": "logo192.svg",
+      "type": "image/svg+xml",
       "sizes": "192x192"
     },
     {
-      "src": "/icons/icon-512x512.png",
-      "type": "image/png",
+      "src": "logo512.svg",
+      "type": "image/svg+xml",
       "sizes": "512x512"
     }
   ],

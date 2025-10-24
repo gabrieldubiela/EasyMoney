@@ -1,0 +1,23 @@
+/* src/styles/lists.css */
+
+.empty-state {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-lg);
+}
+
+.empty-state-title {
+    font-weight: var(--font-weight-bold);
+    font-size: 1.1rem;
+}
+
+.empty-state-description {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}

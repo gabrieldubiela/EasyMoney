@@ -1,77 +1,36 @@
-// src/pages/AdminDashboardPage.jsx (CORRIGIDO)
+// src/pages/AdminPage.jsx
 
 import React, { useState } from 'react';
-import { useAppContext } from '../context/useAppContext';
-import UserManagement from '../components/domains/UserManagement';
-import HouseholdManagement from '../components/domains/HouseholdManagement'; 
-import DataManagement from '../components/domains/DataManagement'; 
+import HouseholdAdminSwitcher from '../components/ui/HouseholdAdminSwitcher';
+import UserAdminTable from '../components/tables/UserAdminTable';
+import UserAdminForm from '../components/forms/UserAdminForm';
 
-const AdminDashboardPage = () => {
-    const { user, loading: userLoading } = useAppContext();
-    const [activeTab, setActiveTab] = useState('users');
+export default function AdminPage() {
+  const [editingUser, setEditingUser] = useState(null);
 
-    // Lógica de Autorização (Mantida)
-    if (userLoading) {
-        return <div>Carregando perfil de usuário...</div>;
-    }
-    
-    const isAdmin = user && user.isAdmin === true; 
+  const handleSwitchFamily = (householdId) => {
+    // Aqui você deve implementar a lógica para setar o householdId global/contexto/redirect
+    window.alert(`Acesso admin à família ${householdId} (implemente logicamente)`); // implementar contexto!
+  };
 
-    if (!isAdmin) {
-        return (
-            <div>
-                <h2>Acesso Não Autorizado</h2>
-                <p>Você não tem permissão de administrador para acessar esta página.</p>
-            </div>
-        );
-    }
-    
-    // Função auxiliar para renderizar o conteúdo da aba (Mantida)
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'users':
-                return <UserManagement />;
-            case 'households':
-                return <HouseholdManagement />;
-            case 'data':
-                return <DataManagement />;
-            default:
-                return <div>Selecione uma opção no menu.</div>;
-        }
-    };
+  return (
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: 28 }}>
+      <h1>Administração Geral</h1>
 
-    return (
-        <div>
-            <h1>Painel de Administração</h1>
-            
-            {/* Menu de Navegação (Tabs) */}
-            <div className="admin-tabs">
-                <button 
-                    onClick={() => setActiveTab('users')}
-                    className={activeTab === 'users' ? 'active' : ''}
-                >
-                    Gestão de Usuários
-                </button>
-                <button 
-                    onClick={() => setActiveTab('households')}
-                    className={activeTab === 'households' ? 'active' : ''}
-                >
-                    Gestão de Famílias
-                </button>
-                <button 
-                    onClick={() => setActiveTab('data')}
-                    className={activeTab === 'data' ? 'active' : ''}
-                >
-                    Manutenção de Dados
-                </button>
-            </div>
-            
-            {/* Conteúdo da Aba Ativa */}
-            <div className="admin-content">
-                {renderContent()}
-            </div>
-        </div>
-    );
-};
+      {/* 1. Bloquinho para trocar de família */}
+      <HouseholdAdminSwitcher onSwitch={handleSwitchFamily} />
 
-export default AdminDashboardPage;
+      {/* 2. Gestão de usuários */}
+      <UserAdminTable onEdit={setEditingUser} />
+
+      {/* 3. Edição/criação de usuário */}
+      {editingUser && (
+        <UserAdminForm
+          editingUser={editingUser}
+          onSaved={() => setEditingUser(null)}
+          onCancel={() => setEditingUser(null)}
+        />
+      )}
+    </div>
+  );
+}
