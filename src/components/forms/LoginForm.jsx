@@ -54,7 +54,7 @@ export default function LoginForm({ onSuccess, onError }) {
       <h2 className="auth-title">Acessar sua conta</h2>
       <form onSubmit={handleLogin} className="form auth-form" autoComplete="off">
         <div className="form-group">
-          <label htmlFor="email" className="form-label required">
+          <label htmlFor="email">
             Email
           </label>
           <input
@@ -68,7 +68,7 @@ export default function LoginForm({ onSuccess, onError }) {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password" className="form-label required">
+          <label htmlFor="password">
             Senha
           </label>
           <input
@@ -82,18 +82,18 @@ export default function LoginForm({ onSuccess, onError }) {
           />
         </div>
         {formError && <div className="form-error">{formError}</div>}
+        <p>
+          <a href="#" onClick={handleRecoveryClick}>
+            Esqueci minha senha
+          </a>
+        </p>
+        {recoveryStatus && <p className="form-success">{recoveryStatus}</p>}
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </div>
       </form>
-      <p>
-        <a href="#" onClick={handleRecoveryClick}>
-          Esqueci minha senha
-        </a>
-      </p>
-      {recoveryStatus && <p className="form-success">{recoveryStatus}</p>}
     </div>
   );
 }

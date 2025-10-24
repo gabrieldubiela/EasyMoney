@@ -6,7 +6,6 @@ import ToastMessage from '../components/ui/ToastMessage';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [showRecovery, setShowRecovery] = useState(false);
   const [toast, setToast] = useState(null); // { type, message }
 
   // Função para exibir feedback global
@@ -14,54 +13,37 @@ export default function AuthPage() {
     setToast({ type, message });
   };
 
-  // LoginForm adaptado: use via prop onSuccess/onError se quiser feedback global
-  // O mesmo para RegisterForm!
-
   return (
     <div className="auth-page">
       <div className="auth-container">
-        {!showRecovery ? (
-          <>
-            {isLogin ? (
-              <LoginForm 
-                // onSuccess={() => showToast("success", "Login realizado!")}
-                // onError={msg => showToast("error", msg)}
-              />
-            ) : (
-              <RegisterForm 
-                // onSuccess={() => showToast("success", "Cadastro realizado!")}
-                // onError={msg => showToast("error", msg)}
-              />
-            )}
-
-            <div className="auth-links">
-              <p>
-                {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}
-                <a href="#" onClick={e => { e.preventDefault(); setIsLogin(p => !p); }}>
-                  {isLogin ? "Cadastre-se" : "Faça Login"}
-                </a>
-              </p>
-
-              {isLogin && (
-                <p>
-                  <a href="#" onClick={e => { e.preventDefault(); setShowRecovery(true); }}>
-                    Esqueci minha senha
-                  </a>
-                </p>
-              )}
-            </div>
-          </>
+        {isLogin ? (
+          <LoginForm 
+            onSuccess={(msg) => showToast("success", msg || "Login realizado!")}
+            onError={(msg) => showToast("error", msg || "Erro ao fazer login")}
+          />
         ) : (
-          // Formulário de recuperação de senha (modal ou inline)
-          <PasswordRecoveryForm
-            onClose={() => setShowRecovery(false)}
-            onSuccess={() => {
-              setShowRecovery(false);
-              showToast("success", "Email de recuperação enviado!");
-            }}
+          <RegisterForm 
+            onSuccess={(msg) => showToast("success", msg || "Cadastro realizado!")}
+            onError={(msg) => showToast("error", msg || "Erro ao cadastrar")}
           />
         )}
+
+        <div className="auth-links" style={{ marginTop: '1rem' }}>
+          <p>
+            {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}
+            <a 
+              href="#" 
+              onClick={(e) => { 
+                e.preventDefault(); 
+                setIsLogin(prev => !prev); 
+              }}
+            >
+              {isLogin ? "Cadastre-se" : "Faça Login"}
+            </a>
+          </p>
+        </div>
       </div>
+
       {/* ToastMessage Global */}
       {toast && (
         <ToastMessage
