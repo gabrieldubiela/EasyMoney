@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import useBalance from '../hooks/useBalance';
 import useMonthClosingStatus from '../hooks/useMonthClosingStatus';
 import { useAppContext } from '../context/useAppContext';
-import { createOrUpdateMonthClosing } from '../services/monthClosingService'; // ajuste o path conforme seu projeto
+import { createOrUpdateMonthClosing } from '../services/monthClosingService';
 import MonthlySummary from '../components/charts/MonthlySummary';
 import TransactionForm from '../components/forms/TransactionForm';
-import PlannedTransactionItem from '../components/ui/PlannedTransactionItem';
+import TransactionItem from '../components/ui/TransactionItem';
 import ToastMessage from '../components/ui/ToastMessage';
 
 export default function BalancePage() {
@@ -18,13 +18,11 @@ export default function BalancePage() {
   // Dados do mês atual (selecionado)
   const {
     plannedTransactions,
-    effectiveTransactions,
     incomeEffective,
     expenseEffective,
     incomePlanned,
     expensePlanned,
     netEffective,
-    netPlanned,
     categories,
     types,
     loading,
@@ -150,7 +148,7 @@ export default function BalancePage() {
           <p>Nenhuma transação planejada para o período.</p>
         ) : (
           plannedTransactions.map(transaction => (
-            <PlannedTransactionItem
+            <TransactionItem
               key={transaction.id}
               transaction={transaction}
               categoryName={getCategoryName(transaction.category_id)}

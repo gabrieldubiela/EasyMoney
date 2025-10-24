@@ -36,7 +36,7 @@ export default function InvestmentProgress({ totalPortfolio, roi, goalStatus }) 
       <div className="goal-section">
         <strong>Goal Progress:</strong>
         {goalStatus && goalStatus.length > 0 ? (
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          <ul >
             {goalStatus.map((goal) => {
               const fillClass =
                 goal.percent >= 100

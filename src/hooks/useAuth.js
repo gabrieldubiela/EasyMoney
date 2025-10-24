@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { loginWithEmail, logout } from "../services/authService";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 /**
  * Hook centralizado para autenticação de usuário.
@@ -40,6 +41,22 @@ export default function useAuth() {
       setLoading(false);
     }
   };
+  
+  // Recuperação de senha por email
+  const recover = async (email) => {
+    setLoading(true);
+    setError("");
+    try {
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (err) {
+      setError(err.message || "Erro ao enviar recuperação.");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { login, logout: doLogout, loading, error };
+  return { login, logout: doLogout, loading, error, recover };
 }

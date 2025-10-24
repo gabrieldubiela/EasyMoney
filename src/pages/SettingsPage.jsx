@@ -1,72 +1,135 @@
-// src/pages/CategoriesAndTypesPage.jsx
+// src/pages/SettingsPage.jsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import useTypes from '../hooks/useTypes';
-import useCategories from '../hooks/useCategories';
-import AddCategoryForm from '../components/forms/AddCategoryForm'; 
-import AddTypeForm from '../components/forms/AddTypeForm';
-import EditCategoryAndTypeItem from '../components/ui/EditCategoryAndTypeItem';
+import useAllTypes from '../hooks/useAllTypes';
+import useAllCategories from '../hooks/useAllCategories';
+import CategoryForm from '../components/forms/CategoryForm';
+import TypeForm from '../components/forms/TypeForm';
+import AlertForm from '../components/forms/AlertForm';
 
+const SettingsPage = () => {
+    const { householdId, isLoading: householdLoading } = useAppContext();
+    const { types, loading: typesLoading, refreshTypes } = useAllTypes();
+    const { categories, loading: categoriesLoading, refreshCategories } = useAllCategories();
 
-const CategoriesAndTypesPage = () => { 
-    const { householdId, isLoading: householdLoading } = useAppContext(); 
-    const { types, loading: typesLoading } = useTypes();
-    const { categories, loading: categoriesLoading } = useCategories();
+    const [editingType, setEditingType] = useState(null);
+    const [editingCategory, setEditingCategory] = useState(null);
 
-    // Consolida o estado de loading
     const isLoading = householdLoading || typesLoading || categoriesLoading;
 
     if (isLoading) {
-        return <div>Carregando Gerenciamento...</div>;
+        return <div className="loading">Carregando configurações...</div>;
     }
-    
+
     if (!householdId) {
-        return <div>Você precisa estar em uma família para gerenciar categorias e tipos.</div>;
+        return <div className="error">Você precisa estar em uma família para gerenciar configurações.</div>;
     }
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>Gerenciar Categorias & Tipos</h1>
+        <div>
+            <h1>Configurações</h1>
 
-            {/* PRIMEIRA SEÇÃO: GESTÃO DE TIPOS */}
-            <section style={{ marginBottom: '40px' }}>
-                <h2>1. Tipos de Transação Atuais ({types.length})</h2>
-                
-                {/* O AddTypeForm deve receber a função de adicionar e a lista para validação */}
-                <AddTypeForm existingTypes={types} /> 
-                
-                <div style={{ marginTop: '10px' }}>
-                    {types.map(typeItem => (
-                        <EditCategoryAndTypeItem 
-                            key={typeItem.id} 
-                            item={typeItem} // Passamos o item (Tipo)
-                            isType={true}
-                        /> 
+            {/* ========== SEÇÃO 1: TIPOS ========== */}
+            <section>
+                <h2>1. Tipos de Transação ({types.length})</h2>
+
+                {/* Formulário para adicionar novo tipo */}
+                {!editingType && (
+                    <TypeForm
+                        existingTypes={types}
+                        onSuccess={() => refreshTypes?.()}
+                    />
+                )}
+
+                {/* Lista de tipos existentes */}
+                <div>
+                    {types.map((typeItem) => (
+                        <div key={typeItem.id}>
+                            {editingType?.id === typeItem.id ? (
+                                <TypeForm
+                                    item={typeItem}
+                                    existingTypes={types}
+                                    onSuccess={() => {
+                                        refreshTypes?.();
+                                        setEditingType(null);
+                                    }}
+                                    onCancel={() => setEditingType(null)}
+                                />
+                            ) : (
+                                <div>
+                                    <span>
+                                        <strong>{typeItem.name}</strong> {typeItem.isIncome ? '(Receita)' : '(Despesa)'}
+                                    </span>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => setEditingType(typeItem)}
+                                    >
+                                        Editar
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             </section>
 
-            <hr style={{ margin: '30px 0' }}/>
+            <hr />
 
-            {/* SEGUNDA SEÇÃO: GESTÃO DE CATEGORIAS */}
+            {/* ========== SEÇÃO 2: CATEGORIAS ========== */}
             <section>
-                <h2>2. Categorias Atuais ({categories.length})</h2>
-                
-                {/* O AddCategoryForm precisa da lista de TIPOS disponíveis para o SELECT */}
-                <AddCategoryForm types={types} existingCategories={categories} /> 
-                
-                <div style={{ marginTop: '10px' }}>
-                    {categories.map(category => (
-                        <EditCategoryAndTypeItem 
-                            key={category.id} 
-                            item={category} 
-                        />
+                <h2>2. Categorias ({categories.length})</h2>
+
+                {/* Formulário para adicionar nova categoria */}
+                {!editingCategory && (
+                    <CategoryForm
+                        existingCategories={categories}
+                        onSuccess={() => refreshCategories?.()}
+                    />
+                )}
+
+                {/* Lista de categorias existentes */}
+                <div>
+                    {categories.map((category) => (
+                        <div key={category.id}>
+                            {editingCategory?.id === category.id ? (
+                                <CategoryForm
+                                    item={category}
+                                    existingCategories={categories}
+                                    onSuccess={() => {
+                                        refreshCategories?.();
+                                        setEditingCategory(null);
+                                    }}
+                                    onCancel={() => setEditingCategory(null)}
+                                />
+                            ) : (
+                                <div>
+                                    <span>
+                                        <strong>{category.name}</strong>
+                                    </span>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => setEditingCategory(category)}
+                                    >
+                                        Editar
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
+            </section>
+
+            <hr />
+
+            {/* ========== SEÇÃO 3: ALERTAS ========== */}
+            <section>
+                <h2>3. Gestão de Alertas</h2>
+                <p>Visualize e gerencie alertas de orçamento:</p>
+                <AlertForm />
             </section>
         </div>
     );
 };
 
-export default CategoriesAndTypesPage;
+export default SettingsPage;

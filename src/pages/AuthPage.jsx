@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import LoginForm from '../components/forms/LoginForm';
 import RegisterForm from '../components/forms/RegisterForm';
-import PasswordRecoveryForm from '../components/forms/PasswordRecoveryForm';
 import ToastMessage from '../components/ui/ToastMessage';
 
 export default function AuthPage() {

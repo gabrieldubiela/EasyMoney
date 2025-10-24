@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { AppContext } from './appContextValue';
-import { fetchUserData } from '../services/userService';
-import { fetchHouseholdData } from '../services/householdService';
+import { fetchUserById } from '../services/userService';
+import { fetchHouseholdById } from '../services/householdService';
 
 export const AppProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
@@ -24,7 +24,7 @@ export const AppProvider = ({ children }) => {
 
         try {
           // Busca dados do usuário via userService
-          const userData = await fetchUserData(uid);
+          const userData = await fetchUserById(uid);
           const defaultHouseholdId = Array.isArray(userData.householdId)
             ? userData.householdId[0]
             : userData.householdId || null;
@@ -34,7 +34,7 @@ export const AppProvider = ({ children }) => {
           // Busca dados da família via householdService, se houver householdId
           if (defaultHouseholdId) {
             try {
-              const householdData = await fetchHouseholdData(defaultHouseholdId);
+              const householdData = await fetchHouseholdById(defaultHouseholdId);
               setFamilyName(householdData.familyName || null);
             } catch (error) {
               setFamilyName(null);
@@ -67,7 +67,7 @@ export const AppProvider = ({ children }) => {
     setHouseholdId(newHouseholdId);
     setLoading(true);
     try {
-      const householdData = await fetchHouseholdData(newHouseholdId);
+      const householdData = await fetchHouseholdById(newHouseholdId);
       setFamilyName(householdData.familyName || null);
     } catch (error) {
       setFamilyName(null);

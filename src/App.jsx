@@ -4,13 +4,11 @@ import React, { useEffect } from 'react';
 import { requestNotificationPermission } from './utils/notification';
 import { AppProvider } from './context/AppContext';
 import AppRoutes from './pages/Routes';
-import useScheduledPayments from './hooks/useScheduledPayments';
 import useRealtimeAlertManager from './hooks/useRealtimeAlertManager';
 import './index.css';
 
 // Componente que usa hooks globais dentro do contexto
 const AppContent = () => {
-  useScheduledPayments();
 
   // Novo: adiciona monitoramento automático de alertas
   useRealtimeAlertManager({

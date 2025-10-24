@@ -1,9 +1,7 @@
 // src/hooks/useHouseholdBaseData.js
 
 import { useMemo } from 'react';
-import { useAppContext } from '../context/useAppContext';
 
-// Hooks principais
 import useAllCategories from './useAllCategories';
 import useAllTypes from './useAllTypes';
 import useAllTransactions from './useAllTransactions';
@@ -11,10 +9,10 @@ import useAllPlannedTransactions from './useAllPlannedTransactions';
 import useAllAlerts from './useAllAlerts';
 import useAllBudgets from './useAllBudgets';
 import useAllGoals from './useAllGoals';
-import useAllGoalsAllocation from './useAllGoalsAllocation';
+import useAllGoalsAllocation from './useAllGoalAllocations';
 import useAllUsers from './useAllUsers';
 import useAllInvestments from './useAllInvestments';
-import useAllInvestmentsHistory from './useAllInvestmentsHistory';
+import useAllInvestmentsHistory from './useAllInvestmentHistory';
 
 /**
  * Hook agregador de todas as coleções-base da household.
@@ -26,7 +24,6 @@ import useAllInvestmentsHistory from './useAllInvestmentsHistory';
  * @returns {object} Dados consolidados da household.
  */
 export default function useHouseholdBaseData() {
-  const { householdId } = useAppContext(); // Mantém compatibilidade futura
 
   // 1️⃣ Hooks de dados Firestore
   const { categories, loading: loadingCat, error: errorCat } = useAllCategories();

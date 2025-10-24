@@ -12,8 +12,9 @@ import "../../styles/buttons.css";
 export default function LoginForm({ onSuccess, onError }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading, error } = useAuth();
+  const { login, recover, loading, error } = useAuth();
   const [formError, setFormError] = useState("");
+  const [recoveryStatus, setRecoveryStatus] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,6 +29,23 @@ export default function LoginForm({ onSuccess, onError }) {
     } else {
       setFormError(error || "Falha no login.");
       onError?.(error);
+    }
+  };
+
+  // Implementação de recuperação de senha
+  const handleRecoveryClick = async (e) => {
+    e.preventDefault();
+    setFormError("");
+    setRecoveryStatus("");
+    if (!email) {
+      setFormError("Informe seu e-mail para recuperar a senha.");
+      return;
+    }
+    const ok = await recover(email);
+    if (ok) {
+      setRecoveryStatus("Enviamos um e-mail para redefinir sua senha.");
+    } else {
+      setFormError(error || "Erro ao recuperar senha.");
     }
   };
 
@@ -70,6 +88,12 @@ export default function LoginForm({ onSuccess, onError }) {
           </button>
         </div>
       </form>
+      <p>
+        <a href="#" onClick={handleRecoveryClick}>
+          Esqueci minha senha
+        </a>
+      </p>
+      {recoveryStatus && <p className="form-success">{recoveryStatus}</p>}
     </div>
   );
 }

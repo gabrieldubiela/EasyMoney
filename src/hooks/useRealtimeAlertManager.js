@@ -154,7 +154,7 @@ const useRealtimeAlertManager = ({ selectedYear, yearMonth, annualData }) => {
           }
         });
     }
-  }, [alerts, performance, plannedTransactions, budgets]);
+  }, [householdId, alerts, performance, plannedTransactions, budgets]);
 };
 
 export default useRealtimeAlertManager;

@@ -1,14 +1,14 @@
-// src/components/ui/forms/TransactionForm.jsx
+// src/components/forms/TransactionForm.jsx
 
-import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../../../context/useAppContext';
-import { saveTransaction } from '../../../services/transactionService';
+import React, { useState } from 'react';
+import { useAppContext } from '../../context/useAppContext';
+import { createTransaction } from '../../services/transactionService';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../firebase/firebaseConfig';
-import useAllCategories from '../../../hooks/useAllCategories';
-import useAllTypes from '../../../hooks/useAllTypes';
-import "../../../styles/forms.css";
-import "../../../styles/buttons.css";
+import { db } from '../../firebase/firebaseConfig';
+import useAllCategories from '../../hooks/useAllCategories';
+import useAllTypes from '../../hooks/useAllTypes';
+import "../../styles/forms.css";
+import "../../styles/buttons.css";
 
 /**
  * Formulário de criação e edição de transações financeiras.
@@ -74,7 +74,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           createdAt: serverTimestamp(),
         });
       } else {
-        await saveTransaction({
+        await createTransaction({
           householdId,
           userId: user.uid,
           formData: {

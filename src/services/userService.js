@@ -2,7 +2,7 @@
 
 import { doc, getDoc, setDoc, deleteDoc, updateDoc, getDocs, collection, where, query } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
-import { removeUserFromHousehold } from "./householdService";
+import { removeMemberFromHousehold } from "./householdService";
 
 /**
  * Busca usuários do sistema com filtros dinâmicos.
@@ -82,5 +82,5 @@ export const updateUser = async (uid, fields) => {
 export const deleteUser = async (uid) => {
   const userRef = doc(db, "users", uid);
   await deleteDoc(userRef);
-  await removeUserFromHousehold(uid); // Remove de todas as famílias onde era membro
+  await removeMemberFromHousehold(uid); // Remove de todas as famílias onde era membro
 };

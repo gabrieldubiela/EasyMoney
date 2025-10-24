@@ -69,7 +69,7 @@ const TypeForm = ({
       try {
         await deleteType(householdId, item.id);
         if (onSuccess) onSuccess();
-      } catch (e) {
+      } catch {
         setFormError("Erro ao excluir tipo!");
       } finally {
         setLoading(false);
@@ -82,9 +82,8 @@ const TypeForm = ({
       onSubmit={handleSave}
       className="form type-form"
       autoComplete="off"
-      style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap'}}
     >
-      <div className="form-group" style={{ minWidth: 160 }}>
+      <div className="form-group">
         <label className="form-label required" htmlFor="type-name">
           Nome do tipo
         </label>
@@ -98,20 +97,19 @@ const TypeForm = ({
           disabled={loading}
         />
       </div>
-      <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', margin: 0 }}>
+      <div className="form-group" >
         <input
           type="checkbox"
           id="type-isincome"
           checked={isIncome}
           onChange={e => setIsIncome(e.target.checked)}
           disabled={loading}
-          style={{ marginRight: 4 }}
         />
-        <label htmlFor="type-isincome" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>
+        <label htmlFor="type-isincome" className="form-label">
           Receita?
         </label>
       </div>
-      <div className="form-actions" style={{ margin: 0, flexWrap: 'wrap', gap: 8 }}>
+      <div className="form-actions">
         <button type="submit" className="btn btn-primary" disabled={loading || !name.trim()}>
           {loading ? 'Salvando...' : item ? 'Salvar' : 'Adicionar'}
         </button>
@@ -126,9 +124,9 @@ const TypeForm = ({
           </>
         )}
       </div>
-      {formError && <div className="form-error" style={{ flexBasis: "100%" }}>{formError}</div>}
+      {formError && <div className="form-error">{formError}</div>}
       {isDuplicate && !item && (
-        <div className="form-error" style={{ flexBasis: "100%" }}>
+        <div className="form-error">
           Esse tipo já existe.
         </div>
       )}

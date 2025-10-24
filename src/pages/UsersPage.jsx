@@ -2,12 +2,10 @@
 
 import React from 'react';
 import { useAppContext } from '../context/useAppContext';
-import UserProfilePanel from '../components/ui/UserProfilePanel';
-import HouseholdUpdateForm from '../components/forms/HouseholdUpdateForm';
-import InviteCodeDisplay from '../components/domains/InviteCodeDisplay';
+import UserProfileForm from '../components/forms/UserProfileForm';
 
 export default function UsersPage() {
-  const { user, householdId } = useAppContext();
+  const { user } = useAppContext();
 
   if (!user) {
     return <div className="loading">Carregando dados do usuário...</div>;
@@ -21,20 +19,9 @@ export default function UsersPage() {
       <section className="section">
         <h2 className="section-title">Dados Pessoais</h2>
         <div className="card">
-          <UserProfilePanel />
+          <UserProfileForm />
         </div>
       </section>
-      {householdId && (
-        <section className="section">
-          <h2 className="section-title">Dados da Família</h2>
-          <div className="card">
-            <HouseholdUpdateForm householdId={householdId} />
-          </div>
-          <div className="card mt-md">
-            <InviteCodeDisplay householdId={householdId} />
-          </div>
-        </section>
-      )}
     </div>
   );
 }

@@ -1,9 +1,9 @@
 // src/pages/TransactionPage.jsx
 
 import React, { useState, useMemo } from 'react';
-import TransactionList from '../components/lists/TransactionList';
+import TransactionList from '../components/tables/TransactionList';
 import TransactionAdder from '../components/ui/TransactionAdder';
-import TransactionFilters from '../components/ui/TransactionFilters';
+import TransactionFilter from '../components/ui/TransactionFilter';
 import { useAppContext } from '../context/useAppContext';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
@@ -65,7 +65,7 @@ const TransactionPage = () => {
 
       <TransactionAdder />
 
-      <TransactionFilters
+      <TransactionFilter
         categories={categories}
         types={types}
         onFilterChange={handleFilterChange}
