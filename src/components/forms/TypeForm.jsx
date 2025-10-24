@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import { createType, updateType, deleteType } from '../../services/typeService';
+import "../../styles/forms.css";
+import "../../styles/buttons.css";
 
 const TypeForm = ({
   item = null,         // Se existir, é edição; se não, é adição
@@ -14,6 +16,7 @@ const TypeForm = ({
   const [name, setName] = useState(item ? item.name : '');
   const [isIncome, setIsIncome] = useState(item ? !!item.isIncome : false);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     if (item) {
@@ -29,8 +32,12 @@ const TypeForm = ({
 
   const handleSave = async (e) => {
     e?.preventDefault && e.preventDefault();
+    setFormError("");
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setFormError("Informe o nome do tipo.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -49,7 +56,7 @@ const TypeForm = ({
       if (onSuccess) onSuccess();
       if (item && onCancel) onCancel();
     } catch (err) {
-      alert(err.message);
+      setFormError(err.message);
     } finally {
       setLoading(false);
     }
@@ -63,7 +70,7 @@ const TypeForm = ({
         await deleteType(householdId, item.id);
         if (onSuccess) onSuccess();
       } catch (e) {
-        alert('Erro ao excluir tipo!');
+        setFormError("Erro ao excluir tipo!");
       } finally {
         setLoading(false);
       }
@@ -73,37 +80,57 @@ const TypeForm = ({
   return (
     <form
       onSubmit={handleSave}
-      style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}
+      className="form type-form"
+      autoComplete="off"
+      style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap'}}
     >
-      <input
-        type="text"
-        placeholder="Nome do tipo"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        style={{ width: 160 }}
-        required
-      />
-      <label>
+      <div className="form-group" style={{ minWidth: 160 }}>
+        <label className="form-label required" htmlFor="type-name">
+          Nome do tipo
+        </label>
+        <input
+          type="text"
+          id="type-name"
+          placeholder="Nome do tipo"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+      <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', margin: 0 }}>
         <input
           type="checkbox"
+          id="type-isincome"
           checked={isIncome}
           onChange={e => setIsIncome(e.target.checked)}
+          disabled={loading}
           style={{ marginRight: 4 }}
         />
-        Receita?
-      </label>
-      <button type="submit" disabled={loading || !name.trim()}>
-        {loading ? 'Salvando...' : item ? 'Salvar' : 'Adicionar'}
-      </button>
-      {item && (
-        <>
-          <button type="button" onClick={handleDelete} style={{ color: 'red' }} disabled={loading}>
-            Excluir
-          </button>
-          <button type="button" onClick={onCancel} disabled={loading}>
-            Cancelar
-          </button>
-        </>
+        <label htmlFor="type-isincome" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>
+          Receita?
+        </label>
+      </div>
+      <div className="form-actions" style={{ margin: 0, flexWrap: 'wrap', gap: 8 }}>
+        <button type="submit" className="btn btn-primary" disabled={loading || !name.trim()}>
+          {loading ? 'Salvando...' : item ? 'Salvar' : 'Adicionar'}
+        </button>
+        {item && (
+          <>
+            <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={loading}>
+              Excluir
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
+              Cancelar
+            </button>
+          </>
+        )}
+      </div>
+      {formError && <div className="form-error" style={{ flexBasis: "100%" }}>{formError}</div>}
+      {isDuplicate && !item && (
+        <div className="form-error" style={{ flexBasis: "100%" }}>
+          Esse tipo já existe.
+        </div>
       )}
     </form>
   );

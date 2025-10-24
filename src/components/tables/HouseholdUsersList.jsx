@@ -56,7 +56,6 @@ export default function HouseholdUsersList({ householdId, isAdmin, showToast }) 
                   )}
                   <button
                     className="btn btn-danger"
-                    style={{ marginLeft: 8 }}
                     onClick={() => handleRemove(m.uid)}
                   >
                     Remover membro

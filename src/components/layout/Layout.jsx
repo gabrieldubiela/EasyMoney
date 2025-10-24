@@ -4,13 +4,14 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
+import "../../styles/layout.css"; 
 
 const Layout = ({ children }) => (
-  <div style={{ display: 'flex', height: '100vh', width: '100vw', background: '#f9f9fb' }}>
+  <div className="app-layout">
     <Sidebar />
-    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+    <div className="app-main-area">
       <Header />
-      <main style={{ flex: 1, overflow: 'auto', padding: 32 }}>
+      <main className="app-content">
         {/* Se vier de rotas, usa Outlet. Se vier de props, usa children (ambos funcionam!) */}
         <Outlet />
         {children}

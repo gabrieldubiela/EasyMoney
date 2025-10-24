@@ -16,39 +16,20 @@ export default function ToastMessage({ type = "info", message, onClose, duration
     }
   }, [duration, onClose]);
 
-  const colors = {
-    success: "#188710",
-    error: "#c01e1e",
-    info: "#286ee0"
-  };
+  // Classes por tipo
+  const typeClass = type ? `toast-${type}` : "";
 
   return (
-    <div
-      className="toast-message"
-      style={{
-        position: "fixed",
-        top: 20,
-        right: 20,
-        minWidth: 200,
-        background: "#fff",
-        color: colors[type] || "#222",
-        border: `2px solid ${colors[type] || "#222"}`,
-        borderRadius: 8,
-        padding: "10px 24px",
-        boxShadow: "0 1px 8px rgba(0,0,0,0.08)",
-        zIndex: 1005,
-        fontWeight: 500
-      }}
-    >
-      {message}
+    <div className={`toast-message ${typeClass}`} tabIndex={0} role="alert">
+      <span>{message}</span>
       {onClose && (
         <span
-          style={{
-            marginLeft: 18,
-            cursor: "pointer",
-            fontWeight: 700
-          }}
+          className="toast-close"
+          tabIndex={0}
+          role="button"
+          aria-label="Fechar"
           onClick={onClose}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onClose(); }}
         >
           ×
         </span>

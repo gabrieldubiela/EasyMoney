@@ -1,17 +1,18 @@
-// src/components/ui/UserProfilePanel.jsx
+// src/components/forms/UserProfileForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import ToastMessage from '../ui/ToastMessage';
 import { updateUser } from '../../services/userService';
-import { 
-  authUpdateDisplayName, 
-  authUpdateEmail, 
-  authUpdatePassword 
+import {
+  authUpdateDisplayName,
+  authUpdateEmail,
+  authUpdatePassword
 } from '../../services/authService';
+import "../../styles/forms.css";
+import "../../styles/buttons.css";
 
-// MAIN PANEL
-export default function UserProfilePanel() {
+export default function UserProfileForm() {
   const { user, loading } = useAppContext();
   const [toast, setToast] = useState(null);
 
@@ -21,7 +22,7 @@ export default function UserProfilePanel() {
   if (!user) return <div className="loading">Usuário não encontrado.</div>;
 
   return (
-    <div>
+    <div className="profile-panel">
       <ProfileDataForm user={user} showToast={showToast} />
       <hr />
       <EmailUpdateForm user={user} showToast={showToast} />
@@ -44,7 +45,8 @@ function ProfileDataForm({ user, showToast }) {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     const newDisplayName = displayName.trim();
-    if (!user || !newDisplayName) return showToast("error", "O nome não pode estar vazio.");
+    if (!user || !newDisplayName)
+      return showToast("error", "O nome não pode estar vazio.");
 
     setIsUpdating(true);
     try {
@@ -65,20 +67,23 @@ function ProfileDataForm({ user, showToast }) {
     <section>
       <h3>Dados básicos</h3>
       <p><strong>Email:</strong> {user.email}</p>
-      <form onSubmit={handleUpdateProfile}>
-        <div>
-          <label htmlFor="displayName">Nome:</label>
+      <form onSubmit={handleUpdateProfile} className="form profile-form" autoComplete="off">
+        <div className="form-group">
+          <label htmlFor="displayName" className="form-label required">Nome:</label>
           <input
             id="displayName"
             type="text"
             value={displayName}
             onChange={e => setDisplayName(e.target.value)}
             required
+            disabled={isUpdating}
           />
         </div>
-        <button type="submit" disabled={isUpdating}>
-          {isUpdating ? 'Salvando...' : 'Salvar Dados'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={isUpdating}>
+            {isUpdating ? 'Salvando...' : 'Salvar Dados'}
+          </button>
+        </div>
       </form>
     </section>
   );
@@ -93,7 +98,8 @@ function EmailUpdateForm({ user, showToast }) {
   const handleUpdateEmail = async (e) => {
     e.preventDefault();
     if (!user || newEmail === user.email) return;
-    if (currentPassword.trim() === '') return showToast("error", "Digite sua senha para confirmar.");
+    if (currentPassword.trim() === '')
+      return showToast("error", "Digite sua senha para confirmar.");
 
     setEmailLoading(true);
     try {
@@ -111,18 +117,20 @@ function EmailUpdateForm({ user, showToast }) {
   return (
     <section>
       <h3>Alterar E-mail</h3>
-      <form onSubmit={handleUpdateEmail}>
-        <div>
-          <label htmlFor="email">Novo E-mail:</label>
-          <input id="email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} required />
+      <form onSubmit={handleUpdateEmail} className="form email-form" autoComplete="off">
+        <div className="form-group">
+          <label htmlFor="email" className="form-label required">Novo E-mail:</label>
+          <input id="email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} required disabled={emailLoading} />
         </div>
-        <div>
-          <label htmlFor="current-password-email">Senha Atual:</label>
-          <input id="current-password-email" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+        <div className="form-group">
+          <label htmlFor="current-password-email" className="form-label required">Senha Atual:</label>
+          <input id="current-password-email" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={emailLoading} />
         </div>
-        <button type="submit" disabled={emailLoading}>
-          {emailLoading ? 'Atualizando...' : 'Alterar E-mail'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={emailLoading}>
+            {emailLoading ? 'Atualizando...' : 'Alterar E-mail'}
+          </button>
+        </div>
       </form>
     </section>
   );
@@ -136,9 +144,12 @@ function PasswordUpdateForm({ user, showToast }) {
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
-    if (newPassword.length < 6) return showToast("error", "Nova senha deve ter ao menos 6 caracteres.");
-    if (currentPassword.trim() === '') return showToast("error", "Digite sua senha atual.");
-    if (newPassword === currentPassword) return showToast("error", "Nova senha não pode ser igual à anterior.");
+    if (newPassword.length < 6)
+      return showToast("error", "Nova senha deve ter ao menos 6 caracteres.");
+    if (currentPassword.trim() === '')
+      return showToast("error", "Digite sua senha atual.");
+    if (newPassword === currentPassword)
+      return showToast("error", "Nova senha não pode ser igual à anterior.");
 
     setPasswordLoading(true);
     try {
@@ -157,18 +168,20 @@ function PasswordUpdateForm({ user, showToast }) {
   return (
     <section>
       <h3>Alterar Senha</h3>
-      <form onSubmit={handleUpdatePassword}>
-        <div>
-          <label htmlFor="current-password-pass">Senha Atual:</label>
-          <input id="current-password-pass" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+      <form onSubmit={handleUpdatePassword} className="form password-form" autoComplete="off">
+        <div className="form-group">
+          <label htmlFor="current-password-pass" className="form-label required">Senha Atual:</label>
+          <input id="current-password-pass" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={passwordLoading} />
         </div>
-        <div>
-          <label htmlFor="new-password">Nova Senha:</label>
-          <input id="new-password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} />
+        <div className="form-group">
+          <label htmlFor="new-password" className="form-label required">Nova Senha:</label>
+          <input id="new-password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} disabled={passwordLoading} />
         </div>
-        <button type="submit" disabled={passwordLoading}>
-          {passwordLoading ? 'Atualizando...' : 'Alterar Senha'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={passwordLoading}>
+            {passwordLoading ? 'Atualizando...' : 'Alterar Senha'}
+          </button>
+        </div>
       </form>
     </section>
   );

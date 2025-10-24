@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../firebase/firebaseConfig';
 import { collection, query, limit, getDocs } from 'firebase/firestore'; 
 import { useAppContext } from '../../context/useAppContext';
+import "../../styles/forms.css";
+import "../../styles/buttons.css";
+import "../../styles/filters.css";
 
 // Funções para presets de data
 function getMonthPeriod() {
@@ -198,11 +201,11 @@ const TransactionFilters = ({ categories, types, onFilterChange }) => {
           {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d} />)}
         </datalist>
       </div>
-      <button onClick={clearFilters} className="btn-outline btn-block" type="button">
+      <button onClick={clearFilters} className="btn btn-secondary btn-block" type="button">
         Limpar Filtros
       </button>
     </div>
   );
 };
 
-export default TransactionFilters;
+export default TransactionFilter;

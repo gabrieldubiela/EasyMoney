@@ -1,9 +1,8 @@
 import React from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import { convertPlannedToEffective, deleteTransaction } from '../../services/transactionService';
+import "../../styles/buttons.css"; 
 
-// Um único TransactionItem serve para planejada e efetiva.
-// Props: transaction, userName, categoryName, typeName, isPlanned, onConvert, onDelete, onEdit
 export default function TransactionItem({
   transaction,
   userName,
@@ -26,7 +25,6 @@ export default function TransactionItem({
         ? new Date(transaction.date).toLocaleDateString('pt-BR')
         : 'Data Desconhecida');
 
-  // Handler para converter planejada em efetiva
   const handleConvert = async (e) => {
     e.stopPropagation();
     try {
@@ -38,7 +36,6 @@ export default function TransactionItem({
     }
   };
 
-  // Handler para exclusão
   const handleDelete = async (e) => {
     e.stopPropagation();
     try {
@@ -56,12 +53,10 @@ export default function TransactionItem({
   };
 
   return (
-    <div className="transaction-item"
+    <div
+      className={`transaction-item${!isPlanned && onEdit ? " transaction-item--clickable" : ""}`}
       onClick={handleEdit}
-      style={{
-        padding: 10, border: '1px solid #ddd', marginBottom: 10,
-        cursor: !isPlanned && onEdit ? 'pointer' : 'default'
-      }}>
+    >
       <div className="transaction-item-header">
         <div className="transaction-item-description">
           {transaction.description}
@@ -89,11 +84,19 @@ export default function TransactionItem({
         <span className="transaction-item-user">Adicionado por: {userName}</span>
         <div className="transaction-item-actions">
           {isPlanned && (
-            <button onClick={handleConvert} className="success btn-sm">
+            <button
+              onClick={handleConvert}
+              className="btn btn-success btn-small"
+              type="button"
+            >
               Converter em Paga
             </button>
           )}
-          <button onClick={handleDelete} className="danger btn-sm">
+          <button
+            onClick={handleDelete}
+            className="btn btn-danger btn-small"
+            type="button"
+          >
             Excluir
           </button>
         </div>

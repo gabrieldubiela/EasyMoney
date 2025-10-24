@@ -1,0 +1,24 @@
+/* src/styles/filters.css */
+
+.transaction-filter {
+  background: var(--color-surface, #fff);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-sm, 0 1px 6px rgba(0,0,0,0.05));
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+.transaction-filter-row {
+  display: flex; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+.transaction-filter-col {
+  min-width: 180px;
+  flex: 1;
+}
+.transaction-filter-title {
+  font-size: 1.15rem;
+  color: var(--color-primary-dark);
+  font-family: var(--font-family-title);
+  margin-bottom: var(--spacing-md);
+}

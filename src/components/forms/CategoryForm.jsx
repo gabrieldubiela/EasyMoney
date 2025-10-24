@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useAppContext } from "../../context/useAppContext";
 import { createCategory, updateCategory, deleteCategory } from "../../services/categoryService";
-import "../../styles/CategoryForm.css";
+import "../../styles/forms.css";
+import "../../styles/buttons.css";
 
 const CategoryForm = ({
-  item = null, 
+  item = null,
   existingCategories = [],
   onSuccess,
   onCancel,
@@ -67,36 +68,49 @@ const CategoryForm = ({
   };
 
   return (
-    <form className="category-form" onSubmit={handleSave}>
-      <input
-        type="text"
-        placeholder="Nome da categoria"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-        disabled={loading}
-      />
-      {isDuplicate && !item && (
-        <span className="duplicate-warning">Essa categoria já existe.</span>
-      )}
-      <div className="button-group">
-        <button type="submit" disabled={loading || !name.trim()}>
+    <form className="form category-form" onSubmit={handleSave} autoComplete="off">
+      <div className="form-group">
+        <label className="form-label required" htmlFor="category-name">
+          Nome da categoria
+        </label>
+        <input
+          type="text"
+          id="category-name"
+          placeholder="Ex: Alimentação"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          disabled={loading}
+          className={isDuplicate && !item ? "input-error" : ""}
+        />
+        {isDuplicate && !item && (
+          <span className="form-error">Essa categoria já existe.</span>
+        )}
+      </div>
+
+      <div className="form-actions">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={loading || !name.trim()}
+        >
           {loading ? "Salvando..." : item ? "Salvar" : "Adicionar"}
         </button>
+
         {item && (
           <>
             <button
               type="button"
+              className="btn btn-danger"
               onClick={handleDelete}
-              className="btn-danger"
               disabled={loading}
             >
               Excluir
             </button>
             <button
               type="button"
+              className="btn btn-secondary"
               onClick={onCancel}
-              className="btn-secondary"
               disabled={loading}
             >
               Cancelar

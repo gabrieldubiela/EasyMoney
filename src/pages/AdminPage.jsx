@@ -1,7 +1,7 @@
 // src/pages/AdminPage.jsx
 
 import React, { useState } from 'react';
-import HouseholdAdminSwitcher from '../components/ui/HouseholdAdminSwitcher';
+import HouseholdAdminSwitcher from '../components/tables/HouseholdAdminSwitcher';
 import UserAdminTable from '../components/tables/UserAdminTable';
 import UserAdminForm from '../components/forms/UserAdminForm';
 

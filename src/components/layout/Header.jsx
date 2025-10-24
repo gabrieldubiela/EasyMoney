@@ -2,43 +2,28 @@
 
 import React from "react";
 import { useAppContext } from "../../context/useAppContext";
+import "../../styles/buttons.css";
+import "../../styles/header.css";
 
 const logoUrl = "/logo.svg";
 
 const Header = () => {
-  const { userName, familyName, householdId, changeHousehold, userId, user } = useAppContext();
+  const { userName, familyName, householdId, changeHousehold, user } = useAppContext();
 
   // Detecta impersonação (está em uma família diferente da original do usuário)
   const isImpersonating = user?.householdId && householdId && !user.householdId.includes(householdId);
 
   return (
-    <header
-      style={{
-        height: 60,
-        background: "#fff",
-        borderBottom: "1px solid #eee",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 32px",
-        justifyContent: "space-between"
-      }}
-    >
+    <header className="header">
       <div style={{ display: "flex", alignItems: "center" }}>
-        <img src={logoUrl} alt="EasyMoney Logo" style={{ height: 38, marginRight: 18 }} />
-        <span>
+        <img src={logoUrl} alt="EasyMoney Logo" className="header-logo" />
+        <span style={{ display: "flex", alignItems: "center" }}>
           <span style={{ fontWeight: "bold" }}>Família:</span> {familyName}
-          <span style={{ color: "#afafaf", fontSize: 13, marginLeft: 6 }}>({householdId})</span>
+          <span className="muted">({householdId})</span>
           {isImpersonating && (
             <button
-              style={{
-                marginLeft: 16,
-                background: "#f1dbff",
-                border: "none",
-                borderRadius: 4,
-                color: "#49456d",
-                cursor: "pointer",
-                padding: "4px 12px"
-              }}
+              className="btn btn-secondary btn-small"
+              style={{ marginLeft: 16 }}
               onClick={() => changeHousehold(user.householdId[0])}
             >
               Voltar à minha família
@@ -47,8 +32,8 @@ const Header = () => {
         </span>
       </div>
       <div>
-        <span style={{ marginRight: 18 }}>👤 {userName}</span>
-        {/* <button style={{ marginLeft: 8 }}>Perfil</button> */}
+        <span className="header-user">👤 {userName}</span>
+        {/* <button className="btn btn-outline btn-small" style={{ marginLeft: 8 }}>Perfil</button> */}
       </div>
     </header>
   );

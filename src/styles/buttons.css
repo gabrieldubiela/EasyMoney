@@ -23,6 +23,7 @@
   user-select: none;
   white-space: nowrap;
 }
+
 .btn:focus {
   outline: 2px solid var(--color-primary-dark);
   outline-offset: 2px;
@@ -31,7 +32,7 @@
   transform: translateY(1px);
 }
 
-/* Variações */
+/* Botão padrão primário */
 .btn-primary,
 .btn {
   background: var(--color-primary);
@@ -45,6 +46,7 @@
   transform: translateY(-1px);
 }
 
+/* Botão secundário */
 .btn-secondary {
   background: var(--color-border);
   color: var(--color-text);
@@ -55,6 +57,7 @@
   color: #fff;
 }
 
+/* Botão de perigo */
 .btn-danger {
   background: var(--color-danger);
   color: #fff;
@@ -64,6 +67,7 @@
   color: #fff;
 }
 
+/* Botão de sucesso */
 .btn-success {
   background: var(--color-success);
   color: #fff;
@@ -72,7 +76,9 @@
   background: color-mix(in srgb, var(--color-success) 80%, black);
 }
 
-.btn:disabled, .btn[aria-disabled="true"] {
+/* Botão desativado */
+.btn:disabled,
+.btn[aria-disabled="true"] {
   opacity: 0.65;
   cursor: not-allowed;
 }
@@ -83,8 +89,22 @@
   font-size: 0.91rem;
 }
 
+/* Tamanho grande */
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.11rem;
+}
+
+/* Botão circular (ex: ícone) */
+.btn-circle {
+  border-radius: 50%;
+  padding: var(--spacing-sm);
+  width: 2.5rem;
+  height: 2.5rem;
+  justify-content: center;
+}
+
 /* Margem automática entre botões */
 .btn + .btn {
   margin-left: var(--spacing-sm);
 }
-

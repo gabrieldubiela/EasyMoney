@@ -7,18 +7,11 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../firebase/firebaseConfig';
 import useAllCategories from '../../../hooks/useAllCategories';
 import useAllTypes from '../../../hooks/useAllTypes';
+import "../../../styles/forms.css";
+import "../../../styles/buttons.css";
 
 /**
  * Formulário de criação e edição de transações financeiras.
- *
- * - Usa hooks centralizados (useAllCategories, useAllTypes) para listar opções.
- * - Suporta criação de transações planejadas ou efetivas.
- * - Designado para uso em modais, páginas ou painéis do EasyMoney.
- *
- * @param {object} props
- * @param {string} [props.transactionId] - ID da transação a ser editada (opcional).
- * @param {function} [props.onSaveSuccess] - Callback chamado após salvar com sucesso.
- * @param {boolean} [props.isPlanned=false] - Define se é uma transação planejada.
  */
 const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) => {
   const { householdId, user } = useAppContext();
@@ -37,33 +30,24 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
   const [date, setDate] = useState(today);
   const [installments, setInstallments] = useState(1);
 
-  /**
-   * Determina se o tipo selecionado é receita.
-   */
+  const [formError, setFormError] = useState("");
+
   const isIncomeType = (selectedTypeId) => {
     const transactionType = types.find((t) => t.id === selectedTypeId);
     return transactionType && transactionType.name?.toUpperCase() === 'RECEITA';
   };
 
-  /**
-   * Retorna o valor com sinal baseado no tipo de transação.
-   * @param {string|number} rawAmount - Valor bruto informado.
-   * @param {string} typeId - ID do tipo selecionado.
-   * @returns {number} Valor com sinal positivo (receita) ou negativo (despesa).
-   */
   const getSignedAmount = (rawAmount, typeId) => {
     const numeric = parseFloat(rawAmount);
     if (isNaN(numeric) || numeric <= 0) throw new Error('Insira um valor positivo.');
     return isIncomeType(typeId) ? numeric : -numeric;
   };
 
-  /**
-   * Lógica de salvamento (planejado ou efetivo).
-   */
   const handleSave = async (e) => {
     e.preventDefault();
     if (!householdId || !user) return;
 
+    setFormError("");
     try {
       setIsProcessing(true);
 
@@ -71,8 +55,13 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       const trimmedDescription = description.trim();
       const trimmedSupplier = supplier.trim();
 
+      if (!category || !type || !amount) {
+        setFormError("Preencha todas as informações obrigatórias.");
+        setIsProcessing(false);
+        return;
+      }
+
       if (isPlanned) {
-        // Criação de transação planejada (valores futuros)
         await addDoc(collection(db, `households/${householdId}/plannedTransactions`), {
           description: trimmedDescription,
           supplier: trimmedSupplier,
@@ -85,7 +74,6 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           createdAt: serverTimestamp(),
         });
       } else {
-        // Criação ou edição de transação efetiva
         await saveTransaction({
           householdId,
           userId: user.uid,
@@ -105,7 +93,6 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       alert('Transação salva com sucesso!');
       if (onSaveSuccess) onSaveSuccess();
 
-      // Reseta o formulário
       setDescription('');
       setSupplier('');
       setAmount('');
@@ -114,14 +101,12 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       setDate(today);
       setInstallments(1);
     } catch (error) {
-      console.error('Erro ao salvar transação:', error);
-      alert(`Erro ao salvar: ${error.message}`);
+      setFormError(error.message || "Erro ao salvar transação.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Controle de carregamento de metadados
   if (loadingCategories || loadingTypes)
     return <div className="loading">Carregando informações...</div>;
 
@@ -133,9 +118,13 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
     );
 
   return (
-    <form onSubmit={handleSave} className="form">
+    <form onSubmit={handleSave} className="form transaction-form" autoComplete="off">
       <div className="form-group">
+        <label htmlFor="tx-description" className="form-label required">
+          Descrição
+        </label>
         <input
+          id="tx-description"
           type="text"
           placeholder="Descrição"
           value={description}
@@ -145,7 +134,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       </div>
 
       <div className="form-group">
+        <label htmlFor="tx-supplier" className="form-label">
+          Fornecedor / Origem
+        </label>
         <input
+          id="tx-supplier"
           type="text"
           placeholder="Fornecedor / Origem"
           value={supplier}
@@ -154,7 +147,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       </div>
 
       <div className="form-group">
+        <label htmlFor="tx-amount" className="form-label required">
+          Valor
+        </label>
         <input
+          id="tx-amount"
           type="number"
           placeholder="Valor"
           value={amount}
@@ -166,8 +163,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       </div>
 
       <div className="form-group">
-        <label className="form-label">Data</label>
+        <label htmlFor="tx-date" className="form-label required">
+          Data
+        </label>
         <input
+          id="tx-date"
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
@@ -177,8 +177,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
 
       {!isPlanned && (
         <div className="form-group">
-          <label className="form-label">Parcelas</label>
+          <label htmlFor="tx-installments" className="form-label">
+            Parcelas
+          </label>
           <input
+            id="tx-installments"
             type="number"
             value={installments}
             onChange={(e) => setInstallments(e.target.value)}
@@ -188,7 +191,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       )}
 
       <div className="form-group">
+        <label htmlFor="tx-category" className="form-label required">
+          Categoria
+        </label>
         <select
+          id="tx-category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           required
@@ -205,7 +212,15 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       </div>
 
       <div className="form-group">
-        <select value={type} onChange={(e) => setType(e.target.value)} required>
+        <label htmlFor="tx-type" className="form-label required">
+          Tipo
+        </label>
+        <select
+          id="tx-type"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          required
+        >
           <option value="" disabled>
             Tipo
           </option>
@@ -217,13 +232,21 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
         </select>
       </div>
 
-      <button type="submit" disabled={isProcessing} className="primary btn-block">
-        {isProcessing
-          ? 'Processando...'
-          : transactionId
-          ? 'Salvar Edição'
-          : 'Adicionar Transação'}
-      </button>
+      {formError && <div className="form-error">{formError}</div>}
+
+      <div className="form-actions">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={isProcessing}
+        >
+          {isProcessing
+            ? 'Processando...'
+            : transactionId
+            ? 'Salvar Edição'
+            : 'Adicionar Transação'}
+        </button>
+      </div>
     </form>
   );
 };

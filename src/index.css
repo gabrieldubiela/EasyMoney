@@ -9,10 +9,10 @@
 
 /* Paleta principal e variáveis */
 :root {
-  --color-primary: #1bdd93;         /* Verde do logo - principal */
-  --color-primary-dark: #179e6a;    /* Verde escuro, para hover */
-  --color-primary-light: #70e9c3;   /* Verde claro */
-  --color-success: #22C55E;         /* Sucesso */
+  --color-primary: #1bdd93;
+  --color-primary-dark: #179e6a;
+  --color-primary-light: #70e9c3;
+  --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #DC2626;
   --color-bg: #F9FAFB;
@@ -119,51 +119,20 @@ h5 { font-size: 1.125rem; }
 h6 { font-size: 1rem; }
 .muted { color: var(--color-text-muted); }
 
-/* Botões estilosos */
+/* Reseta botões para herdar só tokens base; TODO: usar <button class="btn ..."> sempre! */
 button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.625rem 1.25rem;
-  font-size: 1rem;
-  font-weight: var(--font-weight-medium);
   font-family: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  outline: none;
+  box-shadow: none;
   cursor: pointer;
-  transition: all var(--transition-base);
-  background: var(--color-primary);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-  user-select: none;
-  white-space: nowrap;
+  transition: var(--transition-base);
 }
-button:focus {
-  outline: 2px solid var(--color-primary-dark);
-  outline-offset: 2px;
-}
-button:active { transform: translateY(1px); }
-button.primary, .primary > button {
-  background: var(--color-primary);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-button.primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-button.secondary {
-  background: var(--color-border);
-  color: var(--color-text);
-  box-shadow: var(--shadow-sm);
-}
-button.secondary:hover:not(:disabled) {
-  background: var(--color-primary-light);
-  color: #fff;
-}
-/* demais para .danger, .success seguem igual ao seu exemplo */
 
 /* Cartões */
 .card {
@@ -213,3 +182,65 @@ input:disabled, select:disabled, textarea:disabled {
   opacity: 0.65;
 }
 textarea { resize: vertical; min-height: 100px; }
+
+/* Blocos de código */
+.code-block {
+  font-weight: bold;
+  background: #eef3ff;
+  padding: 3px 12px;
+  border-radius: 8px;
+  font-family: 'Fira Mono', 'Consolas', 'Courier New', monospace;
+  letter-spacing: 0.04em;
+  font-size: 1rem;
+}
+
+/* Toast Notifications */
+.toast-message {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  min-width: 200px;
+  background: var(--color-surface, #fff);
+  color: var(--color-text);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  padding: 12px 28px 12px 18px;
+  box-shadow: var(--shadow-md, 0 1px 8px rgba(0,0,0,0.08));
+  z-index: 1005;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 18px);
+}
+.toast-success { border-color: var(--color-success); color: var(--color-success); }
+.toast-error { border-color: var(--color-danger); color: var(--color-danger); }
+.toast-info { border-color: var(--color-primary); color: var(--color-primary); }
+.toast-message .toast-close {
+  margin-left: 18px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.12em;
+  line-height: 1;
+}
+.toast-message .toast-close:focus {
+  outline: 2px solid var(--color-primary);
+}
+
+/* Estilos para itens de transação */
+.transaction-item {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: var(--spacing-sm);
+  background: var(--color-surface, #fff);
+  box-shadow: var(--shadow-xs, 0 0.5px 3px rgba(0,0,0,0.03));
+  transition: box-shadow 140ms;
+}
+.transaction-item--clickable { cursor: pointer; }
+.transaction-item-header, .transaction-item-footer {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.positive { color: var(--color-success); font-weight: 600; }
+.negative { color: var(--color-danger); font-weight: 600; }
+.transaction-item-actions .btn { margin-left: var(--spacing-xs);}

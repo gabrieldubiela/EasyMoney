@@ -1,23 +1,28 @@
-// src/components/ui/HouseholdAdminSwitcher.jsx
+// src/components/tables/HouseholdAdminSwitcher.jsx
 
 import React from 'react';
 import useAllHouseholds from '../../hooks/useAllHouseholds';
 import { useAppContext } from '../../context/useAppContext';
+import "../../styles/tables.css";
+import "../../styles/buttons.css";
 
 const HouseholdAdminSwitcher = () => {
   const { households, loading, error } = useAllHouseholds();
   const { changeHousehold, familyName, householdId } = useAppContext();
 
-  if (loading) return <div>Carregando famílias...</div>;
-  if (error) return <div style={{ color: 'red' }}>Erro ao carregar famílias</div>;
+  if (loading) return <div className="loading">Carregando famílias...</div>;
+  if (error) return <div className="form-error">Erro ao carregar famílias</div>;
 
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="table-wrapper household-admin-switcher" style={{ marginBottom: 16 }}>
       <h3>Famílias</h3>
       <p>
-        <strong>Família atual:</strong> {familyName} <span style={{ color: '#999', fontSize: 12 }}>({householdId})</span>
+        <strong>Família atual:</strong> {familyName}{" "}
+        <span className="muted" style={{ fontSize: 12 }}>
+          ({householdId})
+        </span>
       </p>
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th>Nome</th>
@@ -33,7 +38,12 @@ const HouseholdAdminSwitcher = () => {
               <td>{f.id}</td>
               <td>{Object.keys(f.members || {}).length}</td>
               <td>
-                <button onClick={() => changeHousehold(f.id)}>Impersonar família</button>
+                <button
+                  className="btn btn-secondary btn-small"
+                  onClick={() => changeHousehold(f.id)}
+                >
+                  Impersonar família
+                </button>
               </td>
             </tr>
           ))}

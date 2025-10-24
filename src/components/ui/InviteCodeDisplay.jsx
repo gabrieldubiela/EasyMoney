@@ -1,6 +1,7 @@
 // src/components/ui/InviteCodeDisplay.jsx
 
 import React, { useState } from 'react';
+import "../../styles/buttons.css";
 
 export default function InviteCodeDisplay({ householdId }) {
   const [copyMessage, setCopyMessage] = useState('Copiar Código');
@@ -17,9 +18,14 @@ export default function InviteCodeDisplay({ householdId }) {
     <>
       <h3>Convidar Membros</h3>
       <p>Compartilhe o código abaixo. O usuário convidado deve usá-lo ao se registrar para acessar esta Família.</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-        <code style={{ fontWeight: 'bold', background: '#eef3ff', padding: '3px 12px', borderRadius: 8 }}>{householdId || '...'}</code>
-        <button type="button" onClick={handleCopy} disabled={!householdId}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <code className="code-block">{householdId || '...'}</code>
+        <button
+          type="button"
+          className="btn btn-primary btn-small"
+          onClick={handleCopy}
+          disabled={!householdId}
+        >
           {copyMessage}
         </button>
       </div>

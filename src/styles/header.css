@@ -1,0 +1,23 @@
+/* src/styles/header.css */
+
+.header {
+  height: 60px;
+  background: var(--color-surface, #fff);
+  border-bottom: 1px solid var(--color-border, #eee);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-xl, 32px);
+  justify-content: space-between;
+  z-index: 1040;
+}
+.header-logo {
+  height: 38px; margin-right: var(--spacing-md, 18px);
+}
+.header-family-info span {
+  color: var(--color-text-muted, #afafaf);
+  font-size: 13px;
+  margin-left: 6px;
+}
+.header-user {
+  margin-right: var(--spacing-lg, 18px);
+}

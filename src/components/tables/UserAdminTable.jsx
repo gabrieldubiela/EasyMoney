@@ -21,7 +21,7 @@ const UserAdminTable = ({ onEdit }) => {
   };
 
   return (
-    <div className="table-wrapper user-admin-table" style={{ marginBottom: 16 }}>
+    <div className="table-wrapper user-admin-table" >
       <h3>Usuários do Sistema</h3>
       {loading ? (
         <div>Carregando usuários...</div>
@@ -48,7 +48,6 @@ const UserAdminTable = ({ onEdit }) => {
                   <button
                     className="btn btn-secondary"
                     onClick={() => toggleAdmin(u)}
-                    style={{ marginLeft: 8 }}
                   >
                     {u.isAdmin ? "Remover Admin" : "Promover a Admin"}
                   </button>
@@ -64,7 +63,6 @@ const UserAdminTable = ({ onEdit }) => {
                   </button>
                   <button
                     className="btn btn-danger"
-                    style={{ marginLeft: 8 }}
                     onClick={() => handleDelete(u.id)}
                   >
                     Excluir
