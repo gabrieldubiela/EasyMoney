@@ -10,7 +10,7 @@ import "../../styles/alerts.css";
  * @prop {Array} alerts - Array de objetos de alerta: { id, title, message, alertType, createdAt, urgency }
  *
  * alertType: "budgetExceeded" | "plannedTransaction" | "lowBalance" | ...
- * urgency:  "critical" | "warning" | "info"
+ * urgency: "critical" | "warning" | "info"
  */
 export default function AlertList({ alerts }) {
   if (!alerts || alerts.length === 0) {

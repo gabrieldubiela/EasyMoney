@@ -21,7 +21,7 @@ export function useHouseholdMembers(householdId) {
       const data = await fetchHouseholdById(householdId);
       const membersObj = data.members || {};
       setMembers(Object.entries(membersObj).map(([uid, isAdmin]) => ({ uid, isAdmin })));
-    } catch (err) {
+    } catch {
       setError("Erro ao carregar membros.");
     } finally {
       setLoading(false);
@@ -41,7 +41,7 @@ export function useHouseholdMembers(householdId) {
       await updateMemberAdminStatus(householdId, membersObj);
       await fetchMembers();
       return true;
-    } catch (err) {
+    } catch {
       setError("Erro ao atualizar permissão.");
       return false;
     } finally {
@@ -56,7 +56,7 @@ export function useHouseholdMembers(householdId) {
       await removeMemberFromHousehold(householdId, uid);
       await fetchMembers();
       return true;
-    } catch (err) {
+    } catch {
       setError("Erro ao remover membro.");
       return false;
     } finally {

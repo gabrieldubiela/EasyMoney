@@ -44,7 +44,7 @@ const periodPresets = [
   { label: 'Personalizado', value: 'custom' }
 ];
 
-const TransactionFilters = ({ categories, types, onFilterChange }) => {
+const TransactionFilter = ({ categories, types, onFilterChange }) => {
   const { householdId } = useAppContext();
   // Nova: filtro de período
   const [period, setPeriod] = useState('month');

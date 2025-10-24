@@ -25,16 +25,9 @@ export default function DashboardPage() {
     error,
     balance,
     annualData,
-    performance,
-    monthStatus,
-
-    criticalCategories,
     recentTransactions,
     recentAlerts,
-
     investmentSummary,
-    goals
-    // outros blocos se precisar...
   } = useDashboardData();
 
   // Dados derivados para resumo mensal

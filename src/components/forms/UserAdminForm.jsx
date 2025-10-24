@@ -1,7 +1,7 @@
 // src/components/forms/UserAdminForm.jsx
 
 import React, { useState, useEffect } from 'react';
-import { createUser, updateUser } from '../../services/userService';
+import { updateUser } from '../../services/userService';
 import "../../styles/forms.css";
 import "../../styles/buttons.css";
 

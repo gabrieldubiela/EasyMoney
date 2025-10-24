@@ -102,11 +102,14 @@ export default function useAllTransactions(filters = {}) {
         const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTransactions(docs);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        setHasMore(snapshot.docs.length === (filters.limit || 15));
+        
+        // Corrigido: agora usa filters.limit
+        const currentLimit = filters.limit || 15;
+        setHasMore(snapshot.docs.length === currentLimit);
         setLoading(false);
       },
-      (err) => {
-        setError(err);
+      (error) => { // Renomeado de 'err' para 'error'
+        setError(error);
         setLoading(false);
       }
     );
@@ -114,7 +117,7 @@ export default function useAllTransactions(filters = {}) {
     return () => {
       if (unsubscribeRef.current) unsubscribeRef.current();
     };
-  }, [householdId, buildQuery]);
+  }, [householdId, buildQuery, filters.limit]); // Adicionado filters.limit
 
   // Soma total global dos filtrados (sem limite!)
   useEffect(() => {
@@ -142,7 +145,8 @@ export default function useAllTransactions(filters = {}) {
 
         const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
         setTotalAmount(total);
-      } catch (err) {
+      } catch (error) { // Renomeado para 'error' e agora usado
+        console.error('Erro ao calcular total:', error);
         setTotalAmount(0);
       }
     }
@@ -161,10 +165,15 @@ export default function useAllTransactions(filters = {}) {
         const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTransactions((prev) => [...prev, ...moreDocs]);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        setHasMore(snapshot.docs.length === (filters.limit || 15));
+        
+        const currentLimit = filters.limit || 15;
+        setHasMore(snapshot.docs.length === currentLimit);
         setLoading(false);
       },
-      (err) => setLoading(false)
+      (error) => { // Corrigido: adicionado parâmetro e uso
+        console.error('Erro ao carregar mais:', error);
+        setLoading(false);
+      }
     );
   }, [buildQuery, lastDoc, hasMore, filters.limit]);
 
