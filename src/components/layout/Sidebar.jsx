@@ -16,6 +16,7 @@ const items = [
   { to: "/budgets", label: "Orçamento"},
   { to: "/investments", label: "Investimentos"},
   { to: "/settings", label: "Configurações"},
+  { to: "/version", label: "Versão"},
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -76,7 +77,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               onClick={() => handleNavigation(item.to)}
               end
             >
-              <span className="sidebar-link-icon">{item.icon}</span>
               <span className="sidebar-link-text">{item.label}</span>
             </NavLink>
           ))}
@@ -91,7 +91,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               onClick={() => handleNavigation("/admin")}
               end
             >
-              <span className="sidebar-link-icon">🔐</span>
               <span className="sidebar-link-text">Administração</span>
             </NavLink>
           )}

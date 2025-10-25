@@ -19,6 +19,7 @@ const SettingsPage = lazy(() => import('./SettingsPage'));
 const EditTransactionPage = lazy(() => import('./EditTransactionPage'));
 const HouseholdsPage = lazy(() => import('./HouseholdsPage'));
 const InvestimentsPage = lazy(() => import('./InvestimentsPage'));
+const VersionPage = lazy(() => import('./VersionPage'));
 
 // 1. Rota Protegida Comum (Usuário Logado)
 const ProtectedRoute = ({ children }) => {
@@ -86,6 +87,7 @@ const AppRoutes = () => {
             <Route path="/settings" element={<SettingsPage/>}/>
             <Route path="/households" element={<HouseholdsPage/>}/>
             <Route path="/investments" element={<InvestimentsPage/>}/>
+            <Route path="/versin" element={<VersionPage/>}/>
 
             {/* Admin (com proteção extra) */}
             <Route
