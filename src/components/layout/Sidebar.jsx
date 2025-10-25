@@ -10,12 +10,12 @@ import "../../styles/sidebar.css";
 const logoUrl = "/logo.svg";
 
 const items = [
-  { to: "/", label: "Dashboard", icon: "📊" },
-  { to: "/monthly-balance", label: "Balanço", icon: "📈" },
-  { to: "/transactions", label: "Transações", icon: "💸" },
-  { to: "/budgets", label: "Orçamento", icon: "🎯" },
-  { to: "/investments", label: "Investimentos", icon: "💰" },
-  { to: "/settings", label: "Configurações", icon: "⚙️" },
+  { to: "/", label: "Dashboard"},
+  { to: "/monthly-balance", label: "Balanço"},
+  { to: "/transactions", label: "Transações"},
+  { to: "/budgets", label: "Orçamento"},
+  { to: "/investments", label: "Investimentos"},
+  { to: "/settings", label: "Configurações"},
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -33,18 +33,8 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    if (onClose) onClose(); // Fecha sidebar em mobile
+    if (onClose) onClose();
   };
-
-  // Iniciais do usuário para avatar
-  const userInitials = userName
-    ? userName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .substring(0, 2)
-        .toUpperCase()
-    : "U";
 
   return (
     <>
@@ -65,13 +55,11 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="sidebar-user-section">
           {/* Link para User */}
           <div className="sidebar-user-link" onClick={() => handleNavigation("/user")}>
-            <div className="sidebar-user-avatar">{userInitials}</div>
             <span className="sidebar-user-name">{userName || "Usuário"}</span>
           </div>
 
           {/* Link para Household/Família */}
           <div className="sidebar-family-link" onClick={() => handleNavigation("/households")}>
-            <div className="sidebar-family-icon">👨‍👩‍👧‍👦</div>
             <span className="sidebar-family-name">Família {familyName || "Sem nome"}</span>
           </div>
         </div>
@@ -112,7 +100,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Footer com Logout */}
         <div className="sidebar-footer">
           <button className="sidebar-logout-btn" onClick={handleLogout}>
-            <span>🚪</span>
             <span>Sair</span>
           </button>
         </div>
