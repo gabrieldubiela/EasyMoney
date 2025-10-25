@@ -6,7 +6,7 @@ import Header from "./Header";
 import { Outlet } from "react-router-dom";
 import "../../styles/layout.css"; 
 
-const Layout = ({ children }) => (
+const Layout = () => (
   <div className="app-layout">
     <Sidebar/>
     <div className="app-main-area">
@@ -14,7 +14,6 @@ const Layout = ({ children }) => (
       <main className="app-content">
         {/* Se vier de rotas, usa Outlet. Se vier de props, usa children (ambos funcionam!) */}
         <Outlet/>
-        {children}
       </main>
     </div>
   </div>

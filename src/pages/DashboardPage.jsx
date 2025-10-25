@@ -11,15 +11,10 @@ import RecentExpenses from "../components/charts/RecentExpenses";
 import InvestmentProgress from "../components/charts/InvestmentProgress";
 import useDashboardData from "../hooks/useDashboardData";
 
-/**
- * Página principal do Dashboard conectada aos dados reais via hooks.
- */
 export default function DashboardPage() {
-  // Filtros interativos
-  const [typeFilter, setTypeFilter] = useState(null); // "fixed", "variable" ou null (todas)
-  const [metric, setMetric] = useState("balance"); // "balance" | "income" | "expense"
+  const [typeFilter, setTypeFilter] = useState(null);
+  const [metric, setMetric] = useState("balance");
 
-  // Dados reais do dashboard
   const {
     isLoading,
     error,
@@ -30,7 +25,7 @@ export default function DashboardPage() {
     investmentSummary,
   } = useDashboardData();
 
-  // Dados derivados para resumo mensal
+  // ✅ Dados derivados para resumo mensal
   const monthlySummary = {
     balance: balance?.netEffective || 0,
     totalIncome: balance?.incomeEffective || 0,
@@ -38,7 +33,7 @@ export default function DashboardPage() {
     projectedBalance: (balance?.netEffective || 0) + (balance?.incomePlanned || 0) + (balance?.expensePlanned || 0)
   };
 
-  // Categories e summary para tabelas/gráficos
+  // ✅ CORREÇÃO: Adicione verificação e fallback
   const categories = annualData?.performanceByCategories
     ? Object.values(annualData.performanceByCategories).map(cat => ({
         id: cat.categoryId,
@@ -46,29 +41,38 @@ export default function DashboardPage() {
         typeId: cat.typeId || null
       }))
     : [];
+  
   const budgetSummary = annualData?.performanceByCategories || {};
 
-  // Dados mensais para gráfico de tendência (12 meses)
+  // ✅ CORREÇÃO: Dados mensais com verificação
   const incomeData = categories.length > 0
-    ? categories.map(cat => (cat.monthlyActuals || []).map((v, i) => v > 0 ? v : 0)).reduce((acc, curr) => {
-        curr.forEach((v, i) => acc[i] = (acc[i] || 0) + v);
-        return acc;
-      }, Array(12).fill(0))
+    ? categories
+        .map(cat => (cat.monthlyActuals || []).map((v, i) => v > 0 ? v : 0))
+        .reduce((acc, curr) => {
+          curr.forEach((v, i) => acc[i] = (acc[i] || 0) + v);
+          return acc;
+        }, Array(12).fill(0))
     : Array(12).fill(0);
-  const expenseData = categories.length > 0
-    ? categories.map(cat => (cat.monthlyActuals || []).map((v, i) => v < 0 ? v : 0)).reduce((acc, curr) => {
-        curr.forEach((v, i) => acc[i] = (acc[i] || 0) + v);
-        return acc;
-      }, Array(12).fill(0))
-    : Array(12).fill(0);
-  const balanceData = incomeData.map((inc, i) => inc + (expenseData[i] || 0));
 
-  // Dados de investimentos/metas
-  // investmentSummary: { totalPortfolio, roi, goalStatus }
+  const expenseData = categories.length > 0
+    ? categories
+        .map(cat => (cat.monthlyActuals || []).map((v, i) => v < 0 ? v : 0))
+        .reduce((acc, curr) => {
+          curr.forEach((v, i) => acc[i] = (acc[i] || 0) + v);
+          return acc;
+        }, Array(12).fill(0))
+    : Array(12).fill(0);
+
+  const balanceData = incomeData.map((inc, i) => inc + (expenseData[i] || 0));
 
   if (isLoading) {
     return (
-      <div className="dashboard-page">
+      <div className="dashboard-page" style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
         Carregando dados do dashboard...
       </div>
     );
@@ -76,9 +80,9 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="dashboard-page">
+      <div className="dashboard-page" style={{ padding: '20px' }}>
         Ocorreu um erro ao carregar o dashboard.<br/>
-        <span>{String(error)}</span>
+        <span style={{ color: 'red' }}>{String(error)}</span>
       </div>
     );
   }
@@ -88,15 +92,15 @@ export default function DashboardPage() {
       <MonthlySummary {...monthlySummary}/>
 
       {/* Filtro por tipo */}
-      <div>
-        <label>Category type: </label>
+      <div style={{ margin: '20px 0' }}>
+        <label>Tipo de categoria: </label>
         <select
           value={typeFilter || ""}
           onChange={e => setTypeFilter(e.target.value || null)}
         >
-          <option value="">All</option>
-          <option value="fixed">Fixed</option>
-          <option value="variable">Variable</option>
+          <option value="">Todas</option>
+          <option value="fixed">Fixas</option>
+          <option value="variable">Variáveis</option>
         </select>
       </div>
 
@@ -105,7 +109,7 @@ export default function DashboardPage() {
         categories={categories}
         summary={budgetSummary}
         typeFilter={typeFilter}
-    />
+      />
 
       {/* Gráfico linha evolução */}
       <MonthlyTrendChart
@@ -114,14 +118,14 @@ export default function DashboardPage() {
         balanceData={balanceData}
         metric={metric}
         onChangeMetric={setMetric}
-    />
+      />
 
       {/* Tabela anual por categoria */}
       <YearlyCategoryTable
         categories={categories}
         summary={budgetSummary}
         typeFilter={typeFilter}
-    />
+      />
 
       {/* Donut pizza orçamento */}
       <DonutBudgetChart
@@ -129,20 +133,20 @@ export default function DashboardPage() {
         summary={budgetSummary}
         typeFilter={typeFilter}
         maxCategories={5}
-    />
+      />
 
       {/* Alertas recentes */}
-      <AlertList alerts={recentAlerts}/>
+      <AlertList alerts={recentAlerts || []}/>
 
       {/* Transações recentes */}
-      <RecentExpenses transactions={recentTransactions} maxItems={10}/>
+      <RecentExpenses transactions={recentTransactions || []} maxItems={10}/>
 
       {/* Investimentos e metas */}
       <InvestmentProgress
-        totalPortfolio={investmentSummary.totalPortfolio}
-        roi={investmentSummary.roi}
-        goalStatus={investmentSummary.goalStatus}
-    />
+        totalPortfolio={investmentSummary?.totalPortfolio || 0}
+        roi={investmentSummary?.roi || 0}
+        goalStatus={investmentSummary?.goalStatus || 'on_track'}
+      />
     </div>
   );
 }

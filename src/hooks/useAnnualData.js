@@ -1,20 +1,8 @@
-// src/hooks/useAnnualData.js
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { fetchAllBudgets } from '../services/budgetService';
 import { fetchAllTransactions } from '../services/transactionService';
 
-/**
- * Hook responsável por consolidar dados anuais de orçamento e transações.
- *
- * - Busca budgets e transactions via serviços externos.
- * - Agrega todas as transações do ano (1º jan → 31 dez).
- * - Calcula receitas, despesas, saldo líquido e médias mensais.
- *
- * @param {string|number} selectedYear - Ano selecionado, ex: "2025".
- * @returns {object} { annualData, loading, error }
- */
 export default function useAnnualData(selectedYear) {
   const { householdId } = useAppContext();
   const [annualData, setAnnualData] = useState({
@@ -31,7 +19,6 @@ export default function useAnnualData(selectedYear) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // 1. Busca budgets e transações do ano selecionado
         const [budgets, transactions] = await Promise.all([
           fetchAllBudgets(householdId, selectedYear),
           fetchAllTransactions(householdId, {
@@ -40,7 +27,6 @@ export default function useAnnualData(selectedYear) {
           }),
         ]);
 
-        // 2. Estrutura inicial
         const dataMap = {};
         budgets.forEach((cat) => {
           dataMap[cat.id] = {
@@ -49,7 +35,6 @@ export default function useAnnualData(selectedYear) {
           };
         });
 
-        // 3. Soma transações de cada mês
         transactions.forEach((t) => {
           const monthIndex = parseInt(t.yearMonth.substring(4, 6), 10) - 1;
           if (!dataMap[t.category_id])
@@ -57,7 +42,6 @@ export default function useAnnualData(selectedYear) {
           dataMap[t.category_id].monthlyActuals[monthIndex] += t.amount;
         });
 
-        // 4. Calcula somatórios YTD
         let totalRevenueYTD = 0;
         let totalExpenseYTD = 0;
         const currentYear = new Date().getFullYear();
@@ -83,7 +67,6 @@ export default function useAnnualData(selectedYear) {
           return acc;
         }, {});
 
-        // 5. Define dados consolidados
         setAnnualData({
           summary: {
             totalRevenueYTD,
@@ -107,5 +90,12 @@ export default function useAnnualData(selectedYear) {
     fetchData();
   }, [householdId, selectedYear]);
 
-  return { annualData, loading, error };
+  // ✅ Estabiliza com JSON.stringify (melhor para objetos complexos)
+  const stableAnnualData = useMemo(
+    () => annualData,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(annualData)]
+  );
+
+  return { annualData: stableAnnualData, loading, error };
 }

@@ -28,7 +28,7 @@ export default function AuthPage() {
         />
         )}
 
-        <div className="auth-links" style={{ textAlign: "center" }}>
+        <div className="auth-links" style={{ textAlign: "center", paddingTop: 5 }}>
           <p>
             {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}
             <a 

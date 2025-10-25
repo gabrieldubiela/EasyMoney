@@ -3,17 +3,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useAppContext } from "../../context/useAppContext";
-import "../../styles/sidebar.css"; // Crie conforme acima
+import "../../styles/sidebar.css";
 
 const items = [
-  { to: "/", label: "Dashboard", icon: "🏠" },
-  { to: "/monthly-balance", label: "Balanço Mensal", icon: "📊" },
-  { to: "/transactions", label: "Transações", icon: "💸" },
-  { to: "/budgets", label: "Orçamento", icon: "🗂️" },
-  { to: "/investments", label: "Investimentos", icon: "📈" },
-  { to: "/households", label: "Famílias", icon: "👨‍👩‍👧" },
-  { to: "/settings", label: "Configurações", icon: "⚙️" },
-  { to: "/user", label: "Usuários", icon: "🙍‍♂️" },
+  { to: "/", label: "Dashboard"},
+  { to: "/monthly-balance", label: "Balanço"},
+  { to: "/transactions", label: "Transações"},
+  { to: "/budgets", label: "Orçamento"},
+  { to: "/investments", label: "Investimentos"},
+  { to: "/households", label: "Famílias"},
+  { to: "/settings", label: "Configurações"},
+  { to: "/user", label: "Usuários"},
 ];
 
 const Sidebar = () => {
@@ -38,7 +38,6 @@ const Sidebar = () => {
 
       {user?.isAdmin && (
         <>
-          <div className="sidebar-section-title">Administração</div>
           <NavLink
             to="/admin"
             className={({ isActive }) =>
@@ -49,8 +48,7 @@ const Sidebar = () => {
             }
             end
           >
-            <span className="sidebar-link-icon">🛡️</span>
-            Admin
+            Administração
           </NavLink>
         </>
       )}

@@ -7,13 +7,6 @@ import useBalance from './useBalance';
 import useAnnualData from './useAnnualData';
 import useMonthClosingStatus from './useMonthClosingStatus';
 
-/**
- * Hook agregador e analítico para o Dashboard principal.
- * 
- * - Combina múltiplos hooks de dados (via useHouseholdBaseData)
- * - Deriva métricas simplificadas para exibição (saldo, alertas, metas, investimentos)
- * - Calcula indicadores de desempenho mensal e anual
- */
 export default function useDashboardData() {
   const today = new Date();
   const year = today.getFullYear();
@@ -22,15 +15,15 @@ export default function useDashboardData() {
 
   // 1️⃣ Fonte unificada de dados base
   const {
-    categories,
-    types,
-    transactions,
-    plannedTransactions,
-    alerts,
-    budgets,
-    goals,
-    investments,
-    investmentsHistory,
+    categories = [],
+    types = [],
+    transactions = [],
+    plannedTransactions = [],
+    alerts = [],
+    budgets = {},
+    goals = [],
+    investments = [],
+    investmentsHistory = [],
     loading: baseLoading,
     error: baseError,
   } = useHouseholdBaseData({
@@ -39,22 +32,24 @@ export default function useDashboardData() {
   });
 
   // 2️⃣ Relatórios e cálculos derivados
-  const { performance, loading: performanceLoading } = useMonthlyPerformanceData({
+  const { performance = {}, loading: performanceLoading } = useMonthlyPerformanceData({
     yearMonth,
-    annualData: budgets, // or budgets from AnnualData if needed
+    annualData: budgets,
     categories,
     types,
   });
 
-  const { incomeEffective, expenseEffective, netEffective, loading: balanceLoading } = useBalance(
-    year,
-    month
-  );
+  const { 
+    incomeEffective = 0, 
+    expenseEffective = 0, 
+    netEffective = 0, 
+    loading: balanceLoading 
+  } = useBalance(year, month);
 
-  const { annualData, loading: annualLoading } = useAnnualData(year);
-  const { monthStatus, loading: closingLoading } = useMonthClosingStatus();
+  const { annualData = {}, loading: annualLoading } = useAnnualData(year);
+  const { monthStatus = {}, loading: closingLoading } = useMonthClosingStatus();
 
-  // 3️⃣ Cálculos derivados e insights para exibição (Memo para performance)
+  // 3️⃣ Cálculos derivados e insights para exibição
   const criticalCategories = useMemo(() => {
     if (!performance || Object.keys(performance).length === 0) return [];
 
@@ -65,22 +60,44 @@ export default function useDashboardData() {
           (item.totalAvailable > 0 && item.remaining / item.totalAvailable < 0.2)
       )
       .sort((a, b) => Math.abs(a.remaining) - Math.abs(b.remaining))
-      .slice(0, 5); // top 5 categorias mais críticas
+      .slice(0, 5);
   }, [performance]);
 
   const recentTransactions = useMemo(() => {
+    if (!transactions || !Array.isArray(transactions)) return [];
+    
     return transactions
-      .sort((a, b) => b.date?.toDate() - a.date?.toDate())
+      .filter(t => t.date) // ✅ Filtra transações com data
+      .sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA;
+      })
       .slice(0, 6);
   }, [transactions]);
 
   const recentAlerts = useMemo(() => {
+    if (!alerts || !Array.isArray(alerts)) return [];
+    
     return alerts
-      .sort((a, b) => b.createdAt?.toDate() - a.createdAt?.toDate())
+      .filter(a => a.createdAt) // ✅ Filtra alertas com data
+      .sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateB - dateA;
+      })
       .slice(0, 5);
   }, [alerts]);
 
   const investmentSummary = useMemo(() => {
+    if (!investments || !Array.isArray(investments)) {
+      return { totalInvestments: 0, gainPercent: 0 };
+    }
+    
+    if (!goals || !Array.isArray(goals)) {
+      return { totalInvestments: 0, gainPercent: 0 };
+    }
+
     const totalInvestments = investments.reduce(
       (sum, i) => sum + (i.currentValue || 0),
       0
@@ -111,7 +128,7 @@ export default function useDashboardData() {
       expenseEffective,
       netEffective,
     },
-    annualData,
+    annualData: annualData || { summary: {}, performanceByCategories: {}, rawAnnualData: {} }, // ✅ Fallback
     performance,
     monthStatus,
 
@@ -122,7 +139,7 @@ export default function useDashboardData() {
 
     // Resumo de metas e investimentos
     investmentSummary,
-    goals,
+    goals: goals || [],
 
     // Controle global (UI)
     isLoading,

@@ -82,13 +82,13 @@ export default function LoginForm({ onSuccess, onError }) {
         />
         </div>
         {formError && <div className="form-error">{formError}</div>}
-        <p>
+        {recoveryStatus && <p className="form-success">{recoveryStatus}</p>}
+        <div className="form-actions">
+          <p>
           <a href="#" onClick={handleRecoveryClick}>
             Esqueci minha senha
           </a>
         </p>
-        {recoveryStatus && <p className="form-success">{recoveryStatus}</p>}
-        <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </button>
