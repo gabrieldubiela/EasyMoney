@@ -1,18 +1,472 @@
+/* ================================
+  EasyMoney - Layout Principal (Responsivo)
+  ================================ */
+
 .app-layout {
   display: flex;
   height: 100vh;
   width: 100vw;
   background: var(--color-bg, #f9f9fb);
+  overflow: hidden;
+  position: relative;
 }
+
 .app-main-area {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--color-bg, #f9f9fb);
+  overflow: hidden;
+  position: relative;
 }
+
 .app-content {
   flex: 1;
   overflow: auto;
+  overflow-x: hidden;
   padding: var(--spacing-xl, 32px);
+  -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Container centralizado para conteúdo */
+.app-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ================================
+   SIDEBAR/NAVIGATION LAYOUT
+   ================================ */
+
+.app-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  transition: transform var(--transition-base), width var(--transition-base);
+  z-index: 100;
+}
+
+.app-sidebar--collapsed {
+  width: 70px;
+  min-width: 70px;
+}
+
+/* Header do app */
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-md) var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  flex-shrink: 0;
+}
+
+/* Footer do app */
+.app-footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-md) var(--spacing-xl);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ================================
+   RESPONSIVIDADE - TABLETS
+   ================================ */
+
+@media (max-width: 1024px) {
+  .app-content {
+    padding: var(--spacing-lg, 24px);
+  }
+
+  .app-header,
+  .app-footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .app-sidebar {
+    width: 240px;
+    min-width: 240px;
+  }
+
+  .app-sidebar--collapsed {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .app-content-container {
+    max-width: 960px;
+  }
+}
+
+/* ================================
+   RESPONSIVIDADE - MOBILE
+   ================================ */
+
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    height: 100dvh; /* Dynamic viewport height para mobile */
+  }
+
+  .app-content {
+    padding: var(--spacing-md, 16px);
+    overflow-x: hidden;
+  }
+
+  .app-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .app-footer {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.8125rem;
+  }
+
+  /* Sidebar como overlay em mobile */
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    min-width: 280px;
+    transform: translateX(-100%);
+    z-index: 200;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .app-sidebar--open {
+    transform: translateX(0);
+  }
+
+  .app-sidebar--collapsed {
+    width: 280px;
+    min-width: 280px;
+    transform: translateX(-100%);
+  }
+
+  /* Overlay escuro quando sidebar está aberto */
+  .app-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .app-sidebar-overlay--visible {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Botão de toggle do menu mobile */
+  .app-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-menu-toggle:hover,
+  .app-menu-toggle:active {
+    background: var(--color-secondary);
+    border-color: var(--color-primary);
+  }
+
+  .app-content-container {
+    max-width: 100%;
+  }
+
+  /* Previne scroll do body quando sidebar está aberto */
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
+/* ================================
+   MOBILE PEQUENO (até 480px)
+   ================================ */
+
+@media (max-width: 480px) {
+  .app-content {
+    padding: var(--spacing-sm, 12px);
+  }
+
+  .app-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 52px;
+  }
+
+  .app-footer {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+  }
+
+  .app-sidebar {
+    width: 100vw;
+    min-width: 100vw;
+    max-width: 320px;
+  }
+
+  .app-menu-toggle {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ================================
+   MODO PAISAGEM (LANDSCAPE) MOBILE
+   ================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-layout {
+    height: 100vh; /* Fallback para landscape */
+  }
+
+  .app-content {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .app-header {
+    min-height: 48px;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .app-sidebar {
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
+  }
+}
+
+/* ================================
+   ESTADOS E ANIMAÇÕES
+   ================================ */
+
+/* Transição suave ao abrir/fechar sidebar */
+.app-sidebar,
+.app-sidebar-overlay {
+  will-change: transform, opacity;
+}
+
+/* Loading state */
+.app-content--loading {
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
+}
+
+.app-content--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ================================
+   SCROLLBAR CUSTOMIZADA
+   ================================ */
+
+/* Webkit (Chrome, Safari, Edge) */
+.app-content::-webkit-scrollbar,
+.app-sidebar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.app-content::-webkit-scrollbar-track,
+.app-sidebar::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+.app-content::-webkit-scrollbar-thumb,
+.app-sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.app-content::-webkit-scrollbar-thumb:hover,
+.app-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Firefox */
+.app-content,
+.app-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-bg);
+}
+
+/* Remove scrollbar customizada em mobile */
+@media (max-width: 768px) {
+  .app-content::-webkit-scrollbar,
+  .app-sidebar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .app-content,
+  .app-sidebar {
+    scrollbar-width: none;
+  }
+}
+
+/* ================================
+   SAFE AREAS (iPhone X+, notch)
+   ================================ */
+
+@supports (padding: max(0px)) {
+  .app-content {
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    padding-top: max(var(--spacing-md), env(safe-area-inset-top));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+  }
+
+  @media (max-width: 768px) {
+    .app-sidebar {
+      padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    }
+  }
+}
+
+/* ================================
+   ACESSIBILIDADE
+   ================================ */
+
+/* Foco visível para navegação por teclado */
+.app-menu-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-decoration: none;
+  z-index: 1000;
+  border-radius: var(--radius-md);
+  transition: top var(--transition-fast);
+}
+
+.skip-to-content:focus {
+  top: var(--spacing-sm);
+  outline: 2px solid var(--color-primary-dark);
+}
+
+/* Reduce motion para usuários com preferência */
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar,
+  .app-sidebar-overlay,
+  .app-content--loading::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .app-sidebar {
+    transition: none;
+  }
+}
+
+/* ================================
+   MODO ESCURO - AJUSTES
+   ================================ */
+
+@media (prefers-color-scheme: dark) {
+  .app-sidebar-overlay--visible {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .app-sidebar {
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .app-content::-webkit-scrollbar-track,
+  .app-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ================================
+   LAYOUT ALTERNATIVO - SEM SIDEBAR
+   ================================ */
+
+.app-layout--no-sidebar .app-sidebar {
+  display: none;
+}
+
+.app-layout--no-sidebar .app-main-area {
+  width: 100%;
+}
+
+/* ================================
+   LAYOUT ALTERNATIVO - HEADER FIXO
+   ================================ */
+
+.app-layout--fixed-header .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .app-layout--fixed-header .app-header {
+    box-shadow: var(--shadow-md);
+  }
 }

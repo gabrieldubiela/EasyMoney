@@ -1,8 +1,8 @@
 /* src/styles/cards.css */
 
 /* ================================
-  EasyMoney - Cards de Resumo/Dashboard
-  ================================ */
+  EasyMoney - Cards de Resumo/Dashboard (Responsivo)
+  ================================ */
 
 .card,
 .summary-card,
@@ -10,12 +10,38 @@
 .investment-card {
     flex: 1;
     min-width: 180px;
+    max-width: 100%;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover,
+.summary-card:hover,
+.monthly-summary-card:hover,
+.investment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ================================
+   ELEMENTOS DO CARD
+   ================================ */
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+    gap: var(--spacing-sm);
 }
 
 .card-title {
@@ -23,17 +49,614 @@
     color: var(--color-primary-dark);
     margin-bottom: var(--spacing-xs);
     font-size: 1rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
 }
 
 .card-value {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
     color: var(--color-text);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-xs);
 }
 
-.card:hover,
-.summary-card:hover,
-.monthly-summary-card:hover,
-.investment-card:hover {
-    transform: translateY(-1px);
+.card-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.card-description {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-top: var(--spacing-sm);
+}
+
+.card-footer {
+    margin-top: auto;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+}
+
+/* Ícone do card */
+.card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: var(--color-secondary);
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* Badge do card */
+.card-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-badge--success {
+    background: rgba(var(--color-success-rgb, 34, 197, 94), 0.15);
+    color: var(--color-success);
+}
+
+.card-badge--danger {
+    background: rgba(var(--color-danger-rgb, 220, 38, 38), 0.15);
+    color: var(--color-danger);
+}
+
+.card-badge--warning {
+    background: rgba(var(--color-warning-rgb, 245, 158, 11), 0.15);
+    color: var(--color-warning);
+}
+
+.card-badge--info {
+    background: rgba(var(--color-primary-rgb, 27, 221, 147), 0.15);
+    color: var(--color-primary);
+}
+
+/* ================================
+   VARIANTES DE CARD
+   ================================ */
+
+/* Card clicável */
+.card--clickable {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.card--clickable:active {
+    transform: scale(0.98);
+}
+
+/* Card com destaque */
+.card--featured {
+    border-color: var(--color-primary);
+    border-width: 2px;
     box-shadow: var(--shadow-md);
+}
+
+/* Card compacto */
+.card--compact {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 140px;
+}
+
+.card--compact .card-title {
+    font-size: 0.9375rem;
+}
+
+.card--compact .card-value {
+    font-size: 1.25rem;
+}
+
+/* Card expandido */
+.card--expanded {
+    min-width: 280px;
+}
+
+/* Card com gradiente */
+.card--gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: #fff;
+    border: none;
+}
+
+.card--gradient .card-title,
+.card--gradient .card-value,
+.card--gradient .card-description {
+    color: #fff;
+}
+
+.card--gradient .card-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Card de estatística */
+.stat-card {
+    text-align: center;
+}
+
+.stat-card .card-value {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-card .card-icon {
+    margin: 0 auto var(--spacing-sm);
+}
+
+/* ================================
+   GRID DE CARDS
+   ================================ */
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--spacing-lg);
+    width: 100%;
+}
+
+.card-grid--2-cols {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card-grid--3-cols {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.card-grid--4-cols {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Container flex de cards */
+.card-container {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* ================================
+   CARDS ESPECÍFICOS
+   ================================ */
+
+/* Summary Card */
+.summary-card {
+    min-width: 200px;
+}
+
+.summary-card .card-value {
+    font-size: 1.75rem;
+}
+
+/* Monthly Summary Card */
+.monthly-summary-card {
+    min-width: 220px;
+    border-left: 4px solid var(--color-primary);
+}
+
+/* Investment Card */
+.investment-card {
+    min-width: 240px;
+}
+
+.investment-card .card-value {
+    font-size: 1.5rem;
+    color: var(--color-success);
+}
+
+/* ================================
+   RESPONSIVIDADE - TABLETS
+   ================================ */
+
+@media (max-width: 1024px) {
+    .card,
+    .summary-card,
+    .monthly-summary-card,
+    .investment-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+        min-width: 160px;
+    }
+
+    .card-title {
+        font-size: 0.9375rem;
+    }
+
+    .card-value {
+        font-size: 1.375rem;
+    }
+
+    .card-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.375rem;
+    }
+
+    .stat-card .card-value {
+        font-size: 1.75rem;
+    }
+
+    .card-grid {
+        gap: var(--spacing-md);
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .card-grid--3-cols,
+    .card-grid--4-cols {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-container {
+        gap: var(--spacing-md);
+    }
+}
+
+/* ================================
+   RESPONSIVIDADE - MOBILE
+   ================================ */
+
+@media (max-width: 768px) {
+    .card,
+    .summary-card,
+    .monthly-summary-card,
+    .investment-card {
+        padding: var(--spacing-md);
+        min-width: 100%;
+        flex: none;
+    }
+
+    .card:hover,
+    .summary-card:hover,
+    .monthly-summary-card:hover,
+    .investment-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card--clickable:active {
+        transform: scale(0.99);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .card-title {
+        font-size: 0.9375rem;
+    }
+
+    .card-value {
+        font-size: 1.5rem;
+    }
+
+    .card-subtitle,
+    .card-description {
+        font-size: 0.8125rem;
+    }
+
+    .card-label {
+        font-size: 0.75rem;
+    }
+
+    .card-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1.25rem;
+    }
+
+    .card-badge {
+        font-size: 0.6875rem;
+        padding: 2px var(--spacing-xs);
+    }
+
+    .card-footer {
+        font-size: 0.8125rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-card .card-value {
+        font-size: 1.75rem;
+    }
+
+    /* Grid vira stack em mobile */
+    .card-grid,
+    .card-grid--2-cols,
+    .card-grid--3-cols,
+    .card-grid--4-cols {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    /* Scroll horizontal para cards em mobile (opcional) */
+    .card-container--scroll-mobile {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        gap: var(--spacing-sm);
+        padding-bottom: var(--spacing-sm);
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+
+    .card-container--scroll-mobile .card {
+        flex: 0 0 85%;
+        scroll-snap-align: start;
+        min-width: 280px;
+    }
+
+    /* Oculta scrollbar em mobile */
+    .card-container--scroll-mobile::-webkit-scrollbar {
+        display: none;
+    }
+
+    .card-container--scroll-mobile {
+        scrollbar-width: none;
+    }
+
+    /* Cards compactos ocupam menos espaço */
+    .card--compact {
+        padding: var(--spacing-sm);
+        min-width: 100%;
+    }
+
+    .card--compact .card-title {
+        font-size: 0.875rem;
+    }
+
+    .card--compact .card-value {
+        font-size: 1.125rem;
+    }
+
+    /* Summary cards específicos */
+    .summary-card {
+        min-width: 100%;
+    }
+
+    .summary-card .card-value {
+        font-size: 1.5rem;
+    }
+
+    .monthly-summary-card {
+        min-width: 100%;
+        border-left-width: 3px;
+    }
+
+    .investment-card {
+        min-width: 100%;
+    }
+
+    .investment-card .card-value {
+        font-size: 1.375rem;
+    }
+}
+
+/* ================================
+   MOBILE PEQUENO (até 480px)
+   ================================ */
+
+@media (max-width: 480px) {
+    .card,
+    .summary-card,
+    .monthly-summary-card,
+    .investment-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .card-title {
+        font-size: 0.875rem;
+    }
+
+    .card-value {
+        font-size: 1.375rem;
+    }
+
+    .card-subtitle,
+    .card-description {
+        font-size: 0.75rem;
+    }
+
+    .card-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.125rem;
+    }
+
+    .stat-card .card-value {
+        font-size: 1.5rem;
+    }
+
+    .card-grid {
+        gap: var(--spacing-sm);
+    }
+
+    .card-container--scroll-mobile .card {
+        flex: 0 0 90%;
+        min-width: 260px;
+    }
+}
+
+/* ================================
+   MODO PAISAGEM (LANDSCAPE) MOBILE
+   ================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .card-grid,
+    .card-grid--2-cols {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    .card,
+    .summary-card,
+    .monthly-summary-card,
+    .investment-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .card-value {
+        font-size: 1.25rem;
+    }
+
+    .stat-card .card-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* ================================
+   SKELETON LOADING
+   ================================ */
+
+.card--loading {
+    pointer-events: none;
+    background: linear-gradient(
+        90deg,
+        var(--color-surface) 0%,
+        var(--color-bg) 50%,
+        var(--color-surface) 100%
+    );
+    background-size: 200% 100%;
+    animation: card-skeleton 1.5s ease-in-out infinite;
+}
+
+.card--loading .card-title,
+.card--loading .card-value,
+.card--loading .card-description {
+    background: var(--color-border);
+    color: transparent;
+    border-radius: var(--radius-sm);
+}
+
+.card--loading .card-title {
+    height: 1rem;
+    width: 60%;
+}
+
+.card--loading .card-value {
+    height: 1.5rem;
+    width: 80%;
+}
+
+@keyframes card-skeleton {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ================================
+   MODO ESCURO
+   ================================ */
+
+@media (prefers-color-scheme: dark) {
+    .card--gradient {
+        background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    }
+
+    .card-icon {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .card-footer {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ================================
+   ACESSIBILIDADE
+   ================================ */
+
+.card--clickable:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove outline em dispositivos de toque */
+@media (pointer: coarse) {
+    .card--clickable:focus-visible {
+        outline: none;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .summary-card,
+    .monthly-summary-card,
+    .investment-card,
+    .card--loading {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .card:hover,
+    .card--clickable:active {
+        transform: none !important;
+    }
+}
+
+/* ================================
+   VARIAÇÕES DE COR
+   ================================ */
+
+.card--primary {
+    border-color: var(--color-primary);
+    border-left-width: 4px;
+}
+
+.card--success {
+    border-color: var(--color-success);
+    border-left-width: 4px;
+}
+
+.card--danger {
+    border-color: var(--color-danger);
+    border-left-width: 4px;
+}
+
+.card--warning {
+    border-color: var(--color-warning);
+    border-left-width: 4px;
+}
+
+/* Valores coloridos */
+.card-value--positive {
+    color: var(--color-success);
+}
+
+.card-value--negative {
+    color: var(--color-danger);
+}
+
+.card-value--neutral {
+    color: var(--color-text-muted);
 }

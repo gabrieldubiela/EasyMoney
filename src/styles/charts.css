@@ -1,15 +1,17 @@
 /* src/styles/charts.css */
 
 /* ================================
-  EasyMoney - Gráficos (Wrappers/Layout)
-  ================================ */
+  EasyMoney - Gráficos (Wrappers/Layout) Responsivo
+  ================================ */
 
 .chart-wrapper,
 .monthly-trend,
 .donut-budget-chart {
     margin-top: var(--spacing-xl);
     max-width: 420px;
+    width: 100%;
     text-align: center;
+    padding: 0;
 }
 
 .chart-title,
@@ -20,12 +22,16 @@
     color: var(--color-primary-dark);
     margin-bottom: var(--spacing-sm);
     display: block;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
 .chart-note {
     color: var(--color-text-muted);
     font-size: 0.85rem;
     margin-top: var(--spacing-sm);
+    line-height: 1.5;
+    padding: 0 var(--spacing-sm);
 }
 
 .chart-canvas,
@@ -36,4 +42,559 @@
     box-shadow: var(--shadow-sm);
     padding: var(--spacing-md);
     margin: 0 auto;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    display: block;
+}
+
+/* Container para múltiplos gráficos */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-xl);
+    width: 100%;
+}
+
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Header do gráfico com ações */
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.chart-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+/* Legenda do gráfico */
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.chart-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+/* Tooltip customizado */
+.chart-tooltip {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    box-shadow: var(--shadow-lg);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Loading state */
+.chart-wrapper--loading {
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-wrapper--loading::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: chart-spin 0.8s linear infinite;
+}
+
+@keyframes chart-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty state */
+.chart-empty {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* ================================
+   TIPOS DE GRÁFICOS ESPECÍFICOS
+   ================================ */
+
+/* Gráfico de linha (trend) */
+.monthly-trend {
+    max-width: 600px;
+}
+
+.monthly-trend-header {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Gráfico de rosca (donut) */
+.donut-budget-chart {
+    max-width: 380px;
+}
+
+.donut-budget-chart canvas {
+    max-height: 300px;
+}
+
+/* Gráfico de barras */
+.bar-chart-wrapper {
+    max-width: 600px;
+}
+
+/* Gráfico de pizza (pie) */
+.pie-chart-wrapper {
+    max-width: 380px;
+}
+
+/* ================================
+   RESPONSIVIDADE - TABLETS
+   ================================ */
+
+@media (max-width: 1024px) {
+    .chart-wrapper,
+    .monthly-trend,
+    .donut-budget-chart {
+        margin-top: var(--spacing-lg);
+        max-width: 100%;
+    }
+
+    .chart-title,
+    .monthly-trend-header strong,
+    .donut-budget-chart strong {
+        font-size: 0.9375rem;
+    }
+
+    .chart-note {
+        font-size: 0.8125rem;
+    }
+
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        padding: var(--spacing-sm);
+    }
+
+    .chart-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .chart-legend {
+        gap: var(--spacing-sm);
+    }
+
+    .chart-legend-item {
+        font-size: 0.8125rem;
+    }
+
+    .chart-legend-color {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* ================================
+   RESPONSIVIDADE - MOBILE
+   ================================ */
+
+@media (max-width: 768px) {
+    .chart-wrapper,
+    .monthly-trend,
+    .donut-budget-chart,
+    .bar-chart-wrapper,
+    .pie-chart-wrapper {
+        margin-top: var(--spacing-md);
+        max-width: 100%;
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+    }
+
+    .chart-title,
+    .monthly-trend-header strong,
+    .donut-budget-chart strong {
+        font-size: 0.875rem;
+        padding: 0 var(--spacing-md);
+    }
+
+    .chart-note {
+        font-size: 0.75rem;
+        margin-top: var(--spacing-xs);
+        padding: 0 var(--spacing-md);
+    }
+
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        border-radius: 0;
+        padding: var(--spacing-sm);
+        box-shadow: none;
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 var(--spacing-md);
+    }
+
+    .chart-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .chart-legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+        margin-top: var(--spacing-sm);
+        padding: 0 var(--spacing-md);
+    }
+
+    .chart-legend-item {
+        font-size: 0.8125rem;
+    }
+
+    .chart-legend-color {
+        width: 12px;
+        height: 12px;
+    }
+
+    .chart-tooltip {
+        font-size: 0.8125rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .chart-wrapper--loading {
+        min-height: 250px;
+    }
+
+    .chart-wrapper--loading::after {
+        width: 32px;
+        height: 32px;
+    }
+
+    .chart-empty {
+        padding: var(--spacing-lg);
+        font-size: 0.875rem;
+    }
+
+    /* Altura máxima para gráficos em mobile */
+    .monthly-trend canvas,
+    .bar-chart-wrapper canvas {
+        max-height: 250px !important;
+    }
+
+    .donut-budget-chart canvas,
+    .pie-chart-wrapper canvas {
+        max-height: 220px !important;
+    }
+}
+
+/* ================================
+   MOBILE PEQUENO (até 480px)
+   ================================ */
+
+@media (max-width: 480px) {
+    .chart-wrapper,
+    .monthly-trend,
+    .donut-budget-chart,
+    .bar-chart-wrapper,
+    .pie-chart-wrapper {
+        margin-top: var(--spacing-sm);
+        margin-left: calc(var(--spacing-sm) * -1);
+        margin-right: calc(var(--spacing-sm) * -1);
+    }
+
+    .chart-title,
+    .monthly-trend-header strong,
+    .donut-budget-chart strong {
+        font-size: 0.8125rem;
+        padding: 0 var(--spacing-sm);
+    }
+
+    .chart-note {
+        font-size: 0.6875rem;
+        padding: 0 var(--spacing-sm);
+    }
+
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        padding: var(--spacing-xs);
+    }
+
+    .chart-header {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .chart-legend {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .chart-legend-item {
+        font-size: 0.75rem;
+    }
+
+    .chart-legend-color {
+        width: 10px;
+        height: 10px;
+    }
+
+    .chart-empty {
+        padding: var(--spacing-md);
+        font-size: 0.8125rem;
+    }
+
+    .monthly-trend canvas,
+    .bar-chart-wrapper canvas {
+        max-height: 220px !important;
+    }
+
+    .donut-budget-chart canvas,
+    .pie-chart-wrapper canvas {
+        max-height: 200px !important;
+    }
+}
+
+/* ================================
+   MODO PAISAGEM (LANDSCAPE) MOBILE
+   ================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .chart-wrapper,
+    .monthly-trend,
+    .donut-budget-chart {
+        margin-top: var(--spacing-sm);
+    }
+
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        padding: var(--spacing-xs);
+    }
+
+    .monthly-trend canvas,
+    .bar-chart-wrapper canvas {
+        max-height: 200px !important;
+    }
+
+    .donut-budget-chart canvas,
+    .pie-chart-wrapper canvas {
+        max-height: 180px !important;
+    }
+
+    .chart-legend {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+/* ================================
+   IMPRESSÃO
+   ================================ */
+
+@media print {
+    .chart-wrapper,
+    .monthly-trend,
+    .donut-budget-chart {
+        max-width: 100%;
+        margin: var(--spacing-md) 0;
+        page-break-inside: avoid;
+    }
+
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+
+    .chart-actions {
+        display: none;
+    }
+}
+
+/* ================================
+   MODO ESCURO
+   ================================ */
+
+@media (prefers-color-scheme: dark) {
+    .chart-canvas,
+    .monthly-trend canvas,
+    .donut-budget-chart canvas {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chart-tooltip {
+        background: var(--color-surface);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: var(--shadow-xl), 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* ================================
+   ACESSIBILIDADE
+   ================================ */
+
+/* Botões de ação do gráfico */
+.chart-action-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.chart-action-btn:hover {
+    background: var(--color-secondary);
+    border-color: var(--color-primary);
+}
+
+.chart-action-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .chart-action-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .chart-wrapper--loading::after {
+        animation: none !important;
+    }
+}
+
+/* ================================
+   VARIANTES DE LAYOUT
+   ================================ */
+
+/* Gráfico side-by-side */
+.chart-row {
+    display: flex;
+    gap: var(--spacing-xl);
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.chart-row > * {
+    flex: 1;
+    min-width: 280px;
+}
+
+@media (max-width: 768px) {
+    .chart-row {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .chart-row > * {
+        min-width: 100%;
+    }
+}
+
+/* Gráfico compacto */
+.chart-wrapper--compact {
+    max-width: 320px;
+}
+
+.chart-wrapper--compact .chart-canvas,
+.chart-wrapper--compact canvas {
+    padding: var(--spacing-sm);
+}
+
+.chart-wrapper--compact .chart-title {
+    font-size: 0.9375rem;
+}
+
+/* Gráfico expandido */
+.chart-wrapper--expanded {
+    max-width: 800px;
+}
+
+/* Gráfico full-width */
+.chart-wrapper--full {
+    max-width: 100%;
+}
+
+/* Card com gráfico */
+.chart-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.chart-card .chart-canvas,
+.chart-card canvas {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .chart-card {
+        padding: var(--spacing-md);
+        border-radius: 0;
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+        border-left: none;
+        border-right: none;
+    }
 }

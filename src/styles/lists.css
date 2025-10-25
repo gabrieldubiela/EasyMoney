@@ -1,23 +1,437 @@
 /* src/styles/lists.css */
 
+/* ================================
+  EasyMoney - Listas e Estados Vazios (Responsivo)
+  ================================ */
+
 .empty-state {
     text-align: center;
     color: var(--color-text-muted);
     margin-top: var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    width: 100%;
+    max-width: 100%;
 }
 
 .empty-state-title {
     font-weight: var(--font-weight-bold);
     font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text);
+    line-height: 1.4;
 }
 
 .empty-state-description {
     font-size: 0.9rem;
     color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .transaction-list {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    list-style: none;
+}
+
+/* Quando a lista é um <ul> ou <ol> */
+ul.transaction-list,
+ol.transaction-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Item individual da lista */
+.transaction-list-item {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* ================================
+   ESTADOS VAZIOS - VARIANTES
+   ================================ */
+
+/* Empty state com ícone */
+.empty-state--with-icon {
+    padding-top: var(--spacing-xl);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+    display: inline-block;
+}
+
+/* Empty state com botão de ação */
+.empty-state-action {
+    margin-top: var(--spacing-lg);
+    display: inline-flex;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+/* ================================
+   SKELETON LOADING (Lista carregando)
+   ================================ */
+
+.transaction-list--loading .transaction-list-item {
+    background: linear-gradient(90deg,
+            var(--color-surface) 0%,
+            var(--color-bg) 50%,
+            var(--color-surface) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-md);
+    height: 80px;
+    margin-bottom: var(--spacing-sm);
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ================================
+   RESPONSIVIDADE - TABLETS
+   ================================ */
+
+@media (max-width: 1024px) {
+    .empty-state {
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    .empty-state-title {
+        font-size: 1.05rem;
+    }
+
+    .empty-state-description {
+        font-size: 0.875rem;
+        max-width: 450px;
+    }
+
+    .empty-state-icon {
+        font-size: 2.75rem;
+    }
+
+    .transaction-list {
+        gap: var(--spacing-sm);
+    }
+}
+
+/* ================================
+   RESPONSIVIDADE - MOBILE
+   ================================ */
+
+@media (max-width: 768px) {
+    .empty-state {
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    .empty-state-title {
+        font-size: 1rem;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .empty-state-description {
+        font-size: 0.8125rem;
+        max-width: 100%;
+        padding: 0 var(--spacing-sm);
+        line-height: 1.5;
+    }
+
+    .empty-state-icon {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state-action {
+        margin-top: var(--spacing-md);
+        flex-direction: column;
+        width: 100%;
+        padding: 0 var(--spacing-md);
+    }
+
+    .empty-state-action>* {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .transaction-list {
+        gap: var(--spacing-xs);
+        padding: 0 var(--spacing-xs);
+    }
+
+    .transaction-list--loading .transaction-list-item {
+        height: 70px;
+        margin-bottom: var(--spacing-xs);
+    }
+}
+
+/* ================================
+   MOBILE PEQUENO (até 480px)
+   ================================ */
+
+@media (max-width: 480px) {
+    .empty-state {
+        padding: var(--spacing-md) var(--spacing-xs);
+        margin-top: var(--spacing-sm);
+    }
+
+    .empty-state-title {
+        font-size: 0.9375rem;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .empty-state-description {
+        font-size: 0.75rem;
+        padding: 0 var(--spacing-xs);
+    }
+
+    .empty-state-icon {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .empty-state-action {
+        margin-top: var(--spacing-sm);
+        padding: 0 var(--spacing-sm);
+    }
+
+    .transaction-list {
+        gap: 6px;
+        padding: 0;
+    }
+
+    .transaction-list--loading .transaction-list-item {
+        height: 65px;
+        margin-bottom: 6px;
+        border-radius: var(--radius-sm);
+    }
+}
+
+/* ================================
+   MODO PAISAGEM (LANDSCAPE) MOBILE
+   ================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .empty-state {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .empty-state-icon {
+        font-size: 2rem;
+    }
+
+    .empty-state-action {
+        flex-direction: row;
+        padding: 0;
+    }
+
+    .empty-state-action>* {
+        width: auto;
+    }
+}
+
+/* ================================
+   LISTAS COMPACTAS (Variante)
+   ================================ */
+
+.transaction-list--compact {
+    gap: 4px;
+}
+
+.transaction-list--compact .transaction-list-item {
+    padding: var(--spacing-xs);
+}
+
+@media (max-width: 768px) {
+    .transaction-list--compact {
+        gap: 2px;
+    }
+}
+
+/* ================================
+   LISTAS COM SEPARADORES
+   ================================ */
+
+.transaction-list--divided .transaction-list-item {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.transaction-list--divided .transaction-list-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .transaction-list--divided .transaction-list-item {
+        padding-bottom: var(--spacing-xs);
+        margin-bottom: var(--spacing-xs);
+    }
+}
+
+/* ================================
+   LISTA COM AGRUPAMENTO POR DATA
+   ================================ */
+
+.transaction-list-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.transaction-list-group-header {
+    font-weight: var(--font-weight-bold);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.transaction-list-group-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .transaction-list-group {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .transaction-list-group-header {
+        font-size: 0.8125rem;
+        margin-bottom: var(--spacing-xs);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        margin-left: calc(var(--spacing-xs) * -1);
+        margin-right: calc(var(--spacing-xs) * -1);
+    }
+
+    .transaction-list-group-content {
+        gap: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .transaction-list-group {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .transaction-list-group-header {
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+    }
+
+    .transaction-list-group-content {
+        gap: 6px;
+    }
+}
+
+/* ================================
+   INFINITE SCROLL INDICATOR
+   ================================ */
+
+.transaction-list-loading {
+    text-align: center;
+    padding: var(--spacing-lg);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.transaction-list-loading::after {
+    content: '•••';
+    display: block;
+    font-size: 1.5rem;
+    letter-spacing: 0.25em;
+    animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+
+    0%,
+    20% {
+        opacity: 0.2;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.2;
+    }
+}
+
+@media (max-width: 768px) {
+    .transaction-list-loading {
+        padding: var(--spacing-md);
+        font-size: 0.8125rem;
+    }
+
+    .transaction-list-loading::after {
+        font-size: 1.25rem;
+    }
+}
+
+/* ================================
+   ACESSIBILIDADE
+   ================================ */
+
+.empty-state[role="status"],
+.transaction-list-loading[role="status"] {
+    position: relative;
+}
+
+/* Foco visível para navegação por teclado */
+.transaction-list-item:focus-within {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+}
+
+/* Remove outline em dispositivos de toque */
+@media (pointer: coarse) {
+    .transaction-list-item:focus-within {
+        outline: none;
+    }
+}
+
+/* ================================
+    MODO ESCURO - AJUSTES
+    ================================ */
+
+@media (prefers-color-scheme: dark) {
+    .empty-state-icon {
+        opacity: 0.4;
+    }
+
+    .transaction-list--loading .transaction-list-item {
+        background: linear-gradient(90deg,
+                var(--color-surface) 0%,
+                rgba(255, 255, 255, 0.05) 50%,
+                var(--color-surface) 100%);
+    }
+
+    .transaction-list-group-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
 }

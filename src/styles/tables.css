@@ -1,17 +1,21 @@
 /* src/styles/tables.css */
 
 /* ================================
-  EasyMoney - Tabelas Analíticas
-  ================================ */
+  EasyMoney - Tabelas Analíticas (Responsivo)
+  ================================ */
 
 .table-wrapper {
     margin-top: var(--spacing-xl);
     max-width: 720px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+    border-radius: var(--radius-md);
+    width: 100%;
 }
 
 .table {
     width: 100%;
+    min-width: 100%; /* Garante largura mínima */
     border-collapse: collapse;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -25,12 +29,18 @@
     padding: 0.75em 1em;
     text-align: left;
     border-bottom: 1px solid var(--color-border);
+    white-space: nowrap; /* Previne quebra de linha indesejada */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adiciona ... em textos longos */
 }
 
 .table th {
     font-weight: var(--font-weight-medium);
     background: var(--color-bg);
     color: var(--color-text);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .table-row--zebra {
@@ -63,4 +73,239 @@
     color: var(--color-text-muted);
     font-style: italic;
     padding: var(--spacing-lg);
+}
+
+/* ================================
+   RESPONSIVIDADE - TABLETS
+   ================================ */
+
+@media (max-width: 1024px) {
+    .table-wrapper {
+        max-width: 100%;
+        margin-top: var(--spacing-lg);
+    }
+
+    .table {
+        font-size: 0.9375rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.625em 0.875em;
+    }
+}
+
+/* ================================
+   RESPONSIVIDADE - MOBILE
+   ================================ */
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        margin-top: var(--spacing-md);
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+        border-radius: 0;
+        max-width: calc(100vw);
+    }
+
+    .table {
+        font-size: 0.875rem;
+        border-radius: 0;
+        min-width: 600px; /* Força scroll horizontal em telas pequenas */
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5em 0.75em;
+        font-size: 0.875rem;
+    }
+
+    .table th {
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    /* Indicador visual de scroll horizontal */
+    .table-wrapper::after {
+        content: '← Deslize →';
+        display: block;
+        text-align: center;
+        padding: var(--spacing-sm);
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+        background: var(--color-bg);
+        border-top: 1px solid var(--color-border);
+    }
+
+    /* Remove indicador quando não há scroll */
+    .table-wrapper:not([data-scrollable])::after {
+        display: none;
+    }
+
+    .empty-table-row {
+        padding: var(--spacing-md);
+        font-size: 0.875rem;
+    }
+
+    /* Remove hover em mobile para melhor performance */
+    .table-row:hover {
+        background: inherit;
+    }
+
+    /* Adiciona feedback de toque apenas em linhas críticas */
+    .table-row--critical:active {
+        background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+    }
+}
+
+/* ================================
+   MOBILE PEQUENO (até 480px)
+   ================================ */
+
+@media (max-width: 480px) {
+    .table {
+        font-size: 0.8125rem;
+        min-width: 500px; /* Largura mínima menor para mobile pequeno */
+    }
+
+    .table th,
+    .table td {
+        padding: 0.4em 0.5em;
+        font-size: 0.8125rem;
+    }
+
+    .table th {
+        font-size: 0.75rem;
+    }
+
+    .table-wrapper::after {
+        font-size: 0.6875rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .empty-table-row {
+        padding: var(--spacing-sm);
+        font-size: 0.8125rem;
+    }
+}
+
+/* ================================
+   LAYOUT DE CARTÕES (Mobile Alternativo)
+   Descomente para usar layout de cartões em vez de tabela
+   ================================ */
+
+/*
+@media (max-width: 768px) {
+    .table,
+    .table thead,
+    .table tbody,
+    .table th,
+    .table td,
+    .table tr {
+        display: block;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table tr {
+        margin-bottom: var(--spacing-md);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-sm);
+        background: var(--color-surface);
+    }
+
+    .table td {
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+        white-space: normal;
+    }
+
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: var(--spacing-sm);
+        width: 45%;
+        text-align: left;
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-muted);
+    }
+
+    .table-wrapper {
+        overflow-x: visible;
+    }
+
+    .table-wrapper::after {
+        display: none;
+    }
+}
+*/
+
+/* ================================
+   ACESSIBILIDADE - DISPOSITIVOS DE TOQUE
+   ================================ */
+
+@media (pointer: coarse) {
+    .table th,
+    .table td {
+        min-height: 44px;
+    }
+
+    .table-row--critical,
+    .table tr {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* ================================
+   MODO PAISAGEM (LANDSCAPE) MOBILE
+   ================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .table-wrapper {
+        margin-top: var(--spacing-sm);
+    }
+
+    .table {
+        font-size: 0.8125rem;
+        min-width: 500px;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.4em 0.625em;
+    }
+}
+
+/* ================================
+   IMPRESSÃO
+   ================================ */
+
+@media print {
+    .table-wrapper {
+        overflow: visible;
+        max-width: 100%;
+    }
+
+    .table {
+        border: 1px solid #000;
+        font-size: 10pt;
+    }
+
+    .table th {
+        background: #f0f0f0 !important;
+    }
+
+    .table-wrapper::after {
+        display: none;
+    }
+
+    .table-row:hover {
+        background: inherit;
+    }
 }
