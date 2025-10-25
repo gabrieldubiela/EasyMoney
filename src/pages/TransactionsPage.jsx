@@ -60,7 +60,7 @@ const TransactionPage = () => {
   return (
     <div className="container">
       <div className="page-header">
-        <h1 className="page-title">Revisão Detalhada de Despesas</h1>
+        <h1 className="page-title">Transações</h1>
       </div>
 
       <TransactionAdder/>

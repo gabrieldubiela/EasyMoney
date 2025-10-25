@@ -79,7 +79,7 @@ export default function useAllTransactions(filters = {}) {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
 
     const q = buildQuery();
@@ -87,7 +87,7 @@ export default function useAllTransactions(filters = {}) {
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
     }
-    
+
     if (!q) {
       setLoading(false);
       return;
@@ -99,7 +99,7 @@ export default function useAllTransactions(filters = {}) {
         const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTransactions(docs);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        
+
         const currentLimit = stableFilters.limit || 15;
         setHasMore(snapshot.docs.length === currentLimit);
         setLoading(false);
@@ -114,49 +114,53 @@ export default function useAllTransactions(filters = {}) {
     return () => {
       if (unsubscribeRef.current) unsubscribeRef.current();
     };
-  }, [householdId, buildQuery, stableFilters.limit]); // ✅ Dependências estáveis
+  }, [householdId, buildQuery, stableFilters.limit]);
 
   // Soma total global dos filtrados
   useEffect(() => {
-    async function fetchTotal() {
-      if (!householdId) {
-        setTotalAmount(0);
-        return;
-      }
-      
-      try {
-        const path = getCollectionPath(householdId, stableFilters.planned || false);
-        const colRef = collection(db, path);
-        const conditions = [];
+    if (!householdId) {
+      setTotalAmount(0);
+      return;
+    }
 
-        if (stableFilters.categoryId) conditions.push(where('category_id', '==', stableFilters.categoryId));
-        if (stableFilters.typeId) conditions.push(where('type_id', '==', stableFilters.typeId));
-        if (stableFilters.userId) conditions.push(where('user_id', '==', stableFilters.userId));
-        if (stableFilters.yearMonth) conditions.push(where('yearMonth', '==', stableFilters.yearMonth));
-        if (stableFilters.startDate) conditions.push(where('date', '>=', new Date(stableFilters.startDate)));
-        if (stableFilters.endDate) conditions.push(where('date', '<=', new Date(stableFilters.endDate)));
-        if (stableFilters.minAmount) conditions.push(where('amount', '>=', stableFilters.minAmount));
-        if (stableFilters.maxAmount) conditions.push(where('amount', '<=', stableFilters.maxAmount));
+    const path = getCollectionPath(householdId, stableFilters.planned || false);
+    const colRef = collection(db, path);
+    const conditions = [];
 
-        const q = conditions.length ? query(colRef, ...conditions) : colRef;
-        const snapshot = await getDocs(q);
+    if (stableFilters.categoryId) conditions.push(where('category_id', '==', stableFilters.categoryId));
+    if (stableFilters.typeId) conditions.push(where('type_id', '==', stableFilters.typeId));
+    if (stableFilters.userId) conditions.push(where('user_id', '==', stableFilters.userId));
+    if (stableFilters.yearMonth) conditions.push(where('yearMonth', '==', stableFilters.yearMonth));
+    if (stableFilters.startDate) conditions.push(where('date', '>=', new Date(stableFilters.startDate)));
+    if (stableFilters.endDate) conditions.push(where('date', '<=', new Date(stableFilters.endDate)));
+    if (stableFilters.minAmount) conditions.push(where('amount', '>=', stableFilters.minAmount));
+    if (stableFilters.maxAmount) conditions.push(where('amount', '<=', stableFilters.maxAmount));
 
+    const q = conditions.length ? query(colRef, ...conditions) : colRef;
+
+    const unsubscribeTotal = onSnapshot(
+      q,
+      (snapshot) => {
         const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
         setTotalAmount(total);
-      } catch (err) {
+      },
+      (err) => {
         console.error('Erro ao calcular total:', err);
         setTotalAmount(0);
       }
-    }
-    
-    fetchTotal();
-  }, [householdId, stableFilters]); // ✅ Usa stableFilters
+    );
 
-  // Scroll infinito - carregar mais
-  const loadMore = useCallback(() => {
-    if (!lastDoc || !hasMore || loading) return;
-    
-    setLoading(true);
+    return () => unsubscribeTotal();
+  }, [householdId, stableFilters]);
+
+
+ // Scroll infinito - carregar mais
+const loadMore = useCallback(async () => {
+  if (!lastDoc || !hasMore || loading) return;
+  
+  setLoading(true);
+  
+  try {
     const q = buildQuery(lastDoc);
 
     if (!q) {
@@ -164,23 +168,20 @@ export default function useAllTransactions(filters = {}) {
       return;
     }
 
-    onSnapshot(
-      q,
-      (snapshot) => {
-        const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setTransactions((prev) => [...prev, ...moreDocs]);
-        setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        
-        const currentLimit = stableFilters.limit || 15;
-        setHasMore(snapshot.docs.length === currentLimit);
-        setLoading(false);
-      },
-      (err) => {
-        console.error('Erro ao carregar mais:', err);
-        setLoading(false);
-      }
-    );
-  }, [buildQuery, lastDoc, hasMore, loading, stableFilters.limit]);
+    const snapshot = await getDocs(q);
+    
+    const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setTransactions((prev) => [...prev, ...moreDocs]);
+    setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+    
+    const currentLimit = stableFilters.limit || 15;
+    setHasMore(snapshot.docs.length === currentLimit);
+    setLoading(false);
+  } catch {
+    setLoading(false);
+  }
+}, [buildQuery, lastDoc, hasMore, loading, stableFilters.limit]);
+
 
   // Permite reset externo
   const reset = useCallback(() => {

@@ -38,18 +38,31 @@ const TransactionList = ({ filters, categories, types }) => {
     [users]
   );
 
-  // Scroll infinito nativo (carrega mais ao chegar ao fundo)
-  const scrollRef = useRef(null);
+  // ✅ SOLUÇÃO MODERNA: IntersectionObserver
+  const loadMoreRef = useRef(null);
+
   useEffect(() => {
-    const handleScroll = () => {
-      if (!hasMore || loading) return;
-      const el = scrollRef.current;
-      if (el && el.getBoundingClientRect().bottom <= window.innerHeight + 60) {
-        loadMore();
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 } // Dispara quando 10% do elemento está visível
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, [hasMore, loading, loadMore]);
 
   if (loading && transactions.length === 0) {
@@ -57,10 +70,10 @@ const TransactionList = ({ filters, categories, types }) => {
   }
 
   return (
-    <div ref={scrollRef} className="transaction-list-wrapper">
+    <div className="transaction-list-wrapper">
       <div className="card">
         <h3>
-          Total Filtrado:{" "}
+          Total:{" "}
           {totalAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
         </h3>
       </div>
@@ -82,9 +95,17 @@ const TransactionList = ({ filters, categories, types }) => {
             categoryName={categoryMap[transaction.category_id] || "N/A"}
             typeName={typeMap[transaction.type_id] || "N/A"}
             userName={userMap[transaction.user_id] || "Desconhecido"}
-        />
+          />
         ))}
       </div>
+
+      {/* ✅ Elemento sentinela para IntersectionObserver */}
+      {hasMore && (
+        <div 
+          ref={loadMoreRef} 
+          style={{ height: '20px', margin: '20px 0' }}
+        />
+      )}
 
       {/* Scroll feedback */}
       {loading && transactions.length > 0 && (

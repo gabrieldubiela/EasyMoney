@@ -61,7 +61,7 @@ export default function TransactionItem({
         <div className="transaction-item-description">
           {transaction.description}
           {transaction.supplier && (
-            <span className="transaction-item-supplier"> ({transaction.supplier})</span>
+            <span className="transaction-item-supplier"> - {transaction.supplier}</span>
           )}
         </div>
         <div className={`transaction-item-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}`}>

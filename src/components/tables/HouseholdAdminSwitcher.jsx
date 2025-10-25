@@ -42,7 +42,7 @@ const HouseholdAdminSwitcher = () => {
                   className="btn btn-secondary btn-small"
                   onClick={() => changeHousehold(f.id)}
                 >
-                  Impersonar família
+                  Alterar para esta família
                 </button>
               </td>
             </tr>

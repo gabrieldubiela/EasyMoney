@@ -40,7 +40,7 @@ const TransactionAdder = () => {
           onClick={handleToggleForm}
           className="btn btn-primary btn-block"
         >
-          + Adicionar Nova Despesa
+          Adicionar Nova Transação
         </button>
       )}
     </div>

@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import { createTransaction } from '../../services/transactionService';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
 import useAllCategories from '../../hooks/useAllCategories';
 import useAllTypes from '../../hooks/useAllTypes';
 import "../../styles/forms.css";
@@ -34,7 +32,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
 
   const isIncomeType = (selectedTypeId) => {
     const transactionType = types.find((t) => t.id === selectedTypeId);
-    return transactionType && transactionType.name?.toUpperCase() === 'RECEITA';
+    return transactionType?.isIncome === true; 
   };
 
   const getSignedAmount = (rawAmount, typeId) => {
@@ -48,46 +46,60 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
     if (!householdId || !user) return;
 
     setFormError("");
+    setIsProcessing(true);
+
     try {
-      setIsProcessing(true);
+      if (!description.trim() || !supplier.trim() || !amount || !category || !type || !date) {
+        throw new Error("Preencha todas as informações obrigatórias.");
+      }
 
       const signedAmount = getSignedAmount(amount, type);
       const trimmedDescription = description.trim();
       const trimmedSupplier = supplier.trim();
 
-      if (!category || !type || !amount) {
-        setFormError("Preencha todas as informações obrigatórias.");
-        setIsProcessing(false);
-        return;
-      }
+      // 🔍 DEBUG - ADICIONE ISSO
+    console.log('📤 ENVIANDO PARA O SERVICE:', {
+      householdId,
+      userId: user.uid,
+      description: trimmedDescription,
+      supplier: trimmedSupplier,
+      amount: signedAmount,
+      category_id: category,
+      type_id: type,
+      date,
+      installments_total: installments,
+    });
 
       if (isPlanned) {
-        await addDoc(collection(db, `households/${householdId}/plannedTransactions`), {
-          description: trimmedDescription,
-          supplier: trimmedSupplier,
-          amount: signedAmount,
-          category_id: category,
-          type_id: type,
-          date: new Date(`${date}T00:00:00`),
-          user_id: user.uid,
-          isPaid: false,
-          createdAt: serverTimestamp(),
-        });
-      } else {
-        await createTransaction({
-          householdId,
-          userId: user.uid,
-          formData: {
+        await createTransaction(
+          {
+            householdId,
+            userId: user.uid,
             description: trimmedDescription,
             supplier: trimmedSupplier,
             amount: signedAmount,
-            category,
-            type,
+            category_id: category,
+            type_id: type,
             date,
-            installments,
+            installments_total: installments,
           },
-          editingData: { transactionId, transactionGroupId: null },
-        });
+          true
+        );
+      } else {
+        await createTransaction(
+          {
+            householdId,
+            userId: user.uid,
+            description: trimmedDescription,
+            supplier: trimmedSupplier,
+            amount: signedAmount,
+            category_id: category,
+            type_id: type,
+            date,
+            installments_total: installments,
+          },
+          false
+        );
       }
 
       alert('Transação salva com sucesso!');
@@ -130,11 +142,11 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-      />
+        />
       </div>
 
       <div className="form-group">
-        <label htmlFor="tx-supplier" className="form-label">
+        <label htmlFor="tx-supplier" className="form-label required">
           Fornecedor / Origem
         </label>
         <input
@@ -143,7 +155,8 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           placeholder="Fornecedor / Origem"
           value={supplier}
           onChange={(e) => setSupplier(e.target.value)}
-      />
+          required
+        />
       </div>
 
       <div className="form-group">
@@ -159,7 +172,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           required
           min="0.01"
           step="0.01"
-      />
+        />
       </div>
 
       <div className="form-group">
@@ -172,7 +185,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-      />
+        />
       </div>
 
       {!isPlanned && (
@@ -186,7 +199,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
             value={installments}
             onChange={(e) => setInstallments(e.target.value)}
             min="1"
-        />
+          />
         </div>
       )}
 
@@ -243,8 +256,8 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           {isProcessing
             ? 'Processando...'
             : transactionId
-            ? 'Salvar Edição'
-            : 'Adicionar Transação'}
+              ? 'Salvar Edição'
+              : 'Adicionar Transação'}
         </button>
       </div>
     </form>
