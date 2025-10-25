@@ -41,7 +41,7 @@ const UserAdminForm = ({ editingUser, onSaved, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form user-admin-form" autoComplete="off" style={{ margin: 0 }}>
+    <form onSubmit={handleSubmit} className="form user-admin-form" autoComplete="off" >
       <h4>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</h4>
 
       <div className="form-group">
@@ -53,18 +53,17 @@ const UserAdminForm = ({ editingUser, onSaved, onCancel }) => {
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Nome"
-        />
+      />
       </div>
 
-      <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', margin: 0 }}>
+      <div className="form-group" >
         <input
           id="useradmin-admin"
           type="checkbox"
           checked={isAdmin}
           onChange={e => setIsAdmin(e.target.checked)}
-          style={{ marginRight: 4 }}
-        />
-        <label htmlFor="useradmin-admin" className="form-label" style={{ marginBottom: 0, cursor: "pointer" }}>
+      />
+        <label htmlFor="useradmin-admin" className="form-label">
           Admin do sistema
         </label>
       </div>
@@ -79,7 +78,7 @@ const UserAdminForm = ({ editingUser, onSaved, onCancel }) => {
           value={householdIds}
           onChange={e => setHouseholdIds(e.target.value)}
           placeholder="IDs de famílias (separados por vírgula)"
-        />
+      />
       </div>
 
       {formError && <div className="form-error">{formError}</div>}

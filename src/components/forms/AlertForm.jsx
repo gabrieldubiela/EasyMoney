@@ -186,7 +186,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                         onChange={(e) => setPercentageThreshold(Number(e.target.value))}
                         disabled={loading}
                         required
-                    />
+                  />
                     <small>Alerta será disparado quando atingir esse percentual de gasto.</small>
                 </div>
             )}
@@ -206,7 +206,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                         onChange={(e) => setRemainingThreshold(Number(e.target.value))}
                         disabled={loading}
                         required
-                    />
+                  />
                     <small>Alerta quando o saldo restante cair abaixo desse percentual.</small>
                 </div>
             )}
@@ -247,7 +247,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                             onChange={(e) => setAmountLimit(Number(e.target.value))}
                             disabled={loading}
                             required
-                        />
+                      />
                         <small>Valor máximo permitido para esse tipo de transação.</small>
                     </div>
 
@@ -285,7 +285,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                             value={triggerDay}
                             onChange={(e) => setTriggerDay(Number(e.target.value))}
                             disabled={loading}
-                        />
+                      />
                         <small>0 = no dia do vencimento, 1 = um dia antes, etc.</small>
                     </div>
 
@@ -299,7 +299,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                             value={triggerTime}
                             onChange={(e) => setTriggerTime(e.target.value)}
                             disabled={loading}
-                        />
+                      />
                     </div>
                 </>
             )}
@@ -316,7 +316,7 @@ const AlertForm = ({ item = null, onSuccess, onCancel }) => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     disabled={loading}
-                />
+              />
             </div>
 
             {formError && <div className="form-error">{formError}</div>}

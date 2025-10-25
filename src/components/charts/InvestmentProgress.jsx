@@ -49,10 +49,8 @@ export default function InvestmentProgress({ totalPortfolio, roi, goalStatus }) 
                     <div className="goal-progress-bg progress-bar-bg">
                       <div
                         className={fillClass}
-                        style={{
-                          width: `${Math.min(goal.percent, 100)}%`,
-                        }}
-                      />
+                        style={{width: `${Math.min(goal.percent, 100)}%`}}
+                    />
                     </div>
                     <span>{goal.percent}%</span>
                     <span className="goal-meta">

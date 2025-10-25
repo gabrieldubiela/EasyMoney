@@ -23,12 +23,12 @@ export default function UserProfileForm() {
 
   return (
     <div className="profile-panel">
-      <ProfileDataForm user={user} showToast={showToast} />
-      <hr />
-      <EmailUpdateForm user={user} showToast={showToast} />
-      <hr />
-      <PasswordUpdateForm user={user} showToast={showToast} />
-      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500} />}
+      <ProfileDataForm user={user} showToast={showToast}/>
+      <hr/>
+      <EmailUpdateForm user={user} showToast={showToast}/>
+      <hr/>
+      <PasswordUpdateForm user={user} showToast={showToast}/>
+      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500}/>}
     </div>
   );
 }
@@ -77,7 +77,7 @@ function ProfileDataForm({ user, showToast }) {
             onChange={e => setDisplayName(e.target.value)}
             required
             disabled={isUpdating}
-          />
+        />
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={isUpdating}>
@@ -120,11 +120,11 @@ function EmailUpdateForm({ user, showToast }) {
       <form onSubmit={handleUpdateEmail} className="form email-form" autoComplete="off">
         <div className="form-group">
           <label htmlFor="email" className="form-label required">Novo E-mail:</label>
-          <input id="email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} required disabled={emailLoading} />
+          <input id="email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} required disabled={emailLoading}/>
         </div>
         <div className="form-group">
           <label htmlFor="current-password-email" className="form-label required">Senha Atual:</label>
-          <input id="current-password-email" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={emailLoading} />
+          <input id="current-password-email" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={emailLoading}/>
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={emailLoading}>
@@ -171,11 +171,11 @@ function PasswordUpdateForm({ user, showToast }) {
       <form onSubmit={handleUpdatePassword} className="form password-form" autoComplete="off">
         <div className="form-group">
           <label htmlFor="current-password-pass" className="form-label required">Senha Atual:</label>
-          <input id="current-password-pass" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={passwordLoading} />
+          <input id="current-password-pass" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required disabled={passwordLoading}/>
         </div>
         <div className="form-group">
           <label htmlFor="new-password" className="form-label required">Nova Senha:</label>
-          <input id="new-password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} disabled={passwordLoading} />
+          <input id="new-password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} disabled={passwordLoading}/>
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={passwordLoading}>

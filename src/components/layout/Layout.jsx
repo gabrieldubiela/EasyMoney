@@ -8,12 +8,12 @@ import "../../styles/layout.css";
 
 const Layout = ({ children }) => (
   <div className="app-layout">
-    <Sidebar />
+    <Sidebar/>
     <div className="app-main-area">
-      <Header />
+      <Header/>
       <main className="app-content">
         {/* Se vier de rotas, usa Outlet. Se vier de props, usa children (ambos funcionam!) */}
-        <Outlet />
+        <Outlet/>
         {children}
       </main>
     </div>

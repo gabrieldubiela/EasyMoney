@@ -19,12 +19,15 @@
       "sizes": "512x512"
     }
   ],
-   "scope": "/", 
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#007bff",
   "background_color": "#ffffff",
-  "categories": ["finance", "productivity"],
+  "categories": [
+    "finance",
+    "productivity"
+  ],
   "lang": "pt-BR"
 }

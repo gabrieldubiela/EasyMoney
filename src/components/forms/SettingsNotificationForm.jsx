@@ -15,7 +15,7 @@ const SettingsNotificationForm = ({ onSave }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form" style={{ margin: "16px 0" }}>
+    <form onSubmit={handleSubmit} className="form">
       <h3>Alertas de Gastos</h3>
       <div className="form-group inline">
         <input
@@ -23,13 +23,13 @@ const SettingsNotificationForm = ({ onSave }) => {
           id="enable-alerts"
           checked={enableAlerts}
           onChange={e => setEnableAlerts(e.target.checked)}
-        />
-        <label className="form-label" htmlFor="enable-alerts" style={{ marginBottom: 0 }}>
+      />
+        <label className="form-label" htmlFor="enable-alerts">
           Ativar alertas quando uma categoria ultrapassar x% do limite
         </label>
       </div>
       <div className="form-group inline">
-        <label className="form-label" htmlFor="threshold" style={{ marginBottom: 0 }}>
+        <label className="form-label" htmlFor="threshold" >
           Notificar acima de
         </label>
         <input
@@ -40,9 +40,8 @@ const SettingsNotificationForm = ({ onSave }) => {
           min="10"
           max="100"
           step="1"
-          onChange={e => setThreshold(e.target.value)}
-          style={{ width: 60, margin: "0 8px"}}
-        />
+          onChange={e => setThreshold(e.target.value)}          
+      />
         <span>%</span>
       </div>
       <div className="form-actions">

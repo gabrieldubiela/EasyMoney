@@ -17,7 +17,7 @@ const AppContent = () => {
     annualData: {}
   });
 
-  return <AppRoutes />;
+  return <AppRoutes/>;
 };
 
 // Componente Principal App
@@ -28,7 +28,7 @@ function App() {
 
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   );
 }

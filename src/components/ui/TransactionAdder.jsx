@@ -27,11 +27,10 @@ const TransactionAdder = () => {
           <TransactionForm
             onSaveSuccess={handleSaveSuccess}
             transactionId={null}
-          />
+        />
           <button
             onClick={handleToggleForm}
             className="btn btn-secondary btn-block"
-            style={{ marginTop: "1.5rem" }}
           >
             Fechar Formulário
           </button>

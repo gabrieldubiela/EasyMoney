@@ -130,7 +130,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -143,7 +143,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           placeholder="Fornecedor / Origem"
           value={supplier}
           onChange={(e) => setSupplier(e.target.value)}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -159,7 +159,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           required
           min="0.01"
           step="0.01"
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -172,7 +172,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-        />
+      />
       </div>
 
       {!isPlanned && (
@@ -186,7 +186,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
             value={installments}
             onChange={(e) => setInstallments(e.target.value)}
             min="1"
-          />
+        />
         </div>
       )}
 

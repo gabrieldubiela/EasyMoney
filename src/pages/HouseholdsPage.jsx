@@ -30,12 +30,11 @@ export default function HouseholdsPage() {
         <h2 className="section-title">Família ativa: {householdId}</h2>
 
         {/* Trocar família */}
-        <div style={{ margin: "12px 0 18px" }}>
+        <div>
           <label>Trocar família: </label>
           <select
             value={householdId}
             onChange={e => handleSelect(e.target.value)}
-            style={{ minWidth: 100, marginLeft: 10, padding: 5 }}
           >
             {allHouseholds && allHouseholds.length > 0 ? allHouseholds.map(h => (
               <option key={h.id} value={h.id}>
@@ -49,11 +48,11 @@ export default function HouseholdsPage() {
         </div>
 
         {/* Nome/edit da família */}
-        <div className="card" style={{ margin: "18px 0" }}>
-          <HouseholdUpdateForm householdId={householdId} showToast={setToast} canEdit={isHouseholdAdmin} />
+        <div className="card">
+          <HouseholdUpdateForm householdId={householdId} showToast={setToast} canEdit={isHouseholdAdmin}/>
         </div>
-        <div className="card" style={{ margin: "18px 0" }}>
-          <InviteCodeDisplay householdId={householdId} />
+        <div className="card">
+          <InviteCodeDisplay householdId={householdId}/>
         </div>
       </section>
 
@@ -61,11 +60,11 @@ export default function HouseholdsPage() {
       <section className="section">
         <h2 className="section-title">Membros da Família</h2>
         <div className="card">
-          <HouseholdUsersList householdId={householdId} isAdmin={isHouseholdAdmin} showToast={setToast} />
+          <HouseholdUsersList householdId={householdId} isAdmin={isHouseholdAdmin} showToast={setToast}/>
         </div>
       </section>
 
-      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500} />}
+      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500}/>}
     </div>
   );
 }

@@ -65,7 +65,7 @@ export default function LoginForm({ onSuccess, onError }) {
             placeholder="Email"
             required
             disabled={loading}
-          />
+        />
         </div>
         <div className="form-group">
           <label htmlFor="password">
@@ -79,7 +79,7 @@ export default function LoginForm({ onSuccess, onError }) {
             placeholder="Senha"
             required
             disabled={loading}
-          />
+        />
         </div>
         {formError && <div className="form-error">{formError}</div>}
         <p>

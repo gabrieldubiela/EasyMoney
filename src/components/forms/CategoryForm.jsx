@@ -82,7 +82,7 @@ const CategoryForm = ({
           required
           disabled={loading}
           className={isDuplicate && !item ? "input-error" : ""}
-        />
+      />
         {isDuplicate && !item && (
           <span className="form-error">Essa categoria já existe.</span>
         )}

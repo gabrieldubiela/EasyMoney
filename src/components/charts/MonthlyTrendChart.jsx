@@ -129,8 +129,8 @@ export default function MonthlyTrendChart({
           <option value="expense">Saídas</option>
         </select>
       </div>
-      <div style={{ height: 320 }}>
-        <Line data={chartData} options={chartOptions} />
+      <div>
+        <Line data={chartData} options={chartOptions}/>
       </div>
     </div>
   );

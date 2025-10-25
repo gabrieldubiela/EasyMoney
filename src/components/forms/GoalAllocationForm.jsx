@@ -109,7 +109,7 @@ const GoalAllocationForm = ({
           min="1"
           max="100"
           disabled={isSaving}
-        />
+      />
       </div>
 
       {formError && <div className="form-error">{formError}</div>}

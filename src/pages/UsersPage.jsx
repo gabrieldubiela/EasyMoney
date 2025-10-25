@@ -19,7 +19,7 @@ export default function UsersPage() {
       <section className="section">
         <h2 className="section-title">Dados Pessoais</h2>
         <div className="card">
-          <UserProfileForm />
+          <UserProfileForm/>
         </div>
       </section>
     </div>

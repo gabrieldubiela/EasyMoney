@@ -18,7 +18,7 @@ export default function InviteCodeDisplay({ householdId }) {
     <>
       <h3>Convidar Membros</h3>
       <p>Compartilhe o código abaixo. O usuário convidado deve usá-lo ao se registrar para acessar esta Família.</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div>
         <code className="code-block">{householdId || '...'}</code>
         <button
           type="button"

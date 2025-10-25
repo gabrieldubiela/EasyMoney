@@ -59,7 +59,7 @@ export default function RegisterForm() {
             placeholder="Nome"
             required
             disabled={loading}
-          />
+        />
         </div>
         <div className="form-group">
           <label htmlFor="register-email" className="form-label required">
@@ -73,7 +73,7 @@ export default function RegisterForm() {
             placeholder="Email"
             required
             disabled={loading}
-          />
+        />
         </div>
         <div className="form-group">
           <label htmlFor="register-password" className="form-label required">
@@ -87,7 +87,7 @@ export default function RegisterForm() {
             placeholder="Senha"
             required
             disabled={loading}
-          />
+        />
         </div>
         <div className="form-group">
           <label htmlFor="register-household" className="form-label">
@@ -100,7 +100,7 @@ export default function RegisterForm() {
             onChange={(e) => setHouseholdIdInput(e.target.value)}
             placeholder="ID de Família Existente"
             disabled={loading}
-          />
+        />
         </div>
         {!householdIdInput && (
           <div className="form-group">
@@ -114,7 +114,7 @@ export default function RegisterForm() {
               onChange={(e) => setFamilyName(e.target.value)}
               placeholder="Nome da sua Família (ex: Silva)"
               disabled={loading}
-            />
+          />
           </div>
         )}
         <div className="form-actions">

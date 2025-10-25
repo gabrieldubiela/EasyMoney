@@ -72,7 +72,7 @@ const GoalForm = ({ goal, onSuccess, onCancel }) => {
           onChange={e => setName(e.target.value)}
           required
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -88,7 +88,7 @@ const GoalForm = ({ goal, onSuccess, onCancel }) => {
           required
           min="0"
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -102,7 +102,7 @@ const GoalForm = ({ goal, onSuccess, onCancel }) => {
           value={targetDate}
           onChange={e => setTargetDate(e.target.value)}
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -118,7 +118,7 @@ const GoalForm = ({ goal, onSuccess, onCancel }) => {
           min="0"
           step="0.01"
           disabled={isSaving}
-        />
+      />
       </div>
 
       {formError && <div className="form-error">{formError}</div>}

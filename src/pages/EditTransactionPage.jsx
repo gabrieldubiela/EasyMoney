@@ -20,7 +20,7 @@ const EditTransactionPage = ({ transactionId }) => {
         <div>
             <h1>Editar Despesa (Família: {householdName})</h1>
             {/* Passa o ID para o formulário para que ele carregue os dados */}
-            <TransactionForm transactionId={transactionId} />
+            <TransactionForm transactionId={transactionId}/>
         </div>
     );
 };

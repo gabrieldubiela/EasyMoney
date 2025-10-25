@@ -80,18 +80,18 @@ export default function BalancePage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div>
       <h1>Balanço e Planejamento Mensal</h1>
 
       {/* Alerta/Botão de fechamento do mês anterior */}
       {!closingStatusLoading && needsClosing && (
-        <div className="alert alert-warning" style={{ marginBottom: 16 }}>
+        <div className="alert alert-warning">
           <strong>O mês {needsClosing.monthName} não foi fechado!</strong>
-          <br />
+          <br/>
           {needsClosing.hasData
             ? "Você já possui dados de orçamento/resultado; só confirme o fechamento."
             : "Nenhum dado salvo para o mês; ao fechar, não será mais possível criar ou editar transações nele."}
-          <br />
+          <br/>
           <button
             disabled={closingInProgress || loadingPrev}
             onClick={fecharMesAnterior}
@@ -105,20 +105,19 @@ export default function BalancePage() {
       )}
 
       {/* Seleção de Período */}
-      <div style={{ marginBottom: 16 }}>
+      <div>
         <label>Mês: </label>
         <select value={month} onChange={e => setMonth(Number(e.target.value))}>
           {Array.from({ length: 12 }, (_, i) =>
             <option key={i+1} value={i+1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>
           )}
         </select>
-        <label style={{ marginLeft: 14 }}>Ano: </label>
+        <label>Ano: </label>
         <input
           type="number"
           value={year}
           onChange={e => setYear(Number(e.target.value))}
-          style={{ width: 90 }}
-        />
+      />
       </div>
 
       {/* Resumo sintético */}
@@ -127,20 +126,20 @@ export default function BalancePage() {
         totalIncome={incomeEffective}
         totalExpense={expenseEffective}
         projectedBalance={projectedBalance}
-      />
+    />
 
       {/* Formulário Unificado para Add/Edit Planejado */}
-      <div className="card" style={{ marginTop: 16 }}>
+      <div className="card">
         <h3>Adicionar Planejamento</h3>
         <TransactionForm
           isPlanned={true}
           onSaveSuccess={() => { refetch(); showToast("success", "Transação planejada criada!"); }}
           transactionId={null}
-        />
+      />
       </div>
 
       {/* Lista de Planejadas */}
-      <div className="card" style={{ marginTop: 16 }}>
+      <div className="card">
         <h2>Transações Futuras ({plannedTransactions.length})</h2>
         {loading ? (
           <div className="loading">Carregando...</div>
@@ -154,13 +153,13 @@ export default function BalancePage() {
               categoryName={getCategoryName(transaction.category_id)}
               typeName={getTypeName(transaction.type_id)}
               onConvert={() => { refetch(); showToast("success", "Transação convertida!"); }}
-            />
+          />
           ))
         )}
       </div>
       
       {/* Toasts */}
-      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500} />}
+      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500}/>}
     </div>
   );
 }

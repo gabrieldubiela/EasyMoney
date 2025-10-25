@@ -14,11 +14,11 @@ const HouseholdAdminSwitcher = () => {
   if (error) return <div className="form-error">Erro ao carregar famílias</div>;
 
   return (
-    <div className="table-wrapper household-admin-switcher" style={{ marginBottom: 16 }}>
+    <div className="table-wrapper household-admin-switcher">
       <h3>Famílias</h3>
       <p>
         <strong>Família atual:</strong> {familyName}{" "}
-        <span className="muted" style={{ fontSize: 12 }}>
+        <span className="muted">
           ({householdId})
         </span>
       </p>

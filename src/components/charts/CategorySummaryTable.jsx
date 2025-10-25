@@ -71,7 +71,7 @@ export default function CategorySummaryTable({ categories, summary, typeFilter }
                       <div
                         className={`progress-bar-fill ${progressClass}`}
                         style={{ width: `${Math.min(percent, 100)}%` }}
-                      />
+                    />
                     </div>
                   </div>
                 </td>

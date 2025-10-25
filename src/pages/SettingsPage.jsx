@@ -39,7 +39,7 @@ const SettingsPage = () => {
                     <TypeForm
                         existingTypes={types}
                         onSuccess={() => refreshTypes?.()}
-                    />
+                  />
                 )}
 
                 {/* Lista de tipos existentes */}
@@ -55,7 +55,7 @@ const SettingsPage = () => {
                                         setEditingType(null);
                                     }}
                                     onCancel={() => setEditingType(null)}
-                                />
+                              />
                             ) : (
                                 <div>
                                     <span>
@@ -74,7 +74,7 @@ const SettingsPage = () => {
                 </div>
             </section>
 
-            <hr />
+            <hr/>
 
             {/* ========== SEÇÃO 2: CATEGORIAS ========== */}
             <section>
@@ -85,7 +85,7 @@ const SettingsPage = () => {
                     <CategoryForm
                         existingCategories={categories}
                         onSuccess={() => refreshCategories?.()}
-                    />
+                  />
                 )}
 
                 {/* Lista de categorias existentes */}
@@ -101,7 +101,7 @@ const SettingsPage = () => {
                                         setEditingCategory(null);
                                     }}
                                     onCancel={() => setEditingCategory(null)}
-                                />
+                              />
                             ) : (
                                 <div>
                                     <span>
@@ -120,13 +120,13 @@ const SettingsPage = () => {
                 </div>
             </section>
 
-            <hr />
+            <hr/>
 
             {/* ========== SEÇÃO 3: ALERTAS ========== */}
             <section>
                 <h2>3. Gestão de Alertas</h2>
                 <p>Visualize e gerencie alertas de orçamento:</p>
-                <AlertForm />
+                <AlertForm/>
             </section>
         </div>
     );

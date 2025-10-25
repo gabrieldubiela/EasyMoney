@@ -154,11 +154,11 @@ const TransactionFilter = ({ categories, types, onFilterChange }) => {
         <>
           <div className="transaction-filter-col">
             <label className="form-label">De:</label>
-            <input type="date" value={minDate} onChange={e => setMinDate(e.target.value)} />
+            <input type="date" value={minDate} onChange={e => setMinDate(e.target.value)}/>
           </div>
           <div className="transaction-filter-col">
             <label className="form-label">Até:</label>
-            <input type="date" value={maxDate} onChange={e => setMaxDate(e.target.value)} />
+            <input type="date" value={maxDate} onChange={e => setMaxDate(e.target.value)}/>
           </div>
         </>
         )}
@@ -195,10 +195,10 @@ const TransactionFilter = ({ categories, types, onFilterChange }) => {
           list="search-suggestions"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      />
         <datalist id="search-suggestions">
-          {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s} />)}
-          {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d} />)}
+          {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s}/>)}
+          {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d}/>)}
         </datalist>
       </div>
       <button onClick={clearFilters} className="btn btn-secondary btn-block" type="button">

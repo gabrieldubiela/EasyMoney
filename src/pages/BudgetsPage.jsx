@@ -5,7 +5,7 @@ import BudgetSheet from '../components/tables/BudgetSheet';
 
 const BudgetsPage = () => (
   <div className="annual-sheet-page">
-    <BudgetSheet />
+    <BudgetSheet/>
   </div>
 );
 

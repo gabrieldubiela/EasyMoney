@@ -82,7 +82,7 @@ const TransactionList = ({ filters, categories, types }) => {
             categoryName={categoryMap[transaction.category_id] || "N/A"}
             typeName={typeMap[transaction.type_id] || "N/A"}
             userName={userMap[transaction.user_id] || "Desconhecido"}
-          />
+        />
         ))}
       </div>
 

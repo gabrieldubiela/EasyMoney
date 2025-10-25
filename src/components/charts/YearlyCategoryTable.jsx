@@ -64,7 +64,7 @@ export default function YearlyCategoryTable({ categories, summary, typeFilter })
                       <div
                         className={`progress-bar-fill ${fillClass}`}
                         style={{ width: `${Math.min(percent, 100)}%` }}
-                      />
+                    />
                     </div>
                   </div>
                 </td>

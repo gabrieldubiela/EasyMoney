@@ -72,7 +72,7 @@ const InvestmentForm = ({ investment, onSuccess, onCancel }) => {
           onChange={e => setName(e.target.value)}
           required
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -88,7 +88,7 @@ const InvestmentForm = ({ investment, onSuccess, onCancel }) => {
           required
           min="0"
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -104,7 +104,7 @@ const InvestmentForm = ({ investment, onSuccess, onCancel }) => {
           required
           min="0"
           disabled={isSaving}
-        />
+      />
       </div>
 
       <div className="form-group">
@@ -120,7 +120,7 @@ const InvestmentForm = ({ investment, onSuccess, onCancel }) => {
           min="0"
           step="0.01"
           disabled={isSaving}
-        />
+      />
       </div>
 
       {formError && <div className="form-error">{formError}</div>}

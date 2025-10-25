@@ -63,19 +63,19 @@ const TransactionPage = () => {
         <h1 className="page-title">Revisão Detalhada de Despesas</h1>
       </div>
 
-      <TransactionAdder />
+      <TransactionAdder/>
 
       <TransactionFilter
         categories={categories}
         types={types}
         onFilterChange={handleFilterChange}
-      />
+    />
 
       <TransactionList
         filters={filters}
         categories={categories}
         types={types}
-      />
+    />
     </div>
   );
 };

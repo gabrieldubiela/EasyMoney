@@ -14,14 +14,14 @@ export default function AdminPage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: 28 }}>
+    <div>
       <h1>Administração Geral</h1>
 
       {/* 1. Bloquinho para trocar de família */}
-      <HouseholdAdminSwitcher onSwitch={handleSwitchFamily} />
+      <HouseholdAdminSwitcher onSwitch={handleSwitchFamily}/>
 
       {/* 2. Gestão de usuários */}
-      <UserAdminTable onEdit={setEditingUser} />
+      <UserAdminTable onEdit={setEditingUser}/>
 
       {/* 3. Edição/criação de usuário */}
       {editingUser && (
@@ -29,7 +29,7 @@ export default function AdminPage() {
           editingUser={editingUser}
           onSaved={() => setEditingUser(null)}
           onCancel={() => setEditingUser(null)}
-        />
+      />
       )}
     </div>
   );

@@ -36,7 +36,7 @@ const EditableBudgetCell = React.memo(({ value, onSave }) => {
         }}
         autoFocus
         className="editable-cell-input"
-      />
+    />
     );
   }
   return (
@@ -158,12 +158,12 @@ const BudgetSheet = () => {
                           ? <EditableBudgetCell
                             value={typeObj.valor}
                             onSave={val => handleSaveCell(row.id, t.id, val)}
-                          />
+                        />
                           : typeObj.valor > 0
                             ? typeObj.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
                             : "")
                         : (editingCategory === row.id ? (
-                          <EditableBudgetCell value={0} onSave={val => handleSaveCell(row.id, t.id, val)} />
+                          <EditableBudgetCell value={0} onSave={val => handleSaveCell(row.id, t.id, val)}/>
                         ) : "")
                       }
                     </td>

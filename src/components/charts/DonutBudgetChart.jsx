@@ -96,7 +96,7 @@ export default function DonutBudgetChart({
   return (
     <div className="donut-budget-chart chart-wrapper">
       <strong className="chart-title">Budget Utilization (Top Categories)</strong>
-      <Doughnut data={chartData} options={chartOptions} />
+      <Doughnut data={chartData} options={chartOptions}/>
       <div className="chart-note">
         {typeFilter ? `Type: ${typeFilter}` : "All types"}
       </div>

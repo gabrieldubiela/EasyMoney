@@ -77,7 +77,7 @@ const InvestmentsPage = () => {
             investment={activeInvestment.id ? activeInvestment : null}
             onSuccess={() => setActiveInvestment(null)}
             onCancel={() => setActiveInvestment(null)}
-          />
+        />
         )}
       </section>
 
@@ -125,7 +125,7 @@ const InvestmentsPage = () => {
             goal={activeGoal.id ? activeGoal : null}
             onSuccess={() => setActiveGoal(null)}
             onCancel={() => setActiveGoal(null)}
-          />
+        />
         )}
       </section>
 
@@ -168,7 +168,7 @@ const InvestmentsPage = () => {
             goals={goals}
             onSuccess={() => setShowAllocationForm(false)}
             onCancel={() => setShowAllocationForm(false)}
-          />
+        />
         )}
       </section>
     </div>

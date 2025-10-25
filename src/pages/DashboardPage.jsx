@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="dashboard-page" style={{ padding: 32, textAlign: "center", color: "#999" }}>
+      <div className="dashboard-page">
         Carregando dados do dashboard...
       </div>
     );
@@ -76,24 +76,23 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="dashboard-page" style={{ padding: 32, textAlign: "center", color: "#c01e1e" }}>
-        Ocorreu um erro ao carregar o dashboard.<br />
-        <span style={{ fontSize: 13 }}>{String(error)}</span>
+      <div className="dashboard-page">
+        Ocorreu um erro ao carregar o dashboard.<br/>
+        <span>{String(error)}</span>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-page" style={{ padding: 20 }}>
-      <MonthlySummary {...monthlySummary} />
+    <div className="dashboard-page">
+      <MonthlySummary {...monthlySummary}/>
 
       {/* Filtro por tipo */}
-      <div style={{ marginTop: 24, marginBottom: 12 }}>
+      <div>
         <label>Category type: </label>
         <select
           value={typeFilter || ""}
           onChange={e => setTypeFilter(e.target.value || null)}
-          style={{ marginLeft: 8, padding: "3px 14px" }}
         >
           <option value="">All</option>
           <option value="fixed">Fixed</option>
@@ -106,7 +105,7 @@ export default function DashboardPage() {
         categories={categories}
         summary={budgetSummary}
         typeFilter={typeFilter}
-      />
+    />
 
       {/* Gráfico linha evolução */}
       <MonthlyTrendChart
@@ -115,14 +114,14 @@ export default function DashboardPage() {
         balanceData={balanceData}
         metric={metric}
         onChangeMetric={setMetric}
-      />
+    />
 
       {/* Tabela anual por categoria */}
       <YearlyCategoryTable
         categories={categories}
         summary={budgetSummary}
         typeFilter={typeFilter}
-      />
+    />
 
       {/* Donut pizza orçamento */}
       <DonutBudgetChart
@@ -130,20 +129,20 @@ export default function DashboardPage() {
         summary={budgetSummary}
         typeFilter={typeFilter}
         maxCategories={5}
-      />
+    />
 
       {/* Alertas recentes */}
-      <AlertList alerts={recentAlerts} />
+      <AlertList alerts={recentAlerts}/>
 
       {/* Transações recentes */}
-      <RecentExpenses transactions={recentTransactions} maxItems={10} />
+      <RecentExpenses transactions={recentTransactions} maxItems={10}/>
 
       {/* Investimentos e metas */}
       <InvestmentProgress
         totalPortfolio={investmentSummary.totalPortfolio}
         roi={investmentSummary.roi}
         goalStatus={investmentSummary.goalStatus}
-      />
+    />
     </div>
   );
 }

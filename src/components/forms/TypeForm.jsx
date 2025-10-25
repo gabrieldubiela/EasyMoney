@@ -95,7 +95,7 @@ const TypeForm = ({
           onChange={e => setName(e.target.value)}
           required
           disabled={loading}
-        />
+      />
       </div>
       <div className="form-group" >
         <input
@@ -104,7 +104,7 @@ const TypeForm = ({
           checked={isIncome}
           onChange={e => setIsIncome(e.target.checked)}
           disabled={loading}
-        />
+      />
         <label htmlFor="type-isincome" className="form-label">
           Receita?
         </label>

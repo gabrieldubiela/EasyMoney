@@ -15,15 +15,14 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <img src={logoUrl} alt="EasyMoney Logo" className="header-logo" />
-        <span style={{ display: "flex", alignItems: "center" }}>
-          <span style={{ fontWeight: "bold" }}>Família:</span> {familyName}
+      <div >
+        <img src={logoUrl} alt="EasyMoney Logo" className="header-logo"/>
+        <span >
+          <span>Família:</span> {familyName}
           <span className="muted">({householdId})</span>
           {isImpersonating && (
             <button
               className="btn btn-secondary btn-small"
-              style={{ marginLeft: 16 }}
               onClick={() => changeHousehold(user.householdId[0])}
             >
               Voltar à minha família
@@ -33,7 +32,6 @@ const Header = () => {
       </div>
       <div>
         <span className="header-user">👤 {userName}</span>
-        {/* <button className="btn btn-outline btn-small" style={{ marginLeft: 8 }}>Perfil</button> */}
       </div>
     </header>
   );

@@ -36,7 +36,7 @@ async function initApp() {
     
     root.render(
       <StrictMode>
-        <App />
+        <App/>
       </StrictMode>
     )
 

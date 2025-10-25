@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAppContext();
   if (loading) return <div className="app-loading">Carregando usuário...</div>;
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace/>;
   }
   return children;
 };
@@ -35,7 +35,7 @@ const AdminRoute = ({ children }) => {
   const { user, loading } = useAppContext();
   if (loading) return <div className="app-loading">Carregando autorização...</div>;
   if (!user || !user.isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace/>;
   }
   return children;
 };
@@ -44,7 +44,7 @@ const AdminRoute = ({ children }) => {
 const AuthRoute = ({ children }) => {
   const { user } = useAppContext();
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace/>;
   }
   return children;
 };
@@ -64,45 +64,45 @@ const AppRoutes = () => {
           {/* Rota Pública */}
           <Route
             path="/login"
-            element={<AuthRoute><AuthPage /></AuthRoute>}
-          />
+            element={<AuthRoute><AuthPage/></AuthRoute>}
+        />
 
           {/* Protegidas: Tudo dentro do Layout */}
           <Route
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Outlet />
+                  <Outlet/>
                 </Layout>
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/monthly-balance" element={<BalancePage />} />
-            <Route path="/transactions" element={<TransactionsPage />} />
-            <Route path="/transaction/edit/:id" element={<EditTransactionPage />} />
-            <Route path="/budgets" element={<BudgetsPage />} />
-            <Route path="/user" element={<UsersPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/households" element={<HouseholdsPage />} />
-            <Route path="/investments" element={<InvestimentsPage />} />
+            <Route path="/" element={<DashboardPage/>}/>
+            <Route path="/monthly-balance" element={<BalancePage/>}/>
+            <Route path="/transactions" element={<TransactionsPage/>}/>
+            <Route path="/transaction/edit/:id" element={<EditTransactionPage/>}/>
+            <Route path="/budgets" element={<BudgetsPage/>}/>
+            <Route path="/user" element={<UsersPage/>}/>
+            <Route path="/settings" element={<SettingsPage/>}/>
+            <Route path="/households" element={<HouseholdsPage/>}/>
+            <Route path="/investments" element={<InvestimentsPage/>}/>
 
             {/* Admin (com proteção extra) */}
             <Route
               path="/admin"
               element={
                 <AdminRoute>
-                  <AdminPage />
+                  <AdminPage/>
                 </AdminRoute>
               }
-            />
+          />
           </Route>
 
           {/* Fallback */}
           <Route
             path="*"
-            element={<Navigate to={user ? "/" : "/login"} replace />}
-          />
+            element={<Navigate to={user ? "/" : "/login"} replace/>}
+        />
         </RouterRoutes>
       </Suspense>
     </BrowserRouter>

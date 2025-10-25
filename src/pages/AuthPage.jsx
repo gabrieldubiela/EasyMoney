@@ -6,7 +6,7 @@ import ToastMessage from '../components/ui/ToastMessage';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [toast, setToast] = useState(null); // { type, message }
+  const [toast, setToast] = useState(null);
 
   // Função para exibir feedback global
   const showToast = (type, message) => {
@@ -20,15 +20,15 @@ export default function AuthPage() {
           <LoginForm 
             onSuccess={(msg) => showToast("success", msg || "Login realizado!")}
             onError={(msg) => showToast("error", msg || "Erro ao fazer login")}
-          />
+        />
         ) : (
           <RegisterForm 
             onSuccess={(msg) => showToast("success", msg || "Cadastro realizado!")}
             onError={(msg) => showToast("error", msg || "Erro ao cadastrar")}
-          />
+        />
         )}
 
-        <div className="auth-links" style={{ marginTop: '1rem' }}>
+        <div className="auth-links" style={{ textAlign: "center" }}>
           <p>
             {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}
             <a 
@@ -51,7 +51,7 @@ export default function AuthPage() {
           message={toast.message}
           onClose={() => setToast(null)}
           duration={4200}
-        />
+      />
       )}
     </div>
   );

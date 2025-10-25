@@ -54,7 +54,7 @@ export default function HouseholdUpdateForm({ householdId, showToast, canEdit })
           placeholder="Ex: Silva"
           required
           disabled={loading || !canEdit}
-        />
+      />
       </div>
 
       {formError && <p className="form-error">{formError}</p>}

@@ -8,6 +8,7 @@ import { fetchUserById } from '../services/userService';
 import { fetchHouseholdById } from '../services/householdService';
 
 export const AppProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [userId, setUserId] = useState(null);
   const [householdId, setHouseholdId] = useState(null);
   const [userName, setUserName] = useState(null);
@@ -16,10 +17,10 @@ export const AppProvider = ({ children }) => {
 
   // Detecta login/logout
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setLoading(true);
-      if (user) {
-        const uid = user.uid;
+      if (firebaseUser) {
+        const uid = firebaseUser.uid;
         setUserId(uid);
 
         try {
@@ -30,6 +31,13 @@ export const AppProvider = ({ children }) => {
             : userData.householdId || null;
           setUserName(userData.name || null);
           setHouseholdId(defaultHouseholdId);
+
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            ...userData,
+          });
 
           // Busca dados da família via householdService, se houver householdId
           if (defaultHouseholdId) {
@@ -44,6 +52,7 @@ export const AppProvider = ({ children }) => {
             setFamilyName(null);
           }
         } catch (error) {
+          setUser(firebaseUser);
           setUserName(null);
           setHouseholdId(null);
           setFamilyName(null);
@@ -51,6 +60,7 @@ export const AppProvider = ({ children }) => {
         }
       } else {
         // Logout
+        setUser(null);
         setUserId(null);
         setHouseholdId(null);
         setUserName(null);
@@ -79,6 +89,7 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        user,
         userId,
         householdId,
         userName,
