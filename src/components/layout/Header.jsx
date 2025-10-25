@@ -1,47 +1,49 @@
 // src/components/layout/Header.jsx
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/useAppContext";
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
-import "../../styles/buttons.css";
 import "../../styles/header.css";
 
 const logoUrl = "/logo.svg";
 
-const Header = () => {
-  const { userName, familyName, householdId, changeHousehold, user } = useAppContext();
+const Header = ({ onToggleSidebar, isSidebarOpen }) => {
+  const { userName, familyName } = useAppContext();
+  const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    window.location.href = "/login";
+  const handleLogoClick = () => {
+    navigate("/");
   };
-
-  // Detecta impersonação (está em uma família diferente da original do usuário)
-  const isImpersonating = user?.householdId && householdId && !user.householdId.includes(householdId);
 
   return (
     <header className="header">
-      <div >
-        <img src={logoUrl} alt="EasyMoney Logo" className="header-logo"/>
-        <span >
-          <span>Família:</span> {familyName}
-          {isImpersonating && (
-            <button
-              className="btn btn-secondary btn-small"
-              onClick={() => changeHousehold(user.householdId[0])}
-            >
-              Voltar à minha família
-            </button>
-          )}
-        </span>
-      </div>
-      <div>
-        <span className="header-user">{userName}</span>
-      </div>
-      <button onClick={handleLogout} style={{ marginLeft: 16 }}>
-        Sair
+      {/* Menu toggle */}
+      <button
+        className={`header-menu-toggle ${isSidebarOpen ? "header-menu-toggle--active" : ""}`}
+        onClick={onToggleSidebar}
+        aria-label="Abrir menu"
+      >
+        <div className="header-menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </button>
+
+      {/* Logo clicável */}
+      <div className="header-logo-link" onClick={handleLogoClick}>
+        <img src={logoUrl} alt="EasyMoney" className="header-logo" />
+      </div>
+
+      {/* Info central - esconde quando sidebar abre */}
+      <div className={`header-info ${isSidebarOpen ? "header-info--hidden" : ""}`}>
+        <div className="header-user-link" onClick={() => navigate("/user")}>
+          {userName || "Usuário"}
+        </div>
+        <div className="header-family-link" onClick={() => navigate("/households")}>
+          Família {familyName || "Sem nome"}
+        </div>
+      </div>
     </header>
   );
 };
