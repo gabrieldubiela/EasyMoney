@@ -48,7 +48,9 @@ export default function useAllTransactions(filters = {}) {
 
       if (stableFilters.categoryId) conditions.push(where('category_id', '==', stableFilters.categoryId));
       if (stableFilters.typeId) conditions.push(where('type_id', '==', stableFilters.typeId));
-      if (stableFilters.userId) conditions.push(where('user_id', '==', stableFilters.userId));
+      if (typeof stableFilters.userId !== 'undefined' && stableFilters.userId !== null && stableFilters.userId !== '') {
+        conditions.push(where('user_id', '==', stableFilters.userId));
+      }
       if (stableFilters.yearMonth) conditions.push(where('yearMonth', '==', stableFilters.yearMonth));
       if (stableFilters.startDate) conditions.push(where('date', '>=', new Date(stableFilters.startDate)));
       if (stableFilters.endDate) conditions.push(where('date', '<=', new Date(stableFilters.endDate)));
@@ -57,7 +59,12 @@ export default function useAllTransactions(filters = {}) {
 
       const orderField = stableFilters.orderByField || 'date';
       const orderDirection = stableFilters.orderDirection || 'desc';
-      const pageLimit = customLimit || stableFilters.limit || 15;
+      const pageLimit =
+        typeof stableFilters.limit !== 'undefined'
+          ? stableFilters.limit
+          : typeof customLimit !== 'undefined'
+            ? customLimit
+            : 99999999;
 
       const queryConstraints = [
         ...conditions,
@@ -97,6 +104,7 @@ export default function useAllTransactions(filters = {}) {
       q,
       (snapshot) => {
         const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        console.log("🔥 TODAS TRANSAÇÕES CARREGADAS:", docs); // ADICIONE AQUI
         setTransactions(docs);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
 
@@ -129,7 +137,9 @@ export default function useAllTransactions(filters = {}) {
 
     if (stableFilters.categoryId) conditions.push(where('category_id', '==', stableFilters.categoryId));
     if (stableFilters.typeId) conditions.push(where('type_id', '==', stableFilters.typeId));
-    if (stableFilters.userId) conditions.push(where('user_id', '==', stableFilters.userId));
+    if (typeof stableFilters.userId !== 'undefined' && stableFilters.userId !== null && stableFilters.userId !== '') {
+      conditions.push(where('user_id', '==', stableFilters.userId));
+    }
     if (stableFilters.yearMonth) conditions.push(where('yearMonth', '==', stableFilters.yearMonth));
     if (stableFilters.startDate) conditions.push(where('date', '>=', new Date(stableFilters.startDate)));
     if (stableFilters.endDate) conditions.push(where('date', '<=', new Date(stableFilters.endDate)));
@@ -154,33 +164,33 @@ export default function useAllTransactions(filters = {}) {
   }, [householdId, stableFilters]);
 
 
- // Scroll infinito - carregar mais
-const loadMore = useCallback(async () => {
-  if (!lastDoc || !hasMore || loading) return;
-  
-  setLoading(true);
-  
-  try {
-    const q = buildQuery(lastDoc);
+  // Scroll infinito - carregar mais
+  const loadMore = useCallback(async () => {
+    if (!lastDoc || !hasMore || loading) return;
 
-    if (!q) {
+    setLoading(true);
+
+    try {
+      const q = buildQuery(lastDoc);
+
+      if (!q) {
+        setLoading(false);
+        return;
+      }
+
+      const snapshot = await getDocs(q);
+
+      const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setTransactions((prev) => [...prev, ...moreDocs]);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+
+      const currentLimit = stableFilters.limit || 15;
+      setHasMore(snapshot.docs.length === currentLimit);
       setLoading(false);
-      return;
+    } catch {
+      setLoading(false);
     }
-
-    const snapshot = await getDocs(q);
-    
-    const moreDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setTransactions((prev) => [...prev, ...moreDocs]);
-    setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-    
-    const currentLimit = stableFilters.limit || 15;
-    setHasMore(snapshot.docs.length === currentLimit);
-    setLoading(false);
-  } catch {
-    setLoading(false);
-  }
-}, [buildQuery, lastDoc, hasMore, loading, stableFilters.limit]);
+  }, [buildQuery, lastDoc, hasMore, loading, stableFilters.limit]);
 
 
   // Permite reset externo

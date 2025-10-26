@@ -71,7 +71,7 @@ export default function BalancePage() {
         }
       );
       showToast("success", `Fechamento do mês ${needsClosing.monthName} realizado!`);
-      refetch && refetch();
+      refetch && refetch?.();
     } catch (err) {
       showToast("danger", "Erro ao fechar mês: " + err.message);
     } finally {
@@ -130,17 +130,17 @@ export default function BalancePage() {
 
       {/* Formulário Unificado para Add/Edit Planejado */}
       <div className="card">
-        <h3>Adicionar Planejamento</h3>
+        <h3>Adicionar Transação Planejada</h3>
         <TransactionForm
           isPlanned={true}
-          onSaveSuccess={() => { refetch(); showToast("success", "Transação planejada criada!"); }}
+          onSaveSuccess={() => { refetch?.(); showToast("success", "Transação planejada criada!"); }}
           transactionId={null}
       />
       </div>
 
       {/* Lista de Planejadas */}
       <div className="card">
-        <h2>Transações Futuras ({plannedTransactions.length})</h2>
+        <h2>Transações Planejadas</h2>
         {loading ? (
           <div className="loading">Carregando...</div>
         ) : plannedTransactions.length === 0 ? (
@@ -150,9 +150,10 @@ export default function BalancePage() {
             <TransactionItem
               key={transaction.id}
               transaction={transaction}
+              isPlanned={true}
               categoryName={getCategoryName(transaction.category_id)}
               typeName={getTypeName(transaction.type_id)}
-              onConvert={() => { refetch(); showToast("success", "Transação convertida!"); }}
+              onConvert={() => { refetch?.(); showToast("success", "Transação convertida!"); }}
           />
           ))
         )}

@@ -11,7 +11,8 @@ import {
   getDoc,
   getDocs,
   writeBatch,
-  orderBy
+  orderBy,
+  Timestamp
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
@@ -188,7 +189,14 @@ const createSingleTransaction = async (data, planned = false) => {
     transactionGroupId,
   } = data;
 
-  const d = new Date(date);
+  let dateValue = date;
+  if (typeof dateValue === "string") {
+    dateValue = Timestamp.fromDate(new Date(dateValue + "T00:00:00"));
+  } else if (dateValue instanceof Date) {
+    dateValue = Timestamp.fromDate(dateValue);
+  }
+
+  const d = dateValue.toDate();
   const yearMonthIndex = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}`;
   const path = getCollectionPath(householdId, planned);
 
@@ -198,7 +206,7 @@ const createSingleTransaction = async (data, planned = false) => {
     amount,
     category_id,
     type_id,
-    date: new Date(date + "T00:00:00"),
+    date: dateValue,
     installments_total,
     installments_current,
     user_id: userId,
@@ -227,8 +235,11 @@ const createInstallmentGroup = async (data, planned = false) => {
     transactionGroupId = generateGroupId(),
   } = data;
 
-  const parcelas = dividirParcelas(amount, installments_total);
-  const startDate = new Date(date + "T00:00:00");
+  const installments = divideInstallments(amount, installments_total);
+  const startDate = typeof date === "string"
+    ? new Date(date + "T00:00:00")
+    : (date?.toDate ? date.toDate() : date);
+
   const batch = writeBatch(db);
   const path = getCollectionPath(householdId, planned);
 
@@ -246,10 +257,10 @@ const createInstallmentGroup = async (data, planned = false) => {
     batch.set(transactionRef, {
       description: description.trim(),
       supplier: supplier.trim(),
-      amount: parcelas[i],
+      amount: installments[i],
       category_id,
       type_id,
-      date: installmentDate,
+      date: Timestamp.fromDate(installmentDate),
       installments_total,
       installments_current: i + 1,
       user_id: userId,
@@ -257,7 +268,6 @@ const createInstallmentGroup = async (data, planned = false) => {
       transactionGroupId,
     });
   }
-
   await batch.commit();
 };
 
@@ -273,21 +283,21 @@ const generateGroupId = () => {
  * Divide o valor total das parcelas conforme padrão de cartão de crédito.
  * A primeira parcela recebe a diferença para fechar o total.
  * @param {number} valorTotal - Valor total a parcelar.
- * @param {number} numParcelas - Total de parcelas.
+ * @param {number} numInstallments - Total de parcelas.
  * @returns {Array<number>} Array com valores de cada parcela.
  */
-const dividirParcelas = (valorTotal, numParcelas) => {
-  const valorBase = Math.floor((valorTotal / numParcelas) * 100) / 100;
-  const resto = +(valorTotal - valorBase * numParcelas).toFixed(2);
-  const parcelas = [];
-  for (let i = 0; i < numParcelas; i++) {
+const divideInstallments = (valorTotal, numInstallments) => {
+  const baseValue = Math.floor((valorTotal / numInstallments) * 100) / 100;
+  const rest = +(valorTotal - baseValue * numInstallments).toFixed(2);
+  const installments = [];
+  for (let i = 0; i < numInstallments; i++) {
     if (i === 0) {
-      parcelas.push(Number((valorBase + resto).toFixed(2)));
+      installments.push(Number((baseValue + rest).toFixed(2)));
     } else {
-      parcelas.push(Number(valorBase.toFixed(2)));
+      installments.push(Number(baseValue.toFixed(2)));
     }
   }
-  return parcelas;
+  return installments;
 };
 
 /**
@@ -310,31 +320,14 @@ export const updateTransaction = async (data, planned = false) => {
     if (editAllInstallments) {
       await deleteInstallmentGroup(householdId, transactionGroupId, planned);
       await createInstallmentGroup(
-        {
-          ...fields,
-          householdId,
-          installments_total,
-          transactionGroupId: transactionGroupId || generateGroupId(),
-        },
+        { ...fields, householdId, installments_total, transactionGroupId: transactionGroupId || generateGroupId() },
         planned
       );
     } else {
       await updateSingleTransaction({ householdId, transactionId, ...fields }, planned);
     }
   } else {
-    if (transactionGroupId) {
-      await deleteInstallmentGroup(householdId, transactionGroupId, planned);
-    }
-    await createSingleTransaction(
-      {
-        ...fields,
-        householdId,
-        installments_current: 1,
-        installments_total: 1,
-        transactionGroupId: generateGroupId(),
-      },
-      planned
-    );
+    await updateSingleTransaction({ householdId, transactionId, ...fields }, planned);
   }
 };
 
@@ -346,22 +339,18 @@ export const updateTransaction = async (data, planned = false) => {
  * @param {string} userId
  */
 export async function convertPlannedToEffective(householdId, transaction, userId) {
-  // Calcula yearMonth e fecha os campos conforme efetivação
-  const tDate = transaction.date.toDate
-    ? transaction.date.toDate()
-    : new Date(transaction.date);
-  const yearMonthIndex = tDate.getFullYear().toString() + String(tDate.getMonth() + 1).padStart(2, '0');
-  await addDoc(collection(db, `households/${householdId}/transactions`), {
-    ...transaction,
+  const { id, ...data } = transaction;
+
+  const docRef = await addDoc(collection(db, `households/${householdId}/transactions`), {
+    ...data,
     user_id: userId,
-    yearMonth: yearMonthIndex,
-    installments_total: 1,
-    installments_current: 1,
-    transactionId: transaction.id,
-    createdAt: new Date(), // Ou serverTimestamp() se quiser só server-side
   });
+
   await deleteTransaction(householdId, transaction.id, true);
+  return docRef.id;
 }
+
+
 
 /**
  * Atualiza uma transação unitária.
@@ -370,6 +359,11 @@ export async function convertPlannedToEffective(householdId, transaction, userId
  * @returns {Promise<void>}
  */
 const updateSingleTransaction = async ({ householdId, transactionId, ...fields }, planned = false) => {
+  if (fields.date && typeof fields.date === "string") {
+    fields.date = Timestamp.fromDate(new Date(fields.date + "T00:00:00"));
+  } else if (fields.date instanceof Date) {
+    fields.date = Timestamp.fromDate(fields.date);
+  }
   const path = getCollectionPath(householdId, planned);
   await updateDoc(doc(db, path, transactionId), fields);
 };

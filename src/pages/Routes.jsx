@@ -87,7 +87,7 @@ const AppRoutes = () => {
             <Route path="/settings" element={<SettingsPage/>}/>
             <Route path="/households" element={<HouseholdsPage/>}/>
             <Route path="/investments" element={<InvestimentsPage/>}/>
-            <Route path="/versin" element={<VersionPage/>}/>
+            <Route path="/version" element={<VersionPage/>}/>
 
             {/* Admin (com proteção extra) */}
             <Route

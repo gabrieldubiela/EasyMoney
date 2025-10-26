@@ -7,7 +7,7 @@ import App from './App.jsx'
 // ========================================
 // CONFIGURAÇÃO (ajuste conforme necessário)
 // ========================================
-const APP_VERSION = '3.0.0' // ← Atualize manualmente
+const APP_VERSION = '3.3.0'
 const IS_DEVELOPMENT = window.location.hostname === 'localhost'
 
 // ========================================

@@ -745,3 +745,16 @@ label:hover {
     justify-content: center;
   }
 }
+
+.form-checkbox-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-checkbox-inline input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary); 
+  border-radius: 8px; 
+}

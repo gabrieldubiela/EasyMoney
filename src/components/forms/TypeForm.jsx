@@ -125,11 +125,6 @@ const TypeForm = ({
         )}
       </div>
       {formError && <div className="form-error">{formError}</div>}
-      {isDuplicate && !item && (
-        <div className="form-error">
-          Esse tipo já existe.
-        </div>
-      )}
     </form>
   );
 };

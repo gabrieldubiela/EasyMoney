@@ -16,13 +16,14 @@ import "../../styles/lists.css";
  */
 const TransactionList = ({ filters, categories, types }) => {
   const { users } = useAppContext();
+  const mergedFilters = { ...filters, limit: 15 };
   const {
     transactions,
     loading,
     hasMore,
     loadMore,
     totalAmount,
-  } = useAllTransactions(filters);
+  } = useAllTransactions(mergedFilters);
 
   // Mapas para lookup rápido
   const categoryMap = React.useMemo(

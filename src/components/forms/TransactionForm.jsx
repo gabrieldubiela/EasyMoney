@@ -1,21 +1,39 @@
-// src/components/forms/TransactionForm.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/useAppContext';
-import { createTransaction } from '../../services/transactionService';
+import { createTransaction, updateTransaction } from '../../services/transactionService';
 import useAllCategories from '../../hooks/useAllCategories';
 import useAllTypes from '../../hooks/useAllTypes';
 import "../../styles/forms.css";
 import "../../styles/buttons.css";
 
-/**
- * Formulário de criação e edição de transações financeiras.
- */
-const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) => {
+function formatCurrencyInput(value) {
+  // Remove tudo que não for dígito
+  const cleaned = String(value).replace(/\D/g, "");
+  if (!cleaned) return "R$ 0,00"; // Ou vazio se preferir
+  // Divide por 100 e usa toLocaleString para BRL
+  const floatVal = Number(cleaned) / 100;
+  return floatVal.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+
+const TransactionForm = ({
+  transactionId,
+  onSaveSuccess,
+  onCancel,
+  isPlanned = false,
+  initialData = null,
+  editMode = false
+}) => {
   const { householdId, user } = useAppContext();
   const { categories, loading: loadingCategories } = useAllCategories();
   const { types, loading: loadingTypes } = useAllTypes();
-
+  const isInstallment = initialData && initialData.installments_total > 1;
+  const [editAllInstallments, setEditAllInstallments] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const today = new Date().toISOString().substring(0, 10);
 
@@ -27,12 +45,53 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
   const [type, setType] = useState('');
   const [date, setDate] = useState(today);
   const [installments, setInstallments] = useState(1);
+  const [formError, setFormError] = useState('');
+  const [amountInput, setAmountInput] = useState("");
 
-  const [formError, setFormError] = useState("");
+  // Valores originais para cálculo do total
+  const [originalAmount, setOriginalAmount] = useState(0);
+  const [originalInstallments, setOriginalInstallments] = useState(1);
+
+  // Preencher campos se editar
+  useEffect(() => {
+    if (initialData) {
+      const absAmount = Math.abs(initialData.amount || 0);
+      setAmountInput(formatCurrencyInput((absAmount * 100).toFixed(0)));
+      setAmount(Number(absAmount).toFixed(2));
+      const totalInstallments = initialData.installments_total || 1;
+
+      setDescription(initialData.description || '');
+      setSupplier(initialData.supplier || '');
+      setAmount(absAmount);
+      setOriginalAmount(absAmount);
+      setOriginalInstallments(totalInstallments);
+      setCategory(initialData.category_id || '');
+      setType(initialData.type_id || '');
+      setDate(
+        initialData.date?.toDate
+          ? initialData.date.toDate().toISOString().substr(0, 10)
+          : (initialData.date ? initialData.date.substr(0, 10) : today)
+      );
+      setInstallments(totalInstallments);
+    }
+  }, [initialData, today]);
+
+  // Atualiza o valor quando muda a opção de editar todas
+  useEffect(() => {
+    if (isInstallment && originalAmount > 0) {
+      if (editAllInstallments) {
+        // Mostra valor total (valor unitário × número de parcelas)
+        setAmount(originalAmount * originalInstallments);
+      } else {
+        // Mostra valor unitário
+        setAmount(originalAmount);
+      }
+    }
+  }, [editAllInstallments, originalAmount, originalInstallments, isInstallment]);
 
   const isIncomeType = (selectedTypeId) => {
     const transactionType = types.find((t) => t.id === selectedTypeId);
-    return transactionType?.isIncome === true; 
+    return transactionType?.isIncome === true;
   };
 
   const getSignedAmount = (rawAmount, typeId) => {
@@ -45,7 +104,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
     e.preventDefault();
     if (!householdId || !user) return;
 
-    setFormError("");
+    setFormError('');
     setIsProcessing(true);
 
     try {
@@ -57,23 +116,13 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
       const trimmedDescription = description.trim();
       const trimmedSupplier = supplier.trim();
 
-      // 🔍 DEBUG - ADICIONE ISSO
-    console.log('📤 ENVIANDO PARA O SERVICE:', {
-      householdId,
-      userId: user.uid,
-      description: trimmedDescription,
-      supplier: trimmedSupplier,
-      amount: signedAmount,
-      category_id: category,
-      type_id: type,
-      date,
-      installments_total: installments,
-    });
-
-      if (isPlanned) {
-        await createTransaction(
+      if (editMode && transactionId) {
+        await updateTransaction(
           {
             householdId,
+            transactionId,
+            transactionGroupId: initialData?.transactionGroupId,
+            editAllInstallments,
             userId: user.uid,
             description: trimmedDescription,
             supplier: trimmedSupplier,
@@ -83,7 +132,7 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
             date,
             installments_total: installments,
           },
-          true
+          isPlanned
         );
       } else {
         await createTransaction(
@@ -98,20 +147,22 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
             date,
             installments_total: installments,
           },
-          false
+          isPlanned
         );
       }
 
-      alert('Transação salva com sucesso!');
       if (onSaveSuccess) onSaveSuccess();
 
-      setDescription('');
-      setSupplier('');
-      setAmount('');
-      setCategory('');
-      setType('');
-      setDate(today);
-      setInstallments(1);
+      // Limpa formulário só se não for edição
+      if (!editMode) {
+        setDescription('');
+        setSupplier('');
+        setAmount('');
+        setCategory('');
+        setType('');
+        setDate(today);
+        setInstallments(1);
+      }
     } catch (error) {
       setFormError(error.message || "Erro ao salvar transação.");
     } finally {
@@ -161,14 +212,22 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
 
       <div className="form-group">
         <label htmlFor="tx-amount" className="form-label required">
-          Valor
+          Valor {isInstallment && editAllInstallments ? '(Total do Grupo)' : ''}
         </label>
         <input
           id="tx-amount"
-          type="number"
+          type="text"
           placeholder="Valor"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={amountInput}
+          onChange={e => {
+            const onlyDigits = e.target.value.replace(/\D/g, "");
+            setAmountInput(formatCurrencyInput(onlyDigits));
+            if (onlyDigits) {
+              setAmount((parseInt(onlyDigits, 10) / 100).toFixed(2));
+            } else {
+              setAmount("");
+            }
+          }}
           required
           min="0.01"
           step="0.01"
@@ -245,20 +304,47 @@ const TransactionForm = ({ transactionId, onSaveSuccess, isPlanned = false }) =>
         </select>
       </div>
 
+      {/* PERGUNTA SOBRE EDITAR TODAS AS PARCELAS */}
+      {isInstallment && (
+        <div className="form-group form-checkbox-inline">
+          <label htmlFor="edit-all-installments">
+            Editar todas as parcelas
+            <input
+              type="checkbox"
+              id="edit-all-installments"
+              checked={editAllInstallments}
+              onChange={e => setEditAllInstallments(e.target.checked)}
+            />
+          </label>
+        </div>
+      )}
+
       {formError && <div className="form-error">{formError}</div>}
 
       <div className="form-actions">
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isProcessing}
-        >
-          {isProcessing
-            ? 'Processando...'
-            : transactionId
-              ? 'Salvar Edição'
-              : 'Adicionar Transação'}
-        </button>
+        <div className="btn-group" style={{ width: '100%', justifyContent: 'flex-end' }}>
+          {editMode && onCancel && (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={onCancel}
+              disabled={isProcessing}
+            >
+              Cancelar
+            </button>
+          )}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isProcessing}
+          >
+            {isProcessing
+              ? 'Processando...'
+              : editMode && transactionId
+                ? 'Salvar Edição'
+                : 'Adicionar Transação'}
+          </button>
+        </div>
       </div>
     </form>
   );
