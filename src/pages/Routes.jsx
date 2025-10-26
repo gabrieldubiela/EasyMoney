@@ -16,7 +16,6 @@ const TransactionsPage = lazy(() => import('./TransactionsPage'));
 const AdminPage = lazy(() => import('./AdminPage'));
 const BudgetsPage = lazy(() => import('./BudgetsPage'));
 const SettingsPage = lazy(() => import('./SettingsPage'));
-const EditTransactionPage = lazy(() => import('./EditTransactionPage'));
 const HouseholdsPage = lazy(() => import('./HouseholdsPage'));
 const InvestimentsPage = lazy(() => import('./InvestimentsPage'));
 const VersionPage = lazy(() => import('./VersionPage'));
@@ -81,7 +80,6 @@ const AppRoutes = () => {
             <Route path="/" element={<DashboardPage/>}/>
             <Route path="/monthly-balance" element={<BalancePage/>}/>
             <Route path="/transactions" element={<TransactionsPage/>}/>
-            <Route path="/transaction/edit/:id" element={<EditTransactionPage/>}/>
             <Route path="/budgets" element={<BudgetsPage/>}/>
             <Route path="/user" element={<UsersPage/>}/>
             <Route path="/settings" element={<SettingsPage/>}/>
