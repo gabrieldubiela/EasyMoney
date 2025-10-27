@@ -3,11 +3,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import formatDate from './utils/formatDate'
 
 // ========================================
 // CONFIGURAÇÃO (ajuste conforme necessário)
 // ========================================
-const APP_VERSION = '3.3.0'
+const APP_VERSION = '3.4.0'
 const IS_DEVELOPMENT = window.location.hostname === 'localhost'
 
 // ========================================
@@ -250,7 +251,7 @@ if (IS_DEVELOPMENT) {
 console.log(`
 ╔════════════════════════════════════╗
 ║   🚀 EasyMoney v${APP_VERSION}           ║
-║   📅 ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}  ║
+║   📅 ${formatDate(new Date())} ║
 ║   🌍 ${navigator.onLine ? 'Online ✅' : 'Offline 📵'}              ║
 ║   🔧 ${IS_DEVELOPMENT ? 'Desenvolvimento 🛠️' : 'Produção 🏭'}    ║
 ╚════════════════════════════════════╝

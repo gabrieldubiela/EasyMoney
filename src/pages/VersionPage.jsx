@@ -5,25 +5,17 @@ import "../styles/cards.css";
 import "../styles/alerts.css";
 import "../styles/buttons.css";
 
-const APP_VERSION = "3.3.0";
+const APP_VERSION = "3.4.0";
 const APP_DATE = "25/10/2025";
 
 const changelog = [
     {
-        version: "3.3.0",
+        version: "3.4.0",
         date: "25/10/2025",
         highlights: [
-            "Nova página: Página de versão que contem informações da última atualização.",
-            "Novo layout: Sidebar fixa no desktop e header responsivo no mobile.",
-            "Indicação visual de atualização do PWA (Service Worker).",
-            "Avatar/nome de usuário e nome da família agora como links de navegação.",
-            "Logout agora está apenas na Sidebar.",
-            "Correção do bug de sidebar invisível no mobile.",
-            "Novo botão em transação planejada que permite converter em realizada.",
-            "Opção de editar transações",
-            "Opção de excluir despesas parcelas individualmente ou em grupo",
-            "Opção de editar transação em grupo",
-            "Ao inserir números do formulário ele começa pelos centavos, tornando desnecessário o uso de virgulas e pontos"
+            "- Página inicial em funcionamento",
+            "- Aumento da largura de tabelas em computadores",
+            "- Padronização de datas e valores"
         ]
     },
 ];

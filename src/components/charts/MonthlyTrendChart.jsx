@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from "chart.js";
 import "../../styles/charts.css";
+import formatCurrency from "../../utils/formatCurrency";
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Legend, Tooltip);
 
@@ -50,7 +51,7 @@ export default function MonthlyTrendChart({
       fill: true,
     },
     income: {
-      label: "Entradas",
+      label: "Receitas",
       data: incomeData,
       borderColor: COLORS.income,
       backgroundColor: `${COLORS.income}22`,
@@ -60,7 +61,7 @@ export default function MonthlyTrendChart({
       fill: true,
     },
     expense: {
-      label: "Saídas",
+      label: "Despesas",
       data: expenseData,
       borderColor: COLORS.expense,
       backgroundColor: `${COLORS.expense}22`,
@@ -71,9 +72,20 @@ export default function MonthlyTrendChart({
     }
   };
 
+  // Lógica para mostrar um ou todos os datasets
+  const getChartDatasets = () => {
+    if (metric === "all") {
+      // Mostrar todas as linhas
+      return [datasets.income, datasets.expense, datasets.balance];
+    } else {
+      // Mostrar apenas a linha selecionada
+      return [datasets[metric]];
+    }
+  };
+
   const chartData = {
     labels: LABELS,
-    datasets: [datasets[metric]],
+    datasets: getChartDatasets(),
   };
 
   const chartOptions = {
@@ -88,11 +100,7 @@ export default function MonthlyTrendChart({
         titleColor: style.getPropertyValue("--color-text"),
         bodyColor: style.getPropertyValue("--color-text-muted"),
         callbacks: {
-          label: (context) =>
-            context.parsed.y?.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }),
+          label: (context) => formatCurrency(context.parsed.y),
         },
       },
     },
@@ -105,11 +113,7 @@ export default function MonthlyTrendChart({
         grid: { color: "rgba(100,100,100,0.08)" },
         ticks: {
           color: style.getPropertyValue("--color-text-muted"),
-          callback: (value) =>
-            value.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }),
+          callback: (value) => formatCurrency(value),
         },
       },
     },
@@ -117,20 +121,21 @@ export default function MonthlyTrendChart({
 
   return (
     <div className="chart-wrapper monthly-trend">
+      <h3>Evolução no Ano</h3>
       <div className="monthly-trend-header">
-        <strong className="chart-title">Evolução (últimos 12 meses):</strong>
         <select
           className="monthly-trend-select"
           value={metric}
           onChange={e => onChangeMetric(e.target.value)}
         >
+          <option value="all">Todos</option>
           <option value="balance">Saldo</option>
-          <option value="income">Entradas</option>
-          <option value="expense">Saídas</option>
+          <option value="income">Receita</option>
+          <option value="expense">Despesa</option>
         </select>
       </div>
       <div>
-        <Line data={chartData} options={chartOptions}/>
+        <Line data={chartData} options={chartOptions} />
       </div>
     </div>
   );
@@ -140,6 +145,6 @@ MonthlyTrendChart.propTypes = {
   incomeData: PropTypes.arrayOf(PropTypes.number).isRequired,
   expenseData: PropTypes.arrayOf(PropTypes.number).isRequired,
   balanceData: PropTypes.arrayOf(PropTypes.number).isRequired,
-  metric: PropTypes.oneOf(["balance", "income", "expense"]).isRequired,
+  metric: PropTypes.oneOf(["all", "balance", "income", "expense"]).isRequired,
   onChangeMetric: PropTypes.func.isRequired,
 };

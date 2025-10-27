@@ -3,23 +3,17 @@ import { useAppContext } from '../../context/useAppContext';
 import { createTransaction, updateTransaction } from '../../services/transactionService';
 import useAllCategories from '../../hooks/useAllCategories';
 import useAllTypes from '../../hooks/useAllTypes';
+import formatCurrency from "../../utils/formatCurrency";
 import "../../styles/forms.css";
 import "../../styles/buttons.css";
 
 function formatCurrencyInput(value) {
   // Remove tudo que não for dígito
   const cleaned = String(value).replace(/\D/g, "");
-  if (!cleaned) return "R$ 0,00"; // Ou vazio se preferir
-  // Divide por 100 e usa toLocaleString para BRL
-  const floatVal = Number(cleaned) / 100;
-  return floatVal.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  if (!cleaned) return formatCurrency(0);
+  // Divide por 100 e formata "visualmente" como dinheiro
+  return formatCurrency(Number(cleaned) / 100);
 }
-
 
 const TransactionForm = ({
   transactionId,
@@ -322,7 +316,7 @@ const TransactionForm = ({
       {formError && <div className="form-error">{formError}</div>}
 
       <div className="form-actions">
-        <div className="btn-group" style={{ width: '100%', justifyContent: 'flex-end' }}>
+        <div className="btn-group">
           {editMode && onCancel && (
             <button
               type="button"

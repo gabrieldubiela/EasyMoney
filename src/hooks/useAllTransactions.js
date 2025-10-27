@@ -64,7 +64,7 @@ export default function useAllTransactions(filters = {}) {
           ? stableFilters.limit
           : typeof customLimit !== 'undefined'
             ? customLimit
-            : 99999999;
+            : 10000;
 
       const queryConstraints = [
         ...conditions,
@@ -104,7 +104,6 @@ export default function useAllTransactions(filters = {}) {
       q,
       (snapshot) => {
         const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        console.log("🔥 TODAS TRANSAÇÕES CARREGADAS:", docs); // ADICIONE AQUI
         setTransactions(docs);
         setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
 

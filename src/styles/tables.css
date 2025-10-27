@@ -1,21 +1,21 @@
 /* src/styles/tables.css */
 
 /* ================================
-  EasyMoney - Tabelas Analíticas (Responsivo)
-  ================================ */
+   EasyMoney - Tabelas Analíticas (Responsivo)
+   ================================ */
 
 .table-wrapper {
     margin-top: var(--spacing-xl);
-    max-width: 720px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
-    border-radius: var(--radius-md);
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
 }
 
 .table {
     width: 100%;
-    min-width: 100%; /* Garante largura mínima */
+    min-width: 1300px;
     border-collapse: collapse;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -29,9 +29,9 @@
     padding: 0.75em 1em;
     text-align: left;
     border-bottom: 1px solid var(--color-border);
-    white-space: nowrap; /* Previne quebra de linha indesejada */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Adiciona ... em textos longos */
+    text-overflow: ellipsis;
 }
 
 .table th {
@@ -43,16 +43,23 @@
     z-index: 10;
 }
 
+.table th:last-child,
+.table td:last-child {
+    min-width: 100px;
+    width: 100px;
+    text-align: center;
+}
+
 .table-row--zebra {
-    background: color-mix(in srgb, var(--color-primary-light) 4%, var(--color-surface));
+    background: var(--color-surface);
 }
 
 .table-row--critical {
-    background: color-mix(in srgb, var(--color-danger) 7%, var(--color-surface));
+    background: var(--color-bg);
 }
 
 .table-row:hover {
-    background: color-mix(in srgb, var(--color-primary-light) 12%, var(--color-bg));
+    background: var(--color-bg);
     transition: background var(--transition-fast);
 }
 
@@ -75,18 +82,40 @@
     padding: var(--spacing-lg);
 }
 
+.editable-cell-input {
+    width: 90px;
+    padding: 2px 5px;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 1rem;
+}
+
+.editable-cell-display {
+    cursor: pointer;
+    padding: 2px 5px;
+    display: inline-block;
+    color: inherit;
+}
+
+.editable-cell-display:hover {
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+}
+
 /* ================================
    RESPONSIVIDADE - TABLETS
-   ================================ */
+   ================================= */
 
 @media (max-width: 1024px) {
     .table-wrapper {
-        max-width: 100%;
         margin-top: var(--spacing-lg);
     }
 
     .table {
         font-size: 0.9375rem;
+        min-width: 1200px;
     }
 
     .table th,
@@ -97,21 +126,19 @@
 
 /* ================================
    RESPONSIVIDADE - MOBILE
-   ================================ */
+   ================================= */
 
 @media (max-width: 768px) {
     .table-wrapper {
         margin-top: var(--spacing-md);
-        margin-left: calc(var(--spacing-md) * -1);
-        margin-right: calc(var(--spacing-md) * -1);
+        width: 100%;
         border-radius: 0;
-        max-width: calc(100vw);
     }
 
     .table {
         font-size: 0.875rem;
         border-radius: 0;
-        min-width: 600px; /* Força scroll horizontal em telas pequenas */
+        min-width: 800px;
     }
 
     .table th,
@@ -126,7 +153,12 @@
         letter-spacing: 0.02em;
     }
 
-    /* Indicador visual de scroll horizontal */
+    .table th:last-child,
+    .table td:last-child {
+        min-width: 80px;
+        width: 80px;
+    }
+
     .table-wrapper::after {
         content: '← Deslize →';
         display: block;
@@ -138,7 +170,6 @@
         border-top: 1px solid var(--color-border);
     }
 
-    /* Remove indicador quando não há scroll */
     .table-wrapper:not([data-scrollable])::after {
         display: none;
     }
@@ -148,25 +179,23 @@
         font-size: 0.875rem;
     }
 
-    /* Remove hover em mobile para melhor performance */
     .table-row:hover {
         background: inherit;
     }
 
-    /* Adiciona feedback de toque apenas em linhas críticas */
     .table-row--critical:active {
-        background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+        background: var(--color-bg);
     }
 }
 
 /* ================================
    MOBILE PEQUENO (até 480px)
-   ================================ */
+   ================================= */
 
 @media (max-width: 480px) {
     .table {
         font-size: 0.8125rem;
-        min-width: 500px; /* Largura mínima menor para mobile pequeno */
+        min-width: 600px;
     }
 
     .table th,
@@ -177,6 +206,12 @@
 
     .table th {
         font-size: 0.75rem;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        min-width: 70px;
+        width: 70px;
     }
 
     .table-wrapper::after {
@@ -191,64 +226,8 @@
 }
 
 /* ================================
-   LAYOUT DE CARTÕES (Mobile Alternativo)
-   Descomente para usar layout de cartões em vez de tabela
-   ================================ */
-
-/*
-@media (max-width: 768px) {
-    .table,
-    .table thead,
-    .table tbody,
-    .table th,
-    .table td,
-    .table tr {
-        display: block;
-    }
-
-    .table thead {
-        display: none;
-    }
-
-    .table tr {
-        margin-bottom: var(--spacing-md);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-md);
-        padding: var(--spacing-sm);
-        background: var(--color-surface);
-    }
-
-    .table td {
-        border: none;
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-        white-space: normal;
-    }
-
-    .table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: var(--spacing-sm);
-        width: 45%;
-        text-align: left;
-        font-weight: var(--font-weight-medium);
-        color: var(--color-text-muted);
-    }
-
-    .table-wrapper {
-        overflow-x: visible;
-    }
-
-    .table-wrapper::after {
-        display: none;
-    }
-}
-*/
-
-/* ================================
-   ACESSIBILIDADE - DISPOSITIVOS DE TOQUE
-   ================================ */
+   ACESSIBILIDADE - TOQUE
+   ================================= */
 
 @media (pointer: coarse) {
     .table th,
@@ -260,11 +239,16 @@
     .table tr {
         -webkit-tap-highlight-color: transparent;
     }
+
+    .table td:last-child .btn {
+        min-height: 36px;
+        min-width: 60px;
+    }
 }
 
 /* ================================
-   MODO PAISAGEM (LANDSCAPE) MOBILE
-   ================================ */
+   LANDSCAPE MOBILE
+   ================================= */
 
 @media (max-width: 768px) and (orientation: landscape) {
     .table-wrapper {
@@ -273,7 +257,7 @@
 
     .table {
         font-size: 0.8125rem;
-        min-width: 500px;
+        min-width: 700px;
     }
 
     .table th,
@@ -284,21 +268,23 @@
 
 /* ================================
    IMPRESSÃO
-   ================================ */
+   ================================= */
 
 @media print {
     .table-wrapper {
         overflow: visible;
+        width: 100%;
         max-width: 100%;
     }
 
     .table {
-        border: 1px solid #000;
+        border: 1px solid var(--color-border);
         font-size: 10pt;
+        min-width: auto;
     }
 
     .table th {
-        background: #f0f0f0 !important;
+        background: var(--color-bg) !important;
     }
 
     .table-wrapper::after {

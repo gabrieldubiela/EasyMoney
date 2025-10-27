@@ -2,6 +2,7 @@
 
 import React from "react";
 import PropTypes from "prop-types";
+import formatCurrency from "../../utils/formatCurrency";
 import "../../styles/cards.css";
 
 /**
@@ -13,33 +14,27 @@ export default function MonthlySummary({
   totalExpense,
   projectedBalance,
 }) {
-  const formatValue = (value) =>
-    value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    });
-
   return (
     <div className="summary-container monthly-summary-container">
+      <h3>Balanço Mensal</h3>
       <div className="card summary-card monthly-summary-card balance">
         <h3 className="card-title">Saldo do mês</h3>
-        <span className="card-value">{formatValue(balance)}</span>
+        <span className="card-value">{formatCurrency(balance)}</span>
       </div>
 
       <div className="card summary-card monthly-summary-card income">
         <h3 className="card-title">Entradas</h3>
-        <span className="card-value">{formatValue(totalIncome)}</span>
+        <span className="card-value">{formatCurrency(totalIncome)}</span>
       </div>
 
       <div className="card summary-card monthly-summary-card expense">
         <h3 className="card-title">Saídas</h3>
-        <span className="card-value">{formatValue(totalExpense)}</span>
+        <span className="card-value">{formatCurrency(totalExpense)}</span>
       </div>
 
       <div className="card summary-card monthly-summary-card projected">
         <h3 className="card-title">Saldo projetado</h3>
-        <span className="card-value">{formatValue(projectedBalance)}</span>
+        <span className="card-value">{formatCurrency(projectedBalance)}</span>
       </div>
     </div>
   );

@@ -12,9 +12,17 @@ const useAllInvestmentHistory = (investmentId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!householdId || !investmentId) return;
+    // Caso NÃO tenha householdId ou investmentId, retorne histórico zero e loading finalizado!
+    if (!householdId || !investmentId) {
+      setHistory([]);
+      setLoading(false);
+      return;
+    }
 
-    const colRef = collection(db, `households/${householdId}/investments/${investmentId}/history`);
+    const colRef = collection(
+      db,
+      `households/${householdId}/investments/${investmentId}/history`
+    );
 
     const unsubscribe = onSnapshot(
       colRef,

@@ -8,6 +8,8 @@ import useInvestmentInsights from '../hooks/useInvestmentInsights';
 import InvestmentForm from '../components/forms/InvestmentForm';
 import GoalForm from '../components/forms/GoalForm';
 import GoalAllocationForm from '../components/forms/GoalAllocationForm';
+import formatCurrency from '../utils/formatCurrency';
+import formatDate from '../utils/formatDate';
 
 const InvestmentsPage = () => {
   // Dados principais
@@ -28,7 +30,7 @@ const InvestmentsPage = () => {
       <section className="card">
         <h2>Visão Geral da Carteira</h2>
         <div>
-          <strong>Total Investido:</strong> {totalPortfolio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          <strong>Total Investido:</strong> {formatCurrency(totalPortfolio)}
         </div>
         <div>
           <strong>Rentabilidade (ROI):</strong> {roi.toFixed(2)}%
@@ -59,8 +61,8 @@ const InvestmentsPage = () => {
                 return (
                   <tr key={investment.id}>
                     <td>{investment.name}</td>
-                    <td>{investment.initialAmount?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                    <td>{investment.currentAmount?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>{formatCurrency(investment.initialAmount)}</td>
+                    <td>{formatCurrency(investment.currentAmount)}</td>
                     <td>{percent.toFixed(2)}%</td>
                     <td>
                       <button onClick={() => setActiveInvestment(investment)}>Editar</button>
@@ -77,7 +79,7 @@ const InvestmentsPage = () => {
             investment={activeInvestment.id ? activeInvestment : null}
             onSuccess={() => setActiveInvestment(null)}
             onCancel={() => setActiveInvestment(null)}
-        />
+          />
         )}
       </section>
 
@@ -105,10 +107,10 @@ const InvestmentsPage = () => {
                 return (
                   <tr key={goal.id}>
                     <td>{goal.name}</td>
-                    <td>{goal.targetAmount?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                    <td>{insight.achieved?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>{formatCurrency(goal.targetAmount)}</td>
+                    <td>{formatCurrency(insight.achieved)}</td>
                     <td>{insight.percent || 0}%</td>
-                    <td>{goal.targetDate ? new Date(goal.targetDate).toLocaleDateString('pt-BR') : '-'}</td>
+                    <td>{goal.targetDate ? formatDate(goal.targetDate) : '-'}</td>
                     <td>{goal.status}</td>
                     <td>
                       <button onClick={() => setActiveGoal(goal)}>Editar</button>
@@ -125,7 +127,7 @@ const InvestmentsPage = () => {
             goal={activeGoal.id ? activeGoal : null}
             onSuccess={() => setActiveGoal(null)}
             onCancel={() => setActiveGoal(null)}
-        />
+          />
         )}
       </section>
 
@@ -168,7 +170,7 @@ const InvestmentsPage = () => {
             goals={goals}
             onSuccess={() => setShowAllocationForm(false)}
             onCancel={() => setShowAllocationForm(false)}
-        />
+          />
         )}
       </section>
     </div>

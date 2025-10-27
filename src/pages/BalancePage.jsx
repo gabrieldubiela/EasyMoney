@@ -9,6 +9,7 @@ import MonthlySummary from '../components/charts/MonthlySummary';
 import TransactionForm from '../components/forms/TransactionForm';
 import TransactionItem from '../components/ui/TransactionItem';
 import ToastMessage from '../components/ui/ToastMessage';
+import formatMonth from "../../utils/formatMonth";
 
 export default function BalancePage() {
   const today = new Date();
@@ -87,11 +88,11 @@ export default function BalancePage() {
       {!closingStatusLoading && needsClosing && (
         <div className="alert alert-warning">
           <strong>O mês {needsClosing.monthName} não foi fechado!</strong>
-          <br/>
+          <br />
           {needsClosing.hasData
             ? "Você já possui dados de orçamento/resultado; só confirme o fechamento."
             : "Nenhum dado salvo para o mês; ao fechar, não será mais possível criar ou editar transações nele."}
-          <br/>
+          <br />
           <button
             disabled={closingInProgress || loadingPrev}
             onClick={fecharMesAnterior}
@@ -109,7 +110,9 @@ export default function BalancePage() {
         <label>Mês: </label>
         <select value={month} onChange={e => setMonth(Number(e.target.value))}>
           {Array.from({ length: 12 }, (_, i) =>
-            <option key={i+1} value={i+1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>
+            <option key={i + 1} value={i + 1}>
+              {formatMonth(i)}
+            </option>
           )}
         </select>
         <label>Ano: </label>
@@ -117,7 +120,7 @@ export default function BalancePage() {
           type="number"
           value={year}
           onChange={e => setYear(Number(e.target.value))}
-      />
+        />
       </div>
 
       {/* Resumo sintético */}
@@ -126,7 +129,7 @@ export default function BalancePage() {
         totalIncome={incomeEffective}
         totalExpense={expenseEffective}
         projectedBalance={projectedBalance}
-    />
+      />
 
       {/* Formulário Unificado para Add/Edit Planejado */}
       <div className="card">
@@ -135,7 +138,7 @@ export default function BalancePage() {
           isPlanned={true}
           onSaveSuccess={() => { refetch?.(); showToast("success", "Transação planejada criada!"); }}
           transactionId={null}
-      />
+        />
       </div>
 
       {/* Lista de Planejadas */}
@@ -154,13 +157,13 @@ export default function BalancePage() {
               categoryName={getCategoryName(transaction.category_id)}
               typeName={getTypeName(transaction.type_id)}
               onConvert={() => { refetch?.(); showToast("success", "Transação convertida!"); }}
-          />
+            />
           ))
         )}
       </div>
-      
+
       {/* Toasts */}
-      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500}/>}
+      {toast && <ToastMessage {...toast} onClose={() => setToast(null)} duration={3500} />}
     </div>
   );
 }

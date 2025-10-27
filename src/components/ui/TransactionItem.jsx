@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useAppContext } from '../../context/useAppContext';
 import { convertPlannedToEffective, deleteTransaction, deleteInstallmentGroup } from '../../services/transactionService';
 import TransactionForm from '../forms/TransactionForm';
+import formatCurrency from '../../utils/formatCurrency';
+import formatDate from '../../utils/formatDate';
 import "../../styles/buttons.css";
 
 export default function TransactionItem({
@@ -18,17 +20,8 @@ export default function TransactionItem({
   const [editing, setEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-
-  const formattedAmount = (transaction.amount || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  });
-  const transactionDate =
-    transaction.date?.toDate?.() instanceof Date
-      ? transaction.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-      : (transaction.date && typeof transaction.date === 'string'
-        ? new Date(transaction.date).toLocaleDateString('pt-BR')
-        : 'Data Desconhecida');
+  const formattedAmount = formatCurrency(transaction.amount || 0);
+  const transactionDate = formatDate(transaction.date);
 
   const handleConvert = async (e) => {
     e.stopPropagation();
@@ -61,7 +54,6 @@ export default function TransactionItem({
         onDelete && onDelete(undefined, err);
       });
   };
-
 
   const handleEditOpen = (e) => {
     e.stopPropagation();
@@ -143,35 +135,15 @@ export default function TransactionItem({
       </div>
       {showDeleteModal && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 500,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onClick={() => setShowDeleteModal(false)} // FECHA ao clicar fora
+          onClick={() => setShowDeleteModal(false)}
         >
           <div
-            style={{
-              background: "var(--color-surface, #222f37)",
-              borderRadius: 12,
-              boxShadow: "0 8px 48px rgba(0,0,0,0.25)",
-              padding: "32px 24px 24px 24px",
-              minWidth: 270,
-              maxWidth: 330,
-              color: "var(--color-text, #fff)",
-              textAlign: "center",
-            }}
-            onClick={e => e.stopPropagation()} // NÃO fecha ao clicar dentro do box
+            onClick={e => e.stopPropagation()}
           >
-            <h3 style={{ fontSize: '1.14rem', marginBottom: 16 }}>Excluir transação parcelada</h3>
-            <p style={{ marginBottom: 18 }}>Você deseja excluir <b>apenas esta parcela</b> ou <b>todo o grupo</b> de parcelas?</p>
+            <h3>Excluir transação parcelada</h3>
+            <p>Você deseja excluir <b>apenas esta parcela</b> ou <b>todo o grupo</b> de parcelas?</p>
             <button
               className="btn btn-danger btn-block"
-              style={{ marginBottom: 10, width: "100%" }}
               onClick={async () => {
                 setShowDeleteModal(false);
                 await deleteTransaction(householdId, transaction.id, isPlanned);
@@ -180,7 +152,6 @@ export default function TransactionItem({
             >Apenas esta parcela</button>
             <button
               className="btn btn-warning btn-block"
-              style={{ marginBottom: 16, width: "100%" }}
               onClick={async () => {
                 setShowDeleteModal(false);
                 await deleteInstallmentGroup(householdId, transaction.transactionGroupId, isPlanned);
@@ -189,7 +160,7 @@ export default function TransactionItem({
             >Todo o grupo de parcelas</button>
             <button
               className="btn btn-ghost btn-block"
-              style={{ width: '100%' }} onClick={() => setShowDeleteModal(false)}>Cancelar</button>
+              onClick={() => setShowDeleteModal(false)}>Cancelar</button>
           </div>
         </div>
       )}

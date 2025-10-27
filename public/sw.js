@@ -1,6 +1,6 @@
 // public/sw.js
 
-const CACHE_VERSION = 'v3.3.0';
+const CACHE_VERSION = 'v3.4.0';
 const CACHE_NAME = `easymoney-${CACHE_VERSION}`;
 
 const ESSENTIAL_FILES = [

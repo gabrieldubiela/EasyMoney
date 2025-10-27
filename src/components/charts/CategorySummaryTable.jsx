@@ -1,9 +1,8 @@
-// src/components/charts/CategorySummaryTable.jsx
-
 import React from "react";
 import PropTypes from "prop-types";
+import formatCurrency from "../../utils/formatCurrency";
+import { getProgressClass, getProgressWidthClass, getRowClass } from "../../utils/progressBarClass";
 import "../../styles/tables.css";
-import "../../styles/progress-bars.css";
 
 /**
  * Tabela analítica de desempenho das categorias no mês atual.
@@ -12,34 +11,15 @@ import "../../styles/progress-bars.css";
 export default function CategorySummaryTable({ categories, summary, typeFilter }) {
   const monthIdx = new Date().getMonth();
 
-  const formatValue = (v) =>
-    v.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    });
+  const formatValue = (v) => formatCurrency(v);
 
   const filteredCategories = typeFilter
     ? categories.filter((cat) => cat.typeId === typeFilter)
     : categories;
 
-  // Adaptação para progress bar padronizada
-  const getProgressClass = (percent) => {
-    if (percent < 80) return "progress-fill-success";
-    if (percent < 100) return "progress-fill-warning";
-    return "progress-fill-danger";
-  };
-
-  // Adaptação para linha de alerta
-  const getRowClass = (percent, idx) =>
-    percent >= 90
-      ? "table-row--critical"
-      : idx % 2 === 1
-        ? "table-row--zebra"
-        : "";
-
   return (
     <div className="table-wrapper category-summary-table">
+      <h3>Orçamento Mensal</h3>
       <table className="table">
         <thead>
           <tr>
@@ -57,6 +37,7 @@ export default function CategorySummaryTable({ categories, summary, typeFilter }
             const percent = data.percent || 0;
             const remaining = (data.planned || 0) - (data.spent || 0);
             const progressClass = getProgressClass(percent);
+            const progressWidthClass = getProgressWidthClass(percent);
             const rowClass = getRowClass(percent, idx);
 
             return (
@@ -68,10 +49,7 @@ export default function CategorySummaryTable({ categories, summary, typeFilter }
                   <div className="progress-bar-container">
                     <span>{percent}%</span>
                     <div className="progress-bar-bg">
-                      <div
-                        className={`progress-bar-fill ${progressClass}`}
-                        style={{ width: `${Math.min(percent, 100)}%` }}
-                    />
+                      <div className={`progress-bar-fill ${progressClass} ${progressWidthClass}`} />
                     </div>
                   </div>
                 </td>

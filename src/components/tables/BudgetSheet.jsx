@@ -1,29 +1,28 @@
-// src/components/tables/BudgetSheet.jsx
-
 import React, { useState, useMemo } from "react";
 import useAnnualData from "../../hooks/useAnnualData";
 import useAllCategories from "../../hooks/useAllCategories";
 import useAllTypes from "../../hooks/useAllTypes";
+import formatCurrency from "../../utils/formatCurrency";
 import "../../styles/tables.css";
 import "../../styles/buttons.css";
 import "../../styles/lists.css";
 
-// Para facilitar: nomes dos meses
+// Nomes dos meses
 const MONTH_NAMES = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
 ];
 
-// Célula editável para cada tipo na categoria
-const EditableBudgetCell = React.memo(({ value, onSave }) => {
-  const [isEditing, setIsEditing] = useState(false);
+// Celula editável
+const EditableBudgetCell = React.memo(({ value, onSave, isEditing }) => {
+  const [isEditingCell, setIsEditingCell] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
   const handleSave = () => {
     if (inputValue !== value) onSave(inputValue);
-    setIsEditing(false);
+    setIsEditingCell(false);
   };
 
-  if (isEditing) {
+  if (isEditing && isEditingCell) {
     return (
       <input
         type="number"
@@ -32,20 +31,20 @@ const EditableBudgetCell = React.memo(({ value, onSave }) => {
         onBlur={handleSave}
         onKeyDown={e => {
           if (e.key === "Enter") handleSave();
-          if (e.key === "Escape") setIsEditing(false);
+          if (e.key === "Escape") setIsEditingCell(false);
         }}
         autoFocus
         className="editable-cell-input"
-    />
+      />
     );
   }
   return (
     <span
       className="editable-cell-display"
-      onClick={() => setIsEditing(true)}
+      onClick={() => isEditing && setIsEditingCell(true)}
       title="Clique para editar"
     >
-      {value?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+      {value !== undefined ? formatCurrency(value) : ""}
     </span>
   );
 });
@@ -53,45 +52,34 @@ const EditableBudgetCell = React.memo(({ value, onSave }) => {
 const BudgetSheet = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
   const { categories, loading: loadingCategories } = useAllCategories();
   const { types, loading: loadingTypes } = useAllTypes();
 
-  const categoryMap = useMemo(
-    () => Object.fromEntries(categories.map((c) => [c.id, c.name])), [categories]
-  );
-  const typeMap = useMemo(
-    () => Object.fromEntries(types.map((t) => [t.id, t.name])), [types]
-  );
-
-  // Monta a tabela: cada categoria, cada tipo (mesmo zerado ao editar)
+  // Monta os dados da tabela
   const sheetData = useMemo(() => {
     if (!annualData.rawAnnualData || categories.length === 0 || types.length === 0) return [];
     return categories.map((cat) => {
       const budgetCat = annualData.rawAnnualData[cat.id] || {};
-      const tiposLançados = Object.entries(budgetCat.types || {})
-        .filter(([, dat]) => dat.valor > 0)
-        .map(([typeId, typeData]) => ({
-          typeId,
-          valor: typeData.valor || 0
-        }));
       const todosTipos = types.map((t) => ({
         typeId: t.id,
         valor: budgetCat.types?.[t.id]?.valor || 0
       }));
+      const tiposLançados = todosTipos.filter(t => t.valor > 0);
       return {
         id: cat.id,
         name: cat.name,
-        typesToShow: editingCategory === cat.id ? todosTipos : tiposLançados,
+        // mostra todos os tipos se editando, senão só os lançados
+        typesToShow: isEditing ? todosTipos : tiposLançados,
         monthlyActuals: budgetCat.monthlyActuals || Array(12).fill(0),
         budgeted: budgetCat.types
           ? Object.values(budgetCat.types).reduce((a, t) => a + (t.valor || 0), 0)
           : 0,
       };
     });
-  }, [annualData.rawAnnualData, categories, types, editingCategory]);
+  }, [annualData.rawAnnualData, categories, types, isEditing]);
 
   const totals = useMemo(() => {
     const initialTotals = { budgeted: 0, actual: 0, monthlyActuals: Array(12).fill(0) };
@@ -120,12 +108,26 @@ const BudgetSheet = () => {
 
   return (
     <div className="table-wrapper budget-sheet">
-      <h2>Planilha de Orçamento Anual - {selectedYear}</h2>
-      <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className="form-select">
-        {Array.from({ length: 5 }, (_, i) => (currentYear - 2) + i).map(y => (
-          <option key={y} value={y.toString()}>{y}</option>
-        ))}
-      </select>
+      <h2>Planilha de Orçamento Anual</h2>
+      <div>
+        {/* Campo do ano à esquerda */}
+        <select
+          value={selectedYear}
+          onChange={e => setSelectedYear(e.target.value)}
+          className="form-select"
+        >
+          {Array.from({ length: 5 }, (_, i) => (currentYear - 2) + i).map(y => (
+            <option key={y} value={y.toString()}>{y}</option>
+          ))}
+        </select>
+        {/* Botão à direita */}
+        <button
+          className="btn"
+          onClick={() => setIsEditing(editing => !editing)}
+        >
+          {isEditing ? "Salvar" : "Editar"}
+        </button>
+      </div>
       <table className="table">
         <thead>
           <tr>
@@ -136,7 +138,6 @@ const BudgetSheet = () => {
             <th>% Realizado</th>
             <th>Ideal/Mês Restante</th>
             <th>Diferença</th>
-            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -153,37 +154,23 @@ const BudgetSheet = () => {
                   const typeObj = row.typesToShow.find((x) => x.typeId === t.id);
                   return (
                     <td key={t.id}>
-                      {typeObj
-                        ? (editingCategory === row.id
-                          ? <EditableBudgetCell
-                            value={typeObj.valor}
-                            onSave={val => handleSaveCell(row.id, t.id, val)}
-                        />
-                          : typeObj.valor > 0
-                            ? typeObj.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-                            : "")
-                        : (editingCategory === row.id ? (
-                          <EditableBudgetCell value={0} onSave={val => handleSaveCell(row.id, t.id, val)}/>
-                        ) : "")
-                      }
+                      <EditableBudgetCell
+                        value={typeObj ? typeObj.valor : 0}
+                        onSave={val => handleSaveCell(row.id, t.id, val)}
+                        isEditing={isEditing}
+                      />
                     </td>
                   );
                 })}
                 {row.monthlyActuals.map((actual, idx) => (
                   <td key={idx}>
-                    {actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    {formatCurrency(actual)}
                   </td>
                 ))}
-                <td>{rowTotalActual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td>{formatCurrency(rowTotalActual)}</td>
                 <td>{Math.round(percentRealizado)}%</td>
-                <td>{idealMesRestante.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                <td>{(row.budgeted - rowTotalActual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                <td>
-                  {editingCategory === row.id
-                    ? <button className="btn" onClick={() => setEditingCategory(null)}>Salvar</button>
-                    : <button className="btn" onClick={() => setEditingCategory(row.id)}>Editar</button>
-                  }
-                </td>
+                <td>{formatCurrency(idealMesRestante)}</td>
+                <td>{formatCurrency(row.budgeted - rowTotalActual)}</td>
               </tr>
             );
           })}
@@ -192,10 +179,10 @@ const BudgetSheet = () => {
             {types.map((t) => <td key={t.id}></td>)}
             {totals.monthlyActuals.map((actual, index) => (
               <td key={index}>
-                {actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                {formatCurrency(actual)}
               </td>
             ))}
-            <td>{totals.actual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+            <td>{formatCurrency(totals.actual)}</td>
             <td>
               {totals.budgeted
                 ? Math.round((totals.actual / totals.budgeted) * 100)
@@ -205,13 +192,14 @@ const BudgetSheet = () => {
             <td>
               {(() => {
                 const mesesRestantes = 12 - (new Date().getMonth() + 1);
-                return mesesRestantes > 0
-                  ? ((totals.budgeted - totals.actual) / mesesRestantes).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-                  : (0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+                return formatCurrency(
+                  mesesRestantes > 0
+                    ? ((totals.budgeted - totals.actual) / mesesRestantes)
+                    : 0
+                );
               })()}
             </td>
-            <td>{(totals.budgeted - totals.actual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-            <td></td>
+            <td>{formatCurrency(totals.budgeted - totals.actual)}</td>
           </tr>
         </tbody>
       </table>

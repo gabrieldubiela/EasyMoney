@@ -1,79 +1,72 @@
-// src/components/charts/AlertList.jsx
-
 import React from "react";
 import PropTypes from "prop-types";
-import "../../styles/alerts.css";
+import "../../styles/tables.css";
+import formatCurrency from "../../utils/formatCurrency";
+import formatDate from "../../utils/formatDate";
 
-/**
- * Painel de alertas recentes/ativos do sistema.
- *
- * @prop {Array} alerts - Array de objetos de alerta: { id, title, message, alertType, createdAt, urgency }
- *
- * alertType: "budgetExceeded" | "plannedTransaction" | "lowBalance" | ...
- * urgency: "critical" | "warning" | "info"
- */
-export default function AlertList({ alerts }) {
-  if (!alerts || alerts.length === 0) {
+export default function RecentExpenses({
+  transactions,
+  categories = [],
+  types = [],
+}) {
+  const categoryMap = React.useMemo(
+    () => Object.fromEntries(categories.map(c => [c.id, c.name ?? c.categoryName ?? c.nome ?? ""])),
+    [categories]
+  );
+  const typeMap = React.useMemo(
+    () => Object.fromEntries(types.map(t => [t.id, t.name ?? t.typeName ?? t.tipo ?? ""])),
+    [types]
+  );
+
+  if (!transactions || transactions.length === 0)
     return (
-      <div className="alert-list">
-        <div className="alert-empty">No active alerts for now 🎉</div>
+      <div className="table-wrapper recent-expenses">
+        <div className="empty-table-row">Sem transações.</div>
       </div>
     );
-  }
-
-  function getUrgency(urgency, type) {
-    if (urgency === "critical" || type === "budgetExceeded") return "critical";
-    if (urgency === "warning" || type === "lowBalance") return "warning";
-    return "info";
-  }
-
-  function getIcon(type, urgency) {
-    if (urgency === "critical" || type === "budgetExceeded") return "🚨";
-    if (urgency === "warning" || type === "lowBalance") return "⚠️";
-    if (type === "plannedTransaction") return "📅";
-    return "ℹ️";
-  }
-
-  function formatDate(date) {
-    let d = date;
-    if (d && typeof d.toDate === "function") d = d.toDate();
-    if (!(d instanceof Date)) d = new Date(d);
-    return d.toLocaleString("pt-BR", {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
 
   return (
-    <div className="alert-list">
-      {alerts.map((alert) => {
-        const urgencyClass = `alert-${getUrgency(alert.urgency, alert.alertType)}`;
-        return (
-          <div key={alert.id} className={`alert-item ${urgencyClass}`}>
-            <span className="alert-icon">{getIcon(alert.alertType, alert.urgency)}</span>
-            <div className="alert-content">
-              <strong>{alert.title || alert.alertType}</strong>
-              <p>{alert.message}</p>
-              {alert.createdAt && <time>{formatDate(alert.createdAt)}</time>}
-            </div>
-          </div>
-        );
-      })}
+    <div className="table-wrapper recent-expenses">
+      <h3>Últimas Transações:</h3>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((tx) => (
+            <tr key={tx.id}>
+              <td>{formatDate(tx.date)}</td>
+              <td>{tx.description}</td>
+              <td>{categoryMap[tx.category_id] || "N/A"}</td>
+              <td>{typeMap[tx.type_id] || "N/A"}</td>
+              <td className="amount-negative">
+                {formatCurrency(tx.amount)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
-AlertList.propTypes = {
-  alerts: PropTypes.arrayOf(
+RecentExpenses.propTypes = {
+  transactions: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      title: PropTypes.string,
-      message: PropTypes.string,
-      alertType: PropTypes.string,
-      createdAt: PropTypes.any,
-      urgency: PropTypes.string,
+      amount: PropTypes.number,
+      description: PropTypes.string,
+      date: PropTypes.any,
+      category_id: PropTypes.string,
+      type_id: PropTypes.string,
     })
   ),
+  categories: PropTypes.array,
+  types: PropTypes.array,
 };

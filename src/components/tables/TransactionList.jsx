@@ -1,9 +1,10 @@
 // src/components/lists/TransactionList.jsx
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { useAppContext } from "../../context/useAppContext";
 import TransactionItem from "../ui/TransactionItem";
 import useAllTransactions from "../../hooks/useAllTransactions";
+import formatCurrency from "../../utils/formatCurrency";
 import "../../styles/cards.css";
 import "../../styles/lists.css";
 
@@ -16,25 +17,24 @@ import "../../styles/lists.css";
  */
 const TransactionList = ({ filters, categories, types }) => {
   const { users } = useAppContext();
-  const mergedFilters = { ...filters, limit: 15 };
   const {
     transactions,
     loading,
     hasMore,
     loadMore,
     totalAmount,
-  } = useAllTransactions(mergedFilters);
+  } = useAllTransactions(filters);
 
   // Mapas para lookup rápido
-  const categoryMap = React.useMemo(
+  const categoryMap = useMemo(
     () => Object.fromEntries((categories || []).map((c) => [c.id, c.name])),
     [categories]
   );
-  const typeMap = React.useMemo(
+  const typeMap = useMemo(
     () => Object.fromEntries((types || []).map((t) => [t.id, t.name])),
     [types]
   );
-  const userMap = React.useMemo(
+  const userMap = useMemo(
     () => Object.fromEntries((users || []).map((u) => [u.uid, u.displayName])),
     [users]
   );
@@ -51,7 +51,7 @@ const TransactionList = ({ filters, categories, types }) => {
           loadMore();
         }
       },
-      { threshold: 0.1 } // Dispara quando 10% do elemento está visível
+      { threshold: 0.1 }
     );
 
     const currentRef = loadMoreRef.current;
@@ -74,20 +74,19 @@ const TransactionList = ({ filters, categories, types }) => {
     <div className="transaction-list-wrapper">
       <div className="card">
         <h3>
-          Total:{" "}
-          {totalAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          Total: {formatCurrency(totalAmount)}
         </h3>
       </div>
 
-      {/* Estado vazio */}
       {transactions.length === 0 && !loading && (
         <div className="empty-state">
           <div className="empty-state-title">Nenhuma transação encontrada</div>
-          <p className="empty-state-description">Tente ajustar os filtros ou adicione uma nova transação.</p>
+          <p className="empty-state-description">
+            Tente ajustar os filtros ou adicione uma nova transação.
+          </p>
         </div>
       )}
 
-      {/* Lista */}
       <div className="transaction-list">
         {transactions.map((transaction) => (
           <TransactionItem
@@ -100,15 +99,12 @@ const TransactionList = ({ filters, categories, types }) => {
         ))}
       </div>
 
-      {/* ✅ Elemento sentinela para IntersectionObserver */}
       {hasMore && (
-        <div 
-          ref={loadMoreRef} 
-          style={{ height: '20px', margin: '20px 0' }}
+        <div
+          ref={loadMoreRef}
         />
       )}
 
-      {/* Scroll feedback */}
       {loading && transactions.length > 0 && (
         <div className="loading">Carregando mais...</div>
       )}
