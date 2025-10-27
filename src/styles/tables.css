@@ -230,6 +230,7 @@
    ================================= */
 
 @media (pointer: coarse) {
+
     .table th,
     .table td {
         min-height: 44px;

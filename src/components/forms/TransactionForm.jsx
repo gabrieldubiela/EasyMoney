@@ -3,17 +3,9 @@ import { useAppContext } from '../../context/useAppContext';
 import { createTransaction, updateTransaction } from '../../services/transactionService';
 import useAllCategories from '../../hooks/useAllCategories';
 import useAllTypes from '../../hooks/useAllTypes';
-import formatCurrency from "../../utils/formatCurrency";
+import formatCurrencyInput from "../../utils/formatCurrencyInput";
 import "../../styles/forms.css";
 import "../../styles/buttons.css";
-
-function formatCurrencyInput(value) {
-  // Remove tudo que não for dígito
-  const cleaned = String(value).replace(/\D/g, "");
-  if (!cleaned) return formatCurrency(0);
-  // Divide por 100 e formata "visualmente" como dinheiro
-  return formatCurrency(Number(cleaned) / 100);
-}
 
 const TransactionForm = ({
   transactionId,
@@ -211,6 +203,8 @@ const TransactionForm = ({
         <input
           id="tx-amount"
           type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           placeholder="Valor"
           value={amountInput}
           onChange={e => {
@@ -223,10 +217,9 @@ const TransactionForm = ({
             }
           }}
           required
-          min="0.01"
-          step="0.01"
         />
       </div>
+
 
       <div className="form-group">
         <label htmlFor="tx-date" className="form-label required">

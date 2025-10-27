@@ -1,8 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppContext } from '../context/useAppContext';
-import { fetchAllBudgets } from '../services/budgetService';
+import { fetchAllBudgets, updateBudgetCategoryTypeValue } from '../services/budgetService';
 import { fetchAllTransactions } from '../services/transactionService';
 
+/**
+ * Hook customizado para carregar e editar orçamento anual detalhado.
+ * @param {string|number} selectedYear
+ * @returns {object}
+ */
 export default function useAnnualData(selectedYear) {
   const { householdId } = useAppContext();
   const [annualData, setAnnualData] = useState({
@@ -12,6 +17,9 @@ export default function useAnnualData(selectedYear) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Chave para forçar reload pós update
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!householdId || !selectedYear) return;
@@ -23,22 +31,24 @@ export default function useAnnualData(selectedYear) {
           fetchAllBudgets(householdId, selectedYear),
           fetchAllTransactions(householdId, {
             startDate: new Date(`${selectedYear}-01-01`),
-            endDate: new Date(`${selectedYear}-12-31`),
+            endDate: new Date(`${selectedYear}-12-31`)
           }),
         ]);
 
         const dataMap = {};
         budgets.forEach((cat) => {
           dataMap[cat.id] = {
+            ...cat,
             budgeted: cat.totalBudget || 0,
             monthlyActuals: Array(12).fill(0),
+            types: cat.types || {},
           };
         });
 
         transactions.forEach((t) => {
           const monthIndex = parseInt(t.yearMonth.substring(4, 6), 10) - 1;
           if (!dataMap[t.category_id])
-            dataMap[t.category_id] = { budgeted: 0, monthlyActuals: Array(12).fill(0) };
+            dataMap[t.category_id] = { budgeted: 0, monthlyActuals: Array(12).fill(0), types: {} };
           dataMap[t.category_id].monthlyActuals[monthIndex] += t.amount;
         });
 
@@ -79,8 +89,7 @@ export default function useAnnualData(selectedYear) {
           performanceByCategories: performance,
           rawAnnualData: dataMap,
         });
-      } catch (err) {
-        console.error('Erro ao carregar dados anuais:', err);
+      } catch {
         setError('Falha ao buscar dados anuais.');
       } finally {
         setLoading(false);
@@ -88,14 +97,26 @@ export default function useAnnualData(selectedYear) {
     };
 
     fetchData();
-  }, [householdId, selectedYear]);
+  }, [householdId, selectedYear, refreshKey]);
 
-  // ✅ Estabiliza com JSON.stringify (melhor para objetos complexos)
-  const stableAnnualData = useMemo(
-    () => annualData,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(annualData)]
-  );
+  /**
+   * Atualiza o valor orçado no banco. NÃO mais recarrega os dados aqui.
+   * @param {string} categoryId
+   * @param {string} typeId
+   * @param {number} value
+   */
+  const updateAnnualGoal = async (categoryId, typeId, value) => {
+    if (!householdId || !selectedYear) return;
+    await updateBudgetCategoryTypeValue(householdId, selectedYear, categoryId, typeId, value);
+    // Não chama setRefreshKey aqui!
+  };
 
-  return { annualData: stableAnnualData, loading, error };
+  /**
+   * Força reload dos dados vindos do banco de dados
+   */
+  const refreshAnnualData = () => setRefreshKey(k => k + 1);
+
+  const stableAnnualData = useMemo(() => annualData, [annualData]);
+
+  return { annualData: stableAnnualData, loading, error, updateAnnualGoal, refreshAnnualData };
 }

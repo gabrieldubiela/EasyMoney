@@ -1,5 +1,3 @@
-// src/services/budgetService.js
-
 import {
   collection,
   getDocs,
@@ -59,6 +57,7 @@ export const fetchBudgetCategoryById = async (householdId, year, categoryId) => 
 
 /**
  * Atualiza o valor de um tipo na categoria do orçamento.
+ * Cria o campo types caso não exista para garantir insert/update correto.
  * @param {string} householdId - O ID da família.
  * @param {string|number} year - O ano do orçamento.
  * @param {string} categoryId - O ID da categoria.
@@ -69,14 +68,16 @@ export const fetchBudgetCategoryById = async (householdId, year, categoryId) => 
 export const updateBudgetCategoryTypeValue = async (householdId, year, categoryId, typeId, newValue) => {
   const budgetRef = doc(db, `households/${householdId}/budgets/${year}/categories`, categoryId);
   const budgetSnap = await getDoc(budgetRef);
+
+  let budgetData = {};
   if (budgetSnap.exists()) {
-    const budgetData = budgetSnap.data();
-    const updatedTypes = budgetData.types || {};
-    updatedTypes[typeId] = { valor: newValue };
-    await updateDoc(budgetRef, { types: updatedTypes });
-  } else {
-    throw new Error("Categoria de orçamento não encontrada para atualização.");
+    budgetData = budgetSnap.data();
   }
+  if (!budgetData.types) budgetData.types = {};
+  budgetData.types[typeId] = { valor: newValue };
+
+  // Usa setDoc com merge para criar ou atualizar corretamente mantendo outros valores
+  await setDoc(budgetRef, { types: budgetData.types }, { merge: true });
 };
 
 /**

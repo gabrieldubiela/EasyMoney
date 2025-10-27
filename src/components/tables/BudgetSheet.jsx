@@ -2,32 +2,50 @@ import React, { useState, useMemo } from "react";
 import useAnnualData from "../../hooks/useAnnualData";
 import useAllCategories from "../../hooks/useAllCategories";
 import useAllTypes from "../../hooks/useAllTypes";
-import formatCurrency from "../../utils/formatCurrency";
+import formatCurrencyInput from "../../utils/formatCurrencyInput";
 import "../../styles/tables.css";
 import "../../styles/buttons.css";
 import "../../styles/lists.css";
 
-// Nomes dos meses
 const MONTH_NAMES = [
-  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-// Celula editável
+/**
+ * Célula editável de orçamento por tipo
+ */
 const EditableBudgetCell = React.memo(({ value, onSave, isEditing }) => {
   const [isEditingCell, setIsEditingCell] = useState(false);
-  const [inputValue, setInputValue] = useState(value);
+  const [inputValue, setInputValue] = useState(() => {
+    const strNum = (Math.round((value ?? 0) * 100)).toString();
+    return formatCurrencyInput(strNum).masked;
+  });
+
+  // Mantém inputValue em sincronia com value da prop
+  React.useEffect(() => {
+    const strNum = (Math.round((value ?? 0) * 100)).toString();
+    setInputValue(formatCurrencyInput(strNum).masked);
+  }, [value]);
+
+  const handleInputChange = (e) => {
+    const { masked } = formatCurrencyInput(e.target.value);
+    setInputValue(masked);
+  };
 
   const handleSave = () => {
-    if (inputValue !== value) onSave(inputValue);
+    const { float } = formatCurrencyInput(inputValue);
+    if (float !== value) onSave(float);
     setIsEditingCell(false);
   };
 
   if (isEditing && isEditingCell) {
     return (
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
         value={inputValue}
-        onChange={(e) => setInputValue(Number(e.target.value))}
+        onChange={handleInputChange}
         onBlur={handleSave}
         onKeyDown={e => {
           if (e.key === "Enter") handleSave();
@@ -38,79 +56,138 @@ const EditableBudgetCell = React.memo(({ value, onSave, isEditing }) => {
       />
     );
   }
+  // Visualização somente leitura com máscara
   return (
     <span
-      className="editable-cell-display"
-      onClick={() => isEditing && setIsEditingCell(true)}
-      title="Clique para editar"
+      className={isEditing ? "editable-cell-input" : ""}
+      onClick={isEditing ? () => setIsEditingCell(true) : undefined}
+      title={isEditing ? "Clique para editar" : undefined}
     >
-      {value !== undefined ? formatCurrency(value) : ""}
+      {formatCurrencyInput(Math.round((value ?? 0) * 100).toString()).masked}
     </span>
   );
+
 });
 
+/**
+ * Planilha anual com exibição dos tipos como linhas dentro das categorias
+ */
 const BudgetSheet = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const [isEditing, setIsEditing] = useState(false);
 
-  const { annualData, loading: annualDataLoading, error, updateAnnualGoal } = useAnnualData(selectedYear);
+  // Estado local para update otimista durante edição
+  const [editingTableData, setEditingTableData] = useState(null);
+
+  // Busca dados necessários
+  const { annualData, loading: annualDataLoading, error, updateAnnualGoal, refreshAnnualData } = useAnnualData(selectedYear);
   const { categories, loading: loadingCategories } = useAllCategories();
   const { types, loading: loadingTypes } = useAllTypes();
 
-  // Monta os dados da tabela
-  const sheetData = useMemo(() => {
+  /**
+   * Monta a estrutura da tabela original (dados do backend)
+   */
+  const tableData = useMemo(() => {
     if (!annualData.rawAnnualData || categories.length === 0 || types.length === 0) return [];
-    return categories.map((cat) => {
-      const budgetCat = annualData.rawAnnualData[cat.id] || {};
-      const todosTipos = types.map((t) => ({
-        typeId: t.id,
-        valor: budgetCat.types?.[t.id]?.valor || 0
-      }));
-      const tiposLançados = todosTipos.filter(t => t.valor > 0);
+    return categories.map(cat => {
+      const dataForCat = annualData.rawAnnualData[cat.id] || { types: {} };
+      // Para cada tipo, monta a linha
+      const typesList = types.map(type => {
+        return {
+          typeId: type.id,
+          typeName: type.name,
+          value: dataForCat.types?.[type.id]?.valor || 0
+        };
+      });
       return {
         id: cat.id,
         name: cat.name,
-        // mostra todos os tipos se editando, senão só os lançados
-        typesToShow: isEditing ? todosTipos : tiposLançados,
-        monthlyActuals: budgetCat.monthlyActuals || Array(12).fill(0),
-        budgeted: budgetCat.types
-          ? Object.values(budgetCat.types).reduce((a, t) => a + (t.valor || 0), 0)
-          : 0,
+        typesRows: isEditing ? typesList : typesList.filter(t => t.value > 0),
+        monthlyActuals: dataForCat.monthlyActuals || Array(12).fill(0)
       };
     });
   }, [annualData.rawAnnualData, categories, types, isEditing]);
 
+  // Controla qual dados usar para renderizar (durante edição usa local, fora usa backend)
+  React.useEffect(() => {
+    if (!isEditing) {
+      setEditingTableData(null); // Saiu do modo edição: limpa shadow
+    } else {
+      setEditingTableData(tableData); // Entrou: popula shadow
+    }
+  }, [isEditing, tableData]);
+
+  // Dados para renderizar: local durante edição, global fora da edição
+  const renderTableData = isEditing ? (editingTableData || tableData) : tableData;
+
+  // Calcula totais globais da tabela
   const totals = useMemo(() => {
-    const initialTotals = { budgeted: 0, actual: 0, monthlyActuals: Array(12).fill(0) };
-    return sheetData.reduce((acc, row) => {
-      acc.budgeted += row.budgeted;
-      const totalActualForRow = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
-      acc.actual += totalActualForRow;
-      row.monthlyActuals.forEach((actual, index) => {
-        acc.monthlyActuals[index] += actual;
+    let totalBudgeted = 0;
+    let totalActual = 0;
+    let totalsMonthlyActuals = Array(12).fill(0);
+
+    renderTableData.forEach(cat => {
+      cat.typesRows.forEach(type => { totalBudgeted += type.value; });
+      const real = cat.monthlyActuals.reduce((sum, v) => sum + v, 0);
+      totalActual += real;
+      cat.monthlyActuals.forEach((v, idx) => {
+        totalsMonthlyActuals[idx] += v;
       });
-      return acc;
-    }, initialTotals);
-  }, [sheetData]);
+    });
+
+    return {
+      totalBudgeted,
+      totalActual,
+      totalsMonthlyActuals
+    };
+  }, [renderTableData]);
 
   const isLoading = annualDataLoading || loadingCategories || loadingTypes;
 
-  if (isLoading) return <div>Carregando Planilha Anual de Orçamento para {selectedYear}...</div>;
-  if (error) return <div className="error-table-row">Erro ao carregar dados: {error}</div>;
-  if (sheetData.length === 0) {
-    return <div className="empty-table-row">Não há dados de orçamento ou transações para o ano de {selectedYear}.</div>;
+  if (isLoading)
+    return <div>Loading Annual Budget Sheet for {selectedYear}...</div>;
+  if (error)
+    return <div className="error-table-row">Error loading data: {error}</div>;
+  if (renderTableData.length === 0) {
+    return <div className="empty-table-row">No budget or transaction data for year {selectedYear}.</div>;
   }
 
-  const handleSaveCell = (categoryId, typeId, newValue) => {
-    updateAnnualGoal(categoryId, typeId, newValue);
+  // Handler de salvar célula com update otimista
+  const handleSaveCell = async (categoryId, typeId, newValue) => {
+    // Salva no banco primeiro
+    await updateAnnualGoal(categoryId, typeId, newValue);
+
+    // Update otimista: atualiza estado local para mostrar valor imediatamente
+    setEditingTableData(prevData => {
+      if (!prevData) return prevData;
+      return prevData.map(cat => {
+        if (cat.id !== categoryId) return cat;
+        return {
+          ...cat,
+          typesRows: cat.typesRows.map(type =>
+            type.typeId === typeId ? { ...type, value: newValue } : type
+          )
+        };
+      });
+    });
+  };
+
+  // Handler do botão Edit/Save
+  const handleEditToggle = () => {
+    const wasEditing = isEditing;
+    setIsEditing(!isEditing);
+
+    // Se estava editando e agora vai sair do modo edição, força refresh dos dados do backend
+    if (wasEditing) {
+      refreshAnnualData();
+    }
   };
 
   return (
     <div className="table-wrapper budget-sheet">
-      <h2>Planilha de Orçamento Anual</h2>
-      <div>
-        {/* Campo do ano à esquerda */}
+      <h2>Annual Budget Sheet</h2>
+      <div className="app-header">
         <select
           value={selectedYear}
           onChange={e => setSelectedYear(e.target.value)}
@@ -120,86 +197,97 @@ const BudgetSheet = () => {
             <option key={y} value={y.toString()}>{y}</option>
           ))}
         </select>
-        {/* Botão à direita */}
         <button
           className="btn"
-          onClick={() => setIsEditing(editing => !editing)}
+          onClick={handleEditToggle}
         >
-          {isEditing ? "Salvar" : "Editar"}
+          {isEditing ? "Save" : "Edit"}
         </button>
       </div>
       <table className="table">
         <thead>
           <tr>
-            <th>Categoria</th>
-            {types.map((t) => <th key={t.id}>{t.name}</th>)}
+            <th>Category</th>
+            <th>Type</th>
+            <th>Budgeted</th>
             {MONTH_NAMES.map((month) => <th key={month}>{month}</th>)}
-            <th>Total Realizado</th>
-            <th>% Realizado</th>
-            <th>Ideal/Mês Restante</th>
-            <th>Diferença</th>
+            <th>Total Actual</th>
+            <th>% Realized</th>
+            <th>Goal/Month</th>
           </tr>
         </thead>
         <tbody>
-          {sheetData.map((row) => {
-            const rowTotalActual = row.monthlyActuals.reduce((sum, val) => sum + val, 0);
-            const mesesRestantes = 12 - (new Date().getMonth() + 1);
-            const idealMesRestante =
-              mesesRestantes > 0 ? (row.budgeted - rowTotalActual) / mesesRestantes : 0;
-            const percentRealizado = row.budgeted ? (rowTotalActual / row.budgeted) * 100 : 0;
-            return (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                {types.map((t) => {
-                  const typeObj = row.typesToShow.find((x) => x.typeId === t.id);
-                  return (
-                    <td key={t.id}>
+          {renderTableData.map(category => {
+            const rowSpan = category.typesRows.length || 1;
+            const totalActualForCat = category.monthlyActuals.reduce((sum, val) => sum + val, 0);
+
+            return category.typesRows.length === 0 ? (
+              <tr key={category.id}>
+                <td>{category.name}</td>
+                <td colSpan={MONTH_NAMES.length + 5}>Não foi definido orçamento</td>
+              </tr>
+            ) : (
+              category.typesRows.map((type, idx) => {
+                const percentRealized = type.value ? (totalActualForCat / type.value) * 100 : 0;
+                const monthsLeft = 12 - (new Date().getMonth() + 1);
+                const goalPerMonth = monthsLeft > 0 ? (type.value - totalActualForCat) / monthsLeft : 0;
+
+                return (
+                  <tr key={category.id + "-" + type.typeId}>
+                    {idx === 0 && (
+                      <td rowSpan={rowSpan}>{category.name}</td>
+                    )}
+                    <td>{type.typeName}</td>
+                    <td>
                       <EditableBudgetCell
-                        value={typeObj ? typeObj.valor : 0}
-                        onSave={val => handleSaveCell(row.id, t.id, val)}
+                        value={type.value}
+                        onSave={val => handleSaveCell(category.id, type.typeId, val)}
                         isEditing={isEditing}
                       />
                     </td>
-                  );
-                })}
-                {row.monthlyActuals.map((actual, idx) => (
-                  <td key={idx}>
-                    {formatCurrency(actual)}
-                  </td>
-                ))}
-                <td>{formatCurrency(rowTotalActual)}</td>
-                <td>{Math.round(percentRealizado)}%</td>
-                <td>{formatCurrency(idealMesRestante)}</td>
-                <td>{formatCurrency(row.budgeted - rowTotalActual)}</td>
-              </tr>
-            );
+                    {category.monthlyActuals.map((actual, idxMonth) => (
+                      <td key={idxMonth}>
+                        {formatCurrencyInput(Math.round((actual ?? 0) * 100).toString()).masked}
+                      </td>
+                    ))}
+                    <td>{formatCurrencyInput(Math.round((totalActualForCat ?? 0) * 100).toString()).masked}</td>
+                    <td>{Math.round(percentRealized)}%</td>
+                    <td>
+                      {formatCurrencyInput(Math.round((goalPerMonth ?? 0) * 100).toString()).masked}
+                    </td>
+                  </tr>
+                );
+              })
+            )
           })}
           <tr className="table-row--totals">
             <td>TOTAL</td>
-            {types.map((t) => <td key={t.id}></td>)}
-            {totals.monthlyActuals.map((actual, index) => (
-              <td key={index}>
-                {formatCurrency(actual)}
+            <td></td>
+            <td>
+              {formatCurrencyInput(Math.round((totals.totalBudgeted ?? 0) * 100).toString()).masked}
+            </td>
+            {totals.totalsMonthlyActuals.map((actual, idx) => (
+              <td key={idx}>
+                {formatCurrencyInput(Math.round((actual ?? 0) * 100).toString()).masked}
               </td>
             ))}
-            <td>{formatCurrency(totals.actual)}</td>
+            <td>{formatCurrencyInput(Math.round((totals.totalActual ?? 0) * 100).toString()).masked}</td>
             <td>
-              {totals.budgeted
-                ? Math.round((totals.actual / totals.budgeted) * 100)
+              {totals.totalBudgeted
+                ? Math.round((totals.totalActual / totals.totalBudgeted) * 100)
                 : 0
               }%
             </td>
             <td>
               {(() => {
-                const mesesRestantes = 12 - (new Date().getMonth() + 1);
-                return formatCurrency(
-                  mesesRestantes > 0
-                    ? ((totals.budgeted - totals.actual) / mesesRestantes)
-                    : 0
-                );
+                const monthsLeft = 12 - (new Date().getMonth() + 1);
+                return formatCurrencyInput(Math.round(
+                  (monthsLeft > 0
+                    ? ((totals.totalBudgeted - totals.totalActual) / monthsLeft)
+                    : 0) * 100
+                ).toString()).masked;
               })()}
             </td>
-            <td>{formatCurrency(totals.budgeted - totals.actual)}</td>
           </tr>
         </tbody>
       </table>

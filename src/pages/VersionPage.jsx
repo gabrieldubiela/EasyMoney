@@ -15,7 +15,9 @@ const changelog = [
         highlights: [
             "- Página inicial em funcionamento",
             "- Aumento da largura de tabelas em computadores",
-            "- Padronização de datas e valores"
+            "- Padronização de datas e valores",
+            "- Input de valores abre teclado numerico em celular",
+            "- Possibilidade de edição de valor orçado anual"
         ]
     },
 ];

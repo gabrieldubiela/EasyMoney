@@ -9,7 +9,7 @@ import MonthlySummary from '../components/charts/MonthlySummary';
 import TransactionForm from '../components/forms/TransactionForm';
 import TransactionItem from '../components/ui/TransactionItem';
 import ToastMessage from '../components/ui/ToastMessage';
-import formatMonth from "../../utils/formatMonth";
+import formatMonth from "../utils/formatMonth";
 
 export default function BalancePage() {
   const today = new Date();
