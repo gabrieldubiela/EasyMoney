@@ -4,10 +4,18 @@
   EasyMoney - Estilos Globais Modernos (Responsivo)
   ================================ */
 
+/* src/index.css */
+
+/* ================================
+   EasyMoney - Estilos Globais Modernos (Responsivo)
+   ================================ */
+
 /* Importando fontes */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700&display=swap');
 
-/* Paleta principal e variáveis */
+/* ================================
+   Paleta principal, variáveis e TIPOGRAFIA responsiva
+   ================================ */
 :root {
   /* Principais */
   --color-primary: #1bdd93;
@@ -65,27 +73,23 @@
   --transition-base: 210ms cubic-bezier(.4, 0, .2, 1);
   --transition-slow: 340ms cubic-bezier(.4, 0, .2, 1);
 
-  /* Fontes */
+  /* FONTES */
   --font-family-base: 'Inter', system-ui, sans-serif;
   --font-family-title: 'Poppins', 'Inter', system-ui, sans-serif;
-
-  /* Pesos */
   --font-weight-normal: 400;
   --font-weight-medium: 600;
   --font-weight-bold: 700;
-
-  /* Altura de linha */
   --line-height-base: 1.5;
   --line-height-title: 1.2;
 
-  /* Tamanhos de fonte auxiliares para interface */
-  --font-size-xs: 0.75rem;   /* 12px */
-  --font-size-sm: 0.875rem;  /* 14px */
-  --font-size-md: 1.125rem;  /* 18px */
-  --font-size-lg: 1.25rem;   /* 20px */
-  --font-size-xl: 1.5rem;    /* 24px */
+  /* Tamanhos auxiliares de fonte para UI */
+  --font-size-xs: 0.75rem;    /* 12px - labels, hints, etc. */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-md: 1.125rem;   /* 18px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
 
-  /* Base + títulos responsivos */
+  /* Tamanhos para títulos (responsivo) */
   --font-size-base: 1rem;
   --font-size-h1: clamp(2rem, 4vw, 2.25rem);
   --font-size-h2: clamp(1.5rem, 3vw, 1.875rem);
@@ -95,14 +99,14 @@
   --font-size-h6: 1rem;
 }
 
-/* Modo escuro automático */
+/* ================================
+   Dark mode
+   ================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Principais */
     --color-primary: #1bdd93;
     --color-primary-dark: #179e6a;
     --color-primary-light: #34ffc5;
-    /* Feedback */
     --color-success: #22C55E;
     --color-success-bg: #052e16;
     --color-warning: #F59E0B;
@@ -112,24 +116,20 @@
     --color-info: #3B82F6;
     --color-info-bg: #1e40af;
 
-    /* Alternância e foco */
     --color-focus: #1bdd93;
     --color-bg: #101c23;
     --color-surface: #18242a;
     --color-surface-alt: #20303a;
 
-    /* Borders, text e desabilitado */
     --color-border: #223338;
     --color-text: #e7f8f1;
     --color-text-muted: #94A3B8;
     --color-disabled: #28333a;
     --color-disabled-text: #586268;
 
-    /* Transparências */
     --color-black-transparent: rgba(0, 0, 0, 0.08);
     --color-white-transparent: rgba(255, 255, 255, 0.08);
 
-    /* Sombras adaptadas para dark */
     --shadow-sm: 0 1px 3px rgba(49, 221, 147, 0.15);
     --shadow-md: 0 4px 8px rgba(49, 221, 147, 0.19);
     --shadow-lg: 0 12px 26px rgba(27, 221, 147, 0.25);
@@ -137,17 +137,19 @@
   }
 }
 
-/* Reset básico */
+/* ================================
+   RESET, TIPOGRAFIA GLOBAL
+   ================================ */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   height: 100%;
   font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   line-height: var(--line-height-base);
   color: var(--color-text);
@@ -155,7 +157,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Previne scroll horizontal */
 }
 
 #root {
@@ -166,14 +167,39 @@ body {
   max-width: 100vw;
 }
 
+/* Elementos globais de texto */
+p,
+span,
+label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+}
+
+small, .small {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+strong, b {
+  font-weight: var(--font-weight-bold);
+}
+
+em, i {
+  font-style: italic;
+}
+
 /* Links */
 a {
+  font-family: var(--font-family-base);
   color: var(--color-primary);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
   transition: color var(--transition-fast);
   word-break: break-word;
-  /* Previne overflow em links longos */
 }
 
 a:hover {
@@ -187,60 +213,112 @@ a:focus {
   border-radius: var(--radius-sm);
 }
 
-/* Cabeçalhos - Responsivos */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Cabeçalhos e classes utilitárias de título */
+h1, .h1 {
   font-family: var(--font-family-title);
+  font-size: var(--font-size-h1);
   font-weight: var(--font-weight-bold);
   color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
   margin-bottom: var(--spacing-md);
-  line-height: 1.2;
   text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 10px; padding-bottom: 10px;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+h2, .h2 {
+  font-family: var(--font-family-title);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  padding-top: 10px; padding-bottom: 10px;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+h3, .h3 {
+  font-family: var(--font-family-title);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  padding-top: 10px; padding-bottom: 10px;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+h4, .h4 {
+  font-family: var(--font-family-title);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  padding-top: 10px; padding-bottom: 10px;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+h5, .h5 {
+  font-family: var(--font-family-title);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  padding-top: 10px; padding-bottom: 10px;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+h6, .h6 {
+  font-family: var(--font-family-title);
+  font-size: var(--font-size-h6);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  padding-top: 10px; padding-bottom: 10px;
   word-wrap: break-word;
   hyphens: auto;
 }
 
-h1 {
-  font-size: var(--font-size-h1);
+/* Labels */
+label, .label {
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-xs);
+  display: block;
 }
 
-h2 {
-  font-size: var(--font-size-h2);
+/* Botões, inputs, selects, textarea: herdam fontes e tamanhos base */
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
 }
 
-h3 {
-  font-size: var(--font-size-h3);
-}
-
-h4 {
-  font-size: var(--font-size-h4);
-}
-
-h5 {
-  font-size: var(--font-size-h5);
-}
-
-h6 {
-  font-size: var(--font-size-h6);
-}
-
-.muted {
-  color: var(--color-text-muted);
-}
-
-/* Reseta botões para herdar só tokens base */
 button {
-  font-family: inherit;
-  font-weight: inherit;
-  font-size: inherit;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Muted text helper */
+.muted { color: var(--color-text-muted); }
+
+/* Reseta botões visuais */
+button {
   background: none;
-  color: inherit;
   border: none;
   padding: 0;
   outline: none;
@@ -248,9 +326,7 @@ button {
   cursor: pointer;
   transition: var(--transition-base);
   -webkit-tap-highlight-color: transparent;
-  /* Remove highlight azul no mobile */
   touch-action: manipulation;
-  /* Melhora performance de toque */
 }
 
 /* Cartões - Responsivos */
