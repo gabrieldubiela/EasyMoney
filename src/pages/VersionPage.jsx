@@ -21,6 +21,7 @@ const changelog = [
             "- Padronização de todas as cores do programa de acordo com a palheta",
             "- Os tipos são linhas dentro das categorias",
             "- Exclusão de icones do sidebar",
+            "- Padronização do tamanho das fontes",
         ]
     },
 ];
