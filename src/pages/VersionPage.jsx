@@ -5,12 +5,12 @@ import "../styles/cards.css";
 import "../styles/alerts.css";
 import "../styles/buttons.css";
 
-const APP_VERSION = "3.4.0";
+const APP_VERSION = "3.5.0";
 const APP_DATE = "25/10/2025";
 
 const changelog = [
     {
-        version: "3.4.0",
+        version: "3.5.0",
         date: "25/10/2025",
         highlights: [
             "- Página inicial em funcionamento",
@@ -22,6 +22,7 @@ const changelog = [
             "- Os tipos são linhas dentro das categorias",
             "- Exclusão de icones do sidebar",
             "- Padronização do tamanho das fontes",
+            "- Permitido a criação de novas famílias"
         ]
     },
 ];

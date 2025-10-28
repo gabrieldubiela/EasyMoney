@@ -1,15 +1,18 @@
-// src/pages/HouseholdsPage.jsx
-
 import React, { useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import HouseholdUpdateForm from '../components/forms/HouseholdUpdateForm';
+import HouseholdCreateForm from '../components/forms/HouseholdCreateForm';
 import InviteCodeDisplay from '../components/ui/InviteCodeDisplay';
 import HouseholdUsersList from '../components/tables/HouseholdUsersList';
 import ToastMessage from '../components/ui/ToastMessage';
+import useAllHouseholds from '../hooks/useAllHouseholds';
 
 export default function HouseholdsPage() {
-  const { user, householdId, allHouseholds, changeHousehold, isHouseholdAdmin } = useAppContext();
+  const { user, householdId, changeHousehold, isHouseholdAdmin } = useAppContext();
   const [toast, setToast] = useState(null);
+
+  // Busca SÓ as famílias em que o usuário é membro
+  const { households: allHouseholds, loading, error } = useAllHouseholds({ userId: user?.uid });
 
   // Troca de família ativa
   const handleSelect = (newId) => {
@@ -26,25 +29,37 @@ export default function HouseholdsPage() {
     <div className="container">
       <div className="page-header"><h1 className="page-title">Configurações da Família</h1></div>
 
+      {/* Criar nova família */}
+      <section className="section">
+        <h2 className="section-title">Criar nova família</h2>
+        <div className="card">
+          <HouseholdCreateForm
+            showToast={setToast}
+            onCreated={() => setToast({type:"success", message:"Família criada! Para ver a nova família na lista, recarregue a página."})}
+          />
+        </div>
+      </section>
+
       <section className="section">
         <h2 className="section-title">Família ativa: {householdId}</h2>
-
         {/* Trocar família */}
         <div>
           <label>Trocar família: </label>
-          <select
-            value={householdId}
-            onChange={e => handleSelect(e.target.value)}
-          >
-            {allHouseholds && allHouseholds.length > 0 ? allHouseholds.map(h => (
-              <option key={h.id} value={h.id}>
-                {h.familyName || h.id}
-                {h.id === householdId ? " (atual)" : ""}
-              </option>
-            )) : (
-              <option value="">Nenhuma família encontrada</option>
-            )}
-          </select>
+          {loading ? (
+            <span>Carregando famílias...</span>
+          ) : error ? (
+            <p className="form-error">Erro ao carregar famílias</p>
+          ) : (
+            <select value={householdId} onChange={e => handleSelect(e.target.value)}>
+              {allHouseholds && allHouseholds.length > 0 ? allHouseholds.map(h => (
+                <option key={h.id} value={h.id}>
+                  {(h.familyName || h.id) + (h.id === householdId ? " (atual)" : "")}
+                </option>
+              )) : (
+                <option value="">Nenhuma família encontrada</option>
+              )}
+            </select>
+          )}
         </div>
 
         {/* Nome/edit da família */}

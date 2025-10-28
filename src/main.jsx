@@ -8,7 +8,7 @@ import formatDate from './utils/formatDate'
 // ========================================
 // CONFIGURAÇÃO (ajuste conforme necessário)
 // ========================================
-const APP_VERSION = '3.4.0'
+const APP_VERSION = '3.5.0'
 const IS_DEVELOPMENT = window.location.hostname === 'localhost'
 
 // ========================================

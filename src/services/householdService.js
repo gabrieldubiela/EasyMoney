@@ -3,7 +3,7 @@
 import {
   doc,
   getDoc,
-  setDoc,
+  addDoc,
   updateDoc,
   deleteDoc,
   collection,
@@ -64,17 +64,14 @@ export const fetchHouseholdById = async (householdId) => {
  * @param {string} UserId - UID do usuário criador/admin.
  * @returns {Promise<void>}
  */
-export const createHousehold = async (
-  householdId,
-  familyName,
-  UserId
-) => {
-  await setDoc(doc(db, "households", householdId), {
-    familyName: familyName,
+export const createHousehold = async (familyName, userId) => {
+  const res = await addDoc(collection(db, "households"), {
+    familyName,
     members: {
-      [UserId]: true, // O criador é admin
+      [userId]: true, // O criador é admin
     },
   });
+  return res.id;
 };
 
 /**
