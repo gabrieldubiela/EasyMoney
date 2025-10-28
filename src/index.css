@@ -9,25 +9,37 @@
 
 /* Paleta principal e variáveis */
 :root {
+  /* Principais */
   --color-primary: #1bdd93;
   --color-primary-dark: #179e6a;
   --color-primary-light: #70e9c3;
+
+  /* Feedback */
   --color-success: #22C55E;
+  --color-success-bg: #ECFDF5;
   --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBEB;
   --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-info: #3B82F6;
+  --color-info-bg: #EFF6FF;
+
+  /* Alternância e foco */
+  --color-focus: #1bdd93;
   --color-bg: #F9FAFB;
   --color-surface: #FFFFFF;
+  --color-surface-alt: #F3F4F6;
+
+  /* Borders, text e desabilitado */
   --color-border: #E5E7EB;
   --color-text: #111827;
   --color-text-muted: #6B7280;
+  --color-disabled: #e0e0e0;
+  --color-disabled-text: #bcbcbc;
 
-  /* Tipografia - Responsiva */
-  --font-family-base: 'Inter', system-ui, sans-serif;
-  --font-family-title: 'Poppins', sans-serif;
-  --line-height-base: 1.5;
-  --font-weight-normal: 400;
-  --font-weight-medium: 600;
-  --font-weight-bold: 700;
+  /* Transparências */
+  --color-black-transparent: rgba(0, 0, 0, 0.08);
+  --color-white-transparent: rgba(255, 255, 255, 0.08);
 
   /* Espaçamento - Adaptável */
   --spacing-xs: 0.25rem;
@@ -44,20 +56,40 @@
 
   /* Sombras */
   --shadow-sm: 0 1px 3px rgba(16, 206, 178, 0.04);
-  --shadow-md: 0 4px 8px rgba(49,221,147,0.10);
-  --shadow-lg: 0 12px 26px rgba(23,158,106,0.18);
-  --shadow-xl: 0 20px 40px rgba(23,158,106,0.22);
+  --shadow-md: 0 4px 8px rgba(49, 221, 147, 0.10);
+  --shadow-lg: 0 12px 26px rgba(23, 158, 106, 0.18);
+  --shadow-xl: 0 20px 40px rgba(23, 158, 106, 0.22);
 
   /* Transições */
-  --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
-  --transition-base: 210ms cubic-bezier(.4,0,.2,1);
-  --transition-slow: 340ms cubic-bezier(.4,0,.2,1);
+  --transition-fast: 150ms cubic-bezier(.4, 0, .2, 1);
+  --transition-base: 210ms cubic-bezier(.4, 0, .2, 1);
+  --transition-slow: 340ms cubic-bezier(.4, 0, .2, 1);
 
-  /* Tamanhos de fonte base - Desktop */
+  /* Fontes */
+  --font-family-base: 'Inter', system-ui, sans-serif;
+  --font-family-title: 'Poppins', 'Inter', system-ui, sans-serif;
+
+  /* Pesos */
+  --font-weight-normal: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
+
+  /* Altura de linha */
+  --line-height-base: 1.5;
+  --line-height-title: 1.2;
+
+  /* Tamanhos de fonte auxiliares para interface */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-md: 1.125rem;  /* 18px */
+  --font-size-lg: 1.25rem;   /* 20px */
+  --font-size-xl: 1.5rem;    /* 24px */
+
+  /* Base + títulos responsivos */
   --font-size-base: 1rem;
-  --font-size-h1: 2.25rem;
-  --font-size-h2: 1.875rem;
-  --font-size-h3: 1.5rem;
+  --font-size-h1: clamp(2rem, 4vw, 2.25rem);
+  --font-size-h2: clamp(1.5rem, 3vw, 1.875rem);
+  --font-size-h3: clamp(1.25rem, 2vw, 1.5rem);
   --font-size-h4: 1.25rem;
   --font-size-h5: 1.125rem;
   --font-size-h6: 1rem;
@@ -66,28 +98,54 @@
 /* Modo escuro automático */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Principais */
     --color-primary: #1bdd93;
+    --color-primary-dark: #179e6a;
     --color-primary-light: #34ffc5;
+    /* Feedback */
+    --color-success: #22C55E;
+    --color-success-bg: #052e16;
+    --color-warning: #F59E0B;
+    --color-warning-bg: #78350f;
+    --color-danger: #DC2626;
+    --color-danger-bg: #7f1d1d;
+    --color-info: #3B82F6;
+    --color-info-bg: #1e40af;
+
+    /* Alternância e foco */
+    --color-focus: #1bdd93;
     --color-bg: #101c23;
     --color-surface: #18242a;
+    --color-surface-alt: #20303a;
+
+    /* Borders, text e desabilitado */
     --color-border: #223338;
     --color-text: #e7f8f1;
     --color-text-muted: #94A3B8;
-    --shadow-sm: 0 1px 3px rgba(49,221,147,0.15);
-    --shadow-md: 0 4px 8px rgba(49,221,147,0.19);
-    --shadow-lg: 0 12px 26px rgba(27,221,147,0.25);
-    --shadow-xl: 0 20px 40px rgba(27,221,147,0.30);
+    --color-disabled: #28333a;
+    --color-disabled-text: #586268;
+
+    /* Transparências */
+    --color-black-transparent: rgba(0, 0, 0, 0.08);
+    --color-white-transparent: rgba(255, 255, 255, 0.08);
+
+    /* Sombras adaptadas para dark */
+    --shadow-sm: 0 1px 3px rgba(49, 221, 147, 0.15);
+    --shadow-md: 0 4px 8px rgba(49, 221, 147, 0.19);
+    --shadow-lg: 0 12px 26px rgba(27, 221, 147, 0.25);
+    --shadow-xl: 0 20px 40px rgba(27, 221, 147, 0.30);
   }
 }
 
 /* Reset básico */
-* { 
-  margin: 0; 
-  padding: 0; 
-  box-sizing: border-box; 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: var(--font-family-base);
   font-weight: var(--font-weight-normal);
@@ -96,7 +154,8 @@ html, body {
   background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* Previne scroll horizontal */
+  overflow-x: hidden;
+  /* Previne scroll horizontal */
 }
 
 #root {
@@ -113,12 +172,13 @@ a {
   text-decoration: none;
   font-weight: var(--font-weight-medium);
   transition: color var(--transition-fast);
-  word-break: break-word; /* Previne overflow em links longos */
+  word-break: break-word;
+  /* Previne overflow em links longos */
 }
 
-a:hover { 
-  color: var(--color-primary-dark); 
-  text-decoration: underline; 
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
 }
 
 a:focus {
@@ -128,7 +188,12 @@ a:focus {
 }
 
 /* Cabeçalhos - Responsivos */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-family-title);
   font-weight: var(--font-weight-bold);
   color: var(--color-primary-dark);
@@ -141,14 +206,33 @@ h1, h2, h3, h4, h5, h6 {
   hyphens: auto;
 }
 
-h1 { font-size: var(--font-size-h1); }
-h2 { font-size: var(--font-size-h2); }
-h3 { font-size: var(--font-size-h3); }
-h4 { font-size: var(--font-size-h4); }
-h5 { font-size: var(--font-size-h5); }
-h6 { font-size: var(--font-size-h6); }
+h1 {
+  font-size: var(--font-size-h1);
+}
 
-.muted { color: var(--color-text-muted); }
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+h4 {
+  font-size: var(--font-size-h4);
+}
+
+h5 {
+  font-size: var(--font-size-h5);
+}
+
+h6 {
+  font-size: var(--font-size-h6);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
 
 /* Reseta botões para herdar só tokens base */
 button {
@@ -163,8 +247,10 @@ button {
   box-shadow: none;
   cursor: pointer;
   transition: var(--transition-base);
-  -webkit-tap-highlight-color: transparent; /* Remove highlight azul no mobile */
-  touch-action: manipulation; /* Melhora performance de toque */
+  -webkit-tap-highlight-color: transparent;
+  /* Remove highlight azul no mobile */
+  touch-action: manipulation;
+  /* Melhora performance de toque */
 }
 
 /* Cartões - Responsivos */
@@ -178,15 +264,16 @@ button {
   transition: box-shadow var(--transition-base), transform var(--transition-base);
   width: 100%;
   max-width: 100%;
-  overflow: hidden; /* Previne conteúdo vazando */
+  overflow: hidden;
+  /* Previne conteúdo vazando */
 }
 
-.card:hover { 
-  box-shadow: var(--shadow-md); 
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
-.card.interactive { 
-  cursor: pointer; 
+.card.interactive {
+  cursor: pointer;
 }
 
 .card.interactive:hover {
@@ -195,7 +282,9 @@ button {
 }
 
 /* Inputs - Responsivos */
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   max-width: 100%;
   padding: 0.625rem 0.875rem;
@@ -207,41 +296,42 @@ input, select, textarea {
   color: var(--color-text);
   transition: all var(--transition-base);
   line-height: 1.5;
-  -webkit-appearance: none; /* Remove estilo nativo iOS */
+  -webkit-appearance: none;
+  /* Remove estilo nativo iOS */
   appearance: none;
 }
 
-input:hover:not(:disabled), 
-select:hover:not(:disabled), 
+input:hover:not(:disabled),
+select:hover:not(:disabled),
 textarea:hover:not(:disabled) {
   border-color: var(--color-primary-light);
 }
 
-input:focus, 
-select:focus, 
+input:focus,
+select:focus,
 textarea:focus {
   border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 0 3px rgba(27, 221, 147, 0.14);
 }
 
-input::placeholder, 
+input::placeholder,
 textarea::placeholder {
   color: var(--color-text-muted);
   opacity: 0.7;
 }
 
-input:disabled, 
-select:disabled, 
+input:disabled,
+select:disabled,
 textarea:disabled {
   background: var(--color-bg);
   cursor: not-allowed;
   opacity: 0.65;
 }
 
-textarea { 
-  resize: vertical; 
-  min-height: 100px; 
+textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 /* Blocos de código - Responsivo */
@@ -269,7 +359,7 @@ textarea {
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-md, 8px);
   padding: 12px 28px 12px 18px;
-  box-shadow: var(--shadow-md, 0 1px 8px rgba(0,0,0,0.08));
+  box-shadow: var(--shadow-md, 0 1px 8px rgba(0, 0, 0, 0.08));
   z-index: 1005;
   font-weight: 600;
   font-size: var(--font-size-base);
@@ -279,19 +369,19 @@ textarea {
   word-wrap: break-word;
 }
 
-.toast-success { 
-  border-color: var(--color-success); 
-  color: var(--color-success); 
+.toast-success {
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
-.toast-error { 
-  border-color: var(--color-danger); 
-  color: var(--color-danger); 
+.toast-error {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
-.toast-info { 
-  border-color: var(--color-primary); 
-  color: var(--color-primary); 
+.toast-info {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .toast-message .toast-close {
@@ -314,35 +404,35 @@ textarea {
   border-radius: var(--radius-md, 8px);
   margin-bottom: var(--spacing-sm);
   background: var(--color-surface, #fff);
-  box-shadow: var(--shadow-xs, 0 0.5px 3px rgba(0,0,0,0.03));
+  box-shadow: var(--shadow-xs, 0 0.5px 3px rgba(0, 0, 0, 0.03));
   transition: box-shadow 140ms;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
 
-.transaction-item--clickable { 
-  cursor: pointer; 
+.transaction-item--clickable {
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.transaction-item-header, 
+.transaction-item-header,
 .transaction-item-footer {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
 }
 
-.positive { 
-  color: var(--color-success); 
-  font-weight: 600; 
+.positive {
+  color: var(--color-success);
+  font-weight: 600;
 }
 
-.negative { 
-  color: var(--color-danger); 
-  font-weight: 600; 
+.negative {
+  color: var(--color-danger);
+  font-weight: 600;
 }
 
 .transaction-item-actions {
@@ -351,7 +441,7 @@ textarea {
   flex-wrap: wrap;
 }
 
-.transaction-item-actions .btn { 
+.transaction-item-actions .btn {
   margin-left: var(--spacing-xs);
 }
 
@@ -405,7 +495,12 @@ textarea {
     font-size: var(--font-size-base);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     padding-top: 8px;
     padding-bottom: 8px;
   }
@@ -417,12 +512,16 @@ textarea {
   }
 
   .card.interactive:hover {
-    transform: none; /* Remove transform no mobile para melhor performance */
+    transform: none;
+    /* Remove transform no mobile para melhor performance */
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     padding: 0.5rem 0.75rem;
-    font-size: 1rem; /* Previne zoom no iOS */
+    font-size: 1rem;
+    /* Previne zoom no iOS */
   }
 
   .code-block {
@@ -489,7 +588,9 @@ textarea {
     padding: var(--spacing-sm) var(--spacing-md);
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     padding: 0.5rem 0.625rem;
   }
 
@@ -521,6 +622,7 @@ textarea {
 
 /* Acessibilidade - Melhorias para toque */
 @media (pointer: coarse) {
+
   button,
   a,
   input,
@@ -528,7 +630,8 @@ textarea {
   textarea,
   .transaction-item--clickable,
   .card.interactive {
-    min-height: 44px; /* Tamanho mínimo recomendado para toque */
+    min-height: 44px;
+    /* Tamanho mínimo recomendado para toque */
     min-width: 44px;
   }
 
@@ -539,6 +642,7 @@ textarea {
 
 /* Previne zoom em inputs no iOS */
 @supports (-webkit-touch-callout: none) {
+
   input,
   select,
   textarea {

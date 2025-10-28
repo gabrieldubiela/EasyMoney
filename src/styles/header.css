@@ -1,8 +1,8 @@
 /* src/styles/header.css */
 
 /* ================================
-  EasyMoney - Header (Mobile Only)
-  ================================ */
+   EasyMoney - Header (Mobile Only)
+   ================================ */
 
 .header {
   display: none; /* Oculto por padrão no desktop */
@@ -17,10 +17,10 @@
     display: flex;
     height: 56px;
     min-height: 56px;
-    background: var(--color-surface, #fff);
-    border-bottom: 1px solid var(--color-border, #eee);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
     align-items: center;
-    padding: 0 var(--spacing-md, 16px);
+    padding: 0 var(--spacing-md);
     justify-content: space-between;
     position: sticky;
     top: 0;
@@ -100,7 +100,7 @@
   }
 
   .header-menu-toggle:active {
-    background: var(--color-secondary);
+    background: var(--color-surface-alt);
     border-color: var(--color-primary);
   }
 
@@ -130,7 +130,7 @@
   }
 
   .header-menu-toggle--active .header-menu-icon span:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: rotate(-45deg) translate(6px,-6px);
   }
 }
 
@@ -183,11 +183,10 @@
 @media (prefers-color-scheme: dark) {
   @media (max-width: 768px) {
     .header {
-      border-bottom-color: rgba(255, 255, 255, 0.1);
+      border-bottom-color: var(--color-border);
     }
-
     .header-menu-toggle {
-      border-color: rgba(255, 255, 255, 0.15);
+      border-color: var(--color-border);
     }
   }
 }

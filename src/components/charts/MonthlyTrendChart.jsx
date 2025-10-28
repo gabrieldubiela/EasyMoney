@@ -1,6 +1,6 @@
 // src/components/charts/MonthlyTrendChart.jsx
 
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 import {
@@ -17,9 +17,6 @@ import formatCurrency from "../../utils/formatCurrency";
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Legend, Tooltip);
 
-/**
- * Gráfico de tendência mensal: saldo, receitas e despesas dos 12 últimos meses.
- */
 export default function MonthlyTrendChart({
   incomeData,
   expenseData,
@@ -27,12 +24,19 @@ export default function MonthlyTrendChart({
   metric,
   onChangeMetric,
 }) {
+  // Lê as variáveis da paleta do CSS
   const style = getComputedStyle(document.documentElement);
-  const COLORS = {
-    balance: style.getPropertyValue("--color-primary").trim() || "#4392f1",
-    income: style.getPropertyValue("--color-success").trim() || "#40ba4f",
-    expense: style.getPropertyValue("--color-danger").trim() || "#f55c48",
-  };
+
+  const COLORS = useMemo(() => ({
+    balance: style.getPropertyValue("--color-primary").trim() || "#1bdd93",
+    income: style.getPropertyValue("--color-success").trim() || "#22C55E",
+    expense: style.getPropertyValue("--color-danger").trim() || "#DC2626",
+    textMuted: style.getPropertyValue("--color-text-muted").trim() || "#6B7280",
+    grid: style.getPropertyValue("--color-border").trim() || "#E5E7EB",
+    tooltipBg: style.getPropertyValue("--color-surface").trim() || "#fff",
+    tooltipBorder: style.getPropertyValue("--color-border").trim() || "#E5E7EB",
+    tooltipTitle: style.getPropertyValue("--color-text").trim() || "#111827",
+  }), [style]);
 
   const LABELS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -72,13 +76,10 @@ export default function MonthlyTrendChart({
     }
   };
 
-  // Lógica para mostrar um ou todos os datasets
   const getChartDatasets = () => {
     if (metric === "all") {
-      // Mostrar todas as linhas
       return [datasets.income, datasets.expense, datasets.balance];
     } else {
-      // Mostrar apenas a linha selecionada
       return [datasets[metric]];
     }
   };
@@ -94,11 +95,11 @@ export default function MonthlyTrendChart({
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: style.getPropertyValue("--color-surface"),
-        borderColor: style.getPropertyValue("--color-border"),
+        backgroundColor: COLORS.tooltipBg,
+        borderColor: COLORS.tooltipBorder,
         borderWidth: 1,
-        titleColor: style.getPropertyValue("--color-text"),
-        bodyColor: style.getPropertyValue("--color-text-muted"),
+        titleColor: COLORS.tooltipTitle,
+        bodyColor: COLORS.textMuted,
         callbacks: {
           label: (context) => formatCurrency(context.parsed.y),
         },
@@ -106,13 +107,13 @@ export default function MonthlyTrendChart({
     },
     scales: {
       x: {
-        grid: { color: "rgba(100,100,100,0.08)" },
-        ticks: { color: style.getPropertyValue("--color-text-muted") },
+        grid: { color: COLORS.grid },
+        ticks: { color: COLORS.textMuted },
       },
       y: {
-        grid: { color: "rgba(100,100,100,0.08)" },
+        grid: { color: COLORS.grid },
         ticks: {
-          color: style.getPropertyValue("--color-text-muted"),
+          color: COLORS.textMuted,
           callback: (value) => formatCurrency(value),
         },
       },
@@ -140,6 +141,7 @@ export default function MonthlyTrendChart({
     </div>
   );
 }
+
 
 MonthlyTrendChart.propTypes = {
   incomeData: PropTypes.arrayOf(PropTypes.number).isRequired,

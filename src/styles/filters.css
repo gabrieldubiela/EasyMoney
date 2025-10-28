@@ -1,13 +1,13 @@
 /* src/styles/filters.css */
 
 /* ================================
-  EasyMoney - Filtros de Transações (Responsivo)
-  ================================ */
+   EasyMoney - Filtros de Transações (Responsivo)
+   ================================ */
 
 .transaction-filter {
-  background: var(--color-surface, #fff);
-  border-radius: var(--radius-md, 10px);
-  box-shadow: var(--shadow-sm, 0 1px 6px rgba(0,0,0,0.05));
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   width: 100%;
@@ -79,7 +79,7 @@
   padding: 0 6px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-surface);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
   margin-left: var(--spacing-xs);
@@ -126,7 +126,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-secondary);
+  background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
@@ -141,7 +141,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-black-transparent);
   cursor: pointer;
   font-size: 0.875rem;
   line-height: 1;
@@ -149,7 +149,8 @@
 }
 
 .filter-chip-remove:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--color-black-transparent);
+  opacity: 0.8;
 }
 
 /* Filtro compacto */
@@ -325,6 +326,12 @@
     padding: 2px var(--spacing-xs);
   }
 
+  .filter-chip-remove {
+    width: 13px;
+    height: 13px;
+    font-size: 0.75rem;
+  }
+
   .transaction-filter--collapsed {
     max-height: 48px;
   }
@@ -406,7 +413,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-black-transparent);
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--transition-base);
@@ -443,7 +450,7 @@
 }
 
 .filter-drawer-close:hover {
-  background: var(--color-secondary);
+  background: var(--color-surface-alt);
   border-color: var(--color-primary);
 }
 
@@ -461,24 +468,26 @@
 
 @media (prefers-color-scheme: dark) {
   .filter-chip {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--color-black-transparent);
+    border-color: var(--color-border);
   }
 
   .filter-chip-remove {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-black-transparent);
   }
 
   .filter-chip-remove:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--color-black-transparent);
+    opacity: 0.7;
   }
 
   .filter-drawer {
-    box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-xl);
   }
 
   .filter-drawer-overlay--visible {
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--color-black-transparent);
+    opacity: 1;
   }
 }
 
@@ -587,7 +596,7 @@
   left: 2px;
   width: 20px;
   height: 20px;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 50%;
   transition: transform var(--transition-fast);
 }

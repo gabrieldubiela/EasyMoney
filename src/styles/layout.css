@@ -6,7 +6,7 @@
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: var(--color-bg, #f9f9fb);
+  background: var(--color-bg);
   overflow: hidden;
   position: relative;
 }
@@ -16,7 +16,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg, #f9f9fb);
+  background: var(--color-bg);
   overflow: hidden;
   position: relative;
 }
@@ -25,7 +25,7 @@
   flex: 1;
   overflow: auto;
   overflow-x: hidden;
-  padding: var(--spacing-xl, 12px);
+  padding: var(--spacing-xl);
   -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
   width: 100%;
   max-width: 100%;
@@ -33,14 +33,13 @@
 
 /* Container centralizado para conteúdo */
 .app-content-container {
-  
   margin: 0 auto;
   width: 100%;
 }
 
 /* ================================
    SIDEBAR/NAVIGATION LAYOUT
-   ================================ */
+  ================================ */
 
 .app-sidebar {
   width: 260px;
@@ -86,11 +85,11 @@
 
 /* ================================
    RESPONSIVIDADE - TABLETS
-   ================================ */
+  ================================ */
 
 @media (max-width: 1024px) {
   .app-content {
-    padding: var(--spacing-lg, 24px);
+    padding: var(--spacing-lg);
   }
 
   .app-header,
@@ -115,7 +114,7 @@
 
 /* ================================
    RESPONSIVIDADE - MOBILE
-   ================================ */
+  ================================ */
 
 @media (max-width: 768px) {
   .app-layout {
@@ -124,7 +123,7 @@
   }
 
   .app-content {
-    padding: var(--spacing-md, 16px);
+    padding: var(--spacing-md);
     overflow-x: hidden;
   }
 
@@ -172,7 +171,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-transparent);
     z-index: 150;
     opacity: 0;
     transition: opacity var(--transition-base);
@@ -201,7 +200,7 @@
 
   .app-menu-toggle:hover,
   .app-menu-toggle:active {
-    background: var(--color-secondary);
+    background: var(--color-surface-alt);
     border-color: var(--color-primary);
   }
 
@@ -217,11 +216,11 @@
 
 /* ================================
    MOBILE PEQUENO (até 480px)
-   ================================ */
+  ================================ */
 
 @media (max-width: 480px) {
   .app-content {
-    padding: var(--spacing-sm, 12px);
+    padding: var(--spacing-sm);
   }
 
   .app-header {
@@ -248,7 +247,7 @@
 
 /* ================================
    MODO PAISAGEM (LANDSCAPE) MOBILE
-   ================================ */
+  ================================ */
 
 @media (max-width: 768px) and (orientation: landscape) {
   .app-layout {
@@ -273,7 +272,7 @@
 
 /* ================================
    ESTADOS E ANIMAÇÕES
-   ================================ */
+  ================================ */
 
 /* Transição suave ao abrir/fechar sidebar */
 .app-sidebar,
@@ -310,7 +309,7 @@
 
 /* ================================
    SCROLLBAR CUSTOMIZADA
-   ================================ */
+  ================================ */
 
 /* Webkit (Chrome, Safari, Edge) */
 .app-content::-webkit-scrollbar,
@@ -358,7 +357,7 @@
 
 /* ================================
    SAFE AREAS (iPhone X+, notch)
-   ================================ */
+  ================================ */
 
 @supports (padding: max(0px)) {
   .app-content {
@@ -382,9 +381,8 @@
 
 /* ================================
    ACESSIBILIDADE
-   ================================ */
+  ================================ */
 
-/* Foco visível para navegação por teclado */
 .app-menu-toggle:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -425,26 +423,26 @@
 
 /* ================================
    MODO ESCURO - AJUSTES
-   ================================ */
+  ================================ */
 
 @media (prefers-color-scheme: dark) {
   .app-sidebar-overlay--visible {
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--color-black-transparent);
   }
 
   .app-sidebar {
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-xl);
   }
 
   .app-content::-webkit-scrollbar-track,
   .app-sidebar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-black-transparent);
   }
 }
 
 /* ================================
    LAYOUT ALTERNATIVO - SEM SIDEBAR
-   ================================ */
+  ================================ */
 
 .app-layout--no-sidebar .app-sidebar {
   display: none;
@@ -456,7 +454,7 @@
 
 /* ================================
    LAYOUT ALTERNATIVO - HEADER FIXO
-   ================================ */
+  ================================ */
 
 .app-layout--fixed-header .app-header {
   position: sticky;

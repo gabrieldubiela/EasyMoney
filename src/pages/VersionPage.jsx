@@ -17,7 +17,10 @@ const changelog = [
             "- Aumento da largura de tabelas em computadores",
             "- Padronização de datas e valores",
             "- Input de valores abre teclado numerico em celular",
-            "- Possibilidade de edição de valor orçado anual"
+            "- Possibilidade de edição de valor orçado anual",
+            "- Padronização de todas as cores do programa de acordo com a palheta",
+            "- Os tipos são linhas dentro das categorias",
+            "- Exclusão de icones do sidebar",
         ]
     },
 ];

@@ -1,8 +1,8 @@
 /* src/styles/cards.css */
 
 /* ================================
-  EasyMoney - Cards de Resumo/Dashboard (Responsivo)
-  ================================ */
+   EasyMoney - Cards de Resumo/Dashboard (Responsivo)
+   ================================ */
 
 .card,
 .summary-card,
@@ -103,7 +103,7 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-md);
-    background: var(--color-secondary);
+    background: var(--color-surface-alt);
     color: var(--color-primary);
     font-size: 1.5rem;
     flex-shrink: 0;
@@ -122,23 +122,23 @@
 }
 
 .card-badge--success {
-    background: rgba(var(--color-success-rgb, 34, 197, 94), 0.15);
+    background: var(--color-success-bg);
     color: var(--color-success);
 }
 
 .card-badge--danger {
-    background: rgba(var(--color-danger-rgb, 220, 38, 38), 0.15);
+    background: var(--color-danger-bg);
     color: var(--color-danger);
 }
 
 .card-badge--warning {
-    background: rgba(var(--color-warning-rgb, 245, 158, 11), 0.15);
+    background: var(--color-warning-bg);
     color: var(--color-warning);
 }
 
 .card-badge--info {
-    background: rgba(var(--color-primary-rgb, 27, 221, 147), 0.15);
-    color: var(--color-primary);
+    background: var(--color-info-bg);
+    color: var(--color-info);
 }
 
 /* ================================
@@ -184,18 +184,18 @@
 /* Card com gradiente */
 .card--gradient {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: #fff;
+    color: var(--color-surface);
     border: none;
 }
 
 .card--gradient .card-title,
 .card--gradient .card-value,
 .card--gradient .card-description {
-    color: #fff;
+    color: var(--color-surface);
 }
 
 .card--gradient .card-label {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-text-muted);
 }
 
 /* Card de estatística */
@@ -581,13 +581,11 @@
     .card--gradient {
         background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
     }
-
     .card-icon {
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--color-black-transparent);
     }
-
     .card-footer {
-        border-top-color: rgba(255, 255, 255, 0.1);
+        border-top-color: var(--color-border);
     }
 }
 

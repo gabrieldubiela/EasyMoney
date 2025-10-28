@@ -88,7 +88,7 @@ function showUpdateAlert(registration) {
   const existing = document.getElementById('update-alert');
   if (existing) existing.remove();
 
-  // Cria alerta
+  // Criar alerta
   const alert = document.createElement('div');
   alert.id = 'update-alert';
   alert.style.cssText = `
