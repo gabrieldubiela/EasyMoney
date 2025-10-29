@@ -11,11 +11,12 @@ import {
   LinearScale,
   Legend,
   Tooltip,
+  Filler,
 } from "chart.js";
 import "../../styles/charts.css";
 import formatCurrency from "../../utils/formatCurrency";
 
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Legend, Tooltip);
+ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Legend, Tooltip, Filler);
 
 export default function MonthlyTrendChart({
   incomeData,

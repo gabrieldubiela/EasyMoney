@@ -13,4 +13,4 @@ export default function formatCurrencyInput(input) {
         minimumFractionDigits: 2,
     });
     return { masked, float };
-}
+}    

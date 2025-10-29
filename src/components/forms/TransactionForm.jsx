@@ -42,7 +42,9 @@ const TransactionForm = ({
   useEffect(() => {
     if (initialData) {
       const absAmount = Math.abs(initialData.amount || 0);
-      setAmountInput(formatCurrencyInput((absAmount * 100).toFixed(0)));
+      const { masked, float } = formatCurrencyInput((absAmount * 100).toFixed(0));
+      setAmountInput(masked);
+      setAmount(float);
       setAmount(Number(absAmount).toFixed(2));
       const totalInstallments = initialData.installments_total || 1;
 
@@ -204,12 +206,13 @@ const TransactionForm = ({
           id="tx-amount"
           type="text"
           inputMode="numeric"
-          pattern="[0-9]*"
           placeholder="Valor"
           value={amountInput}
           onChange={e => {
             const onlyDigits = e.target.value.replace(/\D/g, "");
-            setAmountInput(formatCurrencyInput(onlyDigits));
+            const { masked, float } = formatCurrencyInput(onlyDigits);
+            setAmountInput(masked);
+            setAmount(float);
             if (onlyDigits) {
               setAmount((parseInt(onlyDigits, 10) / 100).toFixed(2));
             } else {
