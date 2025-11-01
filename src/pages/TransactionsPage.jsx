@@ -10,14 +10,13 @@ import { db } from '../firebase/firebaseConfig';
 
 const TransactionPage = () => {
   const { householdId } = useAppContext();
-
-  // Filtros (com presets novos)
   const [categoryFilter, setCategoryFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [supplier, setSupplier] = useState('');
+  const [description, setDescription] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
-
+  const [yearMonth, setYearMonth] = useState('');
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
 
@@ -42,19 +41,23 @@ const TransactionPage = () => {
   const filters = useMemo(() => ({
     categoryId: categoryFilter,
     typeId: typeFilter,
-    searchTerm,
+    supplier,
+    description,
     startDate: minDate,
     endDate: maxDate,
+    yearMonth,
     limit: 15 // scroll infinito, aumenta conforme carregamento
-  }), [categoryFilter, typeFilter, searchTerm, minDate, maxDate]);
+  }), [categoryFilter, typeFilter, supplier, minDate, maxDate, yearMonth, description]);
 
   // Callback dos filtros
   const handleFilterChange = (newFilters) => {
     setCategoryFilter(newFilters.categoryId || '');
     setTypeFilter(newFilters.typeId || '');
-    setSearchTerm(newFilters.searchTerm || '');
+    setSupplier(newFilters.supplier || '');
+    setDescription(newFilters.description || '');
     setMinDate(newFilters.startDate || '');
     setMaxDate(newFilters.endDate || '');
+    setYearMonth(newFilters.yearMonth || '');
   };
 
   return (
@@ -63,19 +66,19 @@ const TransactionPage = () => {
         <h1 className="page-title">Transações</h1>
       </div>
 
-      <TransactionAdder/>
+      <TransactionAdder />
 
       <TransactionFilter
         categories={categories}
         types={types}
         onFilterChange={handleFilterChange}
-    />
+      />
 
       <TransactionList
         filters={filters}
         categories={categories}
         types={types}
-    />
+      />
     </div>
   );
 };

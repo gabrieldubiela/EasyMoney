@@ -1,4 +1,4 @@
-// src/components/charts/CategorySummaryTable.jsx
+// src/components/charts/InvestmentProgress.jsx
 
 import React from "react";
 import PropTypes from "prop-types";

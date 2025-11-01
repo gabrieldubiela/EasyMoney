@@ -2,22 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, query, limit, getDocs } from 'firebase/firestore'; 
+import { collection, query, limit, getDocs } from 'firebase/firestore';
 import { useAppContext } from '../../context/useAppContext';
 import "../../styles/forms.css";
 import "../../styles/buttons.css";
 import "../../styles/filters.css";
 
 // Funções para presets de data
-function getMonthPeriod() {
-  const today = new Date();
-  const start = new Date(today.getFullYear(), today.getMonth(), 1);
-  const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  return {
-    minDate: start.toISOString().substr(0, 10),
-    maxDate: end.toISOString().substr(0, 10)
-  };
-}
 function getThreeMonthsPeriod() {
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth() - 2, 1);
@@ -46,35 +37,34 @@ const periodPresets = [
 
 const TransactionFilter = ({ categories, types, onFilterChange }) => {
   const { householdId } = useAppContext();
-  // Nova: filtro de período
   const [period, setPeriod] = useState('month');
-
-  // Filtros detalhados
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
-  // Sugestões
+  const [yearMonth, setYearMonth] = useState('');
   const [supplierSuggestions, setSupplierSuggestions] = useState([]);
   const [descriptionSuggestions, setDescriptionSuggestions] = useState([]);
 
   // Atualiza datas ao trocar preset de período
   useEffect(() => {
     if (period === 'month') {
-      const { minDate, maxDate } = getMonthPeriod();
-      setMinDate(minDate);
-      setMaxDate(maxDate);
-    } else if (period === 'threeMonths') {
-      const { minDate, maxDate } = getThreeMonthsPeriod();
-      setMinDate(minDate);
-      setMaxDate(maxDate);
-    } else if (period === 'year') {
-      const { minDate, maxDate } = getYearPeriod();
-      setMinDate(minDate);
-      setMaxDate(maxDate);
+      const today = new Date();
+      const ym = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
+      setYearMonth(ym);
+    } else {
+      setYearMonth(''); // Limpa para outros períodos
+      if (period === 'threeMonths') {
+        const { minDate, maxDate } = getThreeMonthsPeriod();
+        setMinDate(minDate);
+        setMaxDate(maxDate);
+      } else if (period === 'year') {
+        const { minDate, maxDate } = getYearPeriod();
+        setMinDate(minDate);
+        setMaxDate(maxDate);
+      }
     }
-    // Personalizado: não altera minDate/maxDate
   }, [period]);
 
   // Sugestão de fornecedor/descrição (para buscar rápida)
@@ -120,13 +110,28 @@ const TransactionFilter = ({ categories, types, onFilterChange }) => {
     const filters = {
       categoryId: selectedCategory,
       typeId: selectedType,
-      searchTerm: searchTerm.trim(),
-      startDate: minDate,
-      endDate: maxDate
     };
+
+    // Se tiver texto de busca, envie em ambos os campos para filtrar pelos dois
+    if (searchTerm.trim()) {
+      filters.supplier = searchTerm.trim();
+      filters.description = searchTerm.trim();
+    }
+
+
+    if (period === 'month') {
+      filters.yearMonth = yearMonth;
+    } else {
+      if (minDate) filters.startDate = minDate;
+      if (maxDate) filters.endDate = maxDate;
+    }
+
+    console.log('Filtros enviados:', filters);
+
     onFilterChange(filters);
-    // eslint-disable-next-line
-  }, [selectedCategory, selectedType, searchTerm, minDate, maxDate]);
+  }, [selectedCategory, selectedType, searchTerm, minDate, maxDate, yearMonth, period, onFilterChange]);
+
+
 
   // Limpa todos filtros
   const clearFilters = () => {
@@ -146,21 +151,21 @@ const TransactionFilter = ({ categories, types, onFilterChange }) => {
           <label className="form-label">Período:</label>
           <select value={period} onChange={e => setPeriod(e.target.value)}>
             {periodPresets.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
         {(period === "custom") && (
-        <>
-          <div className="transaction-filter-col">
-            <label className="form-label">De:</label>
-            <input type="date" value={minDate} onChange={e => setMinDate(e.target.value)}/>
-          </div>
-          <div className="transaction-filter-col">
-            <label className="form-label">Até:</label>
-            <input type="date" value={maxDate} onChange={e => setMaxDate(e.target.value)}/>
-          </div>
-        </>
+          <>
+            <div className="transaction-filter-col">
+              <label className="form-label">De:</label>
+              <input type="date" value={minDate} onChange={e => setMinDate(e.target.value)} />
+            </div>
+            <div className="transaction-filter-col">
+              <label className="form-label">Até:</label>
+              <input type="date" value={maxDate} onChange={e => setMaxDate(e.target.value)} />
+            </div>
+          </>
         )}
       </div>
 
@@ -195,10 +200,10 @@ const TransactionFilter = ({ categories, types, onFilterChange }) => {
           list="search-suggestions"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-      />
+        />
         <datalist id="search-suggestions">
-          {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s}/>)}
-          {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d}/>)}
+          {supplierSuggestions.map((s, i) => <option key={`sup-${i}`} value={s} />)}
+          {descriptionSuggestions.map((d, i) => <option key={`desc-${i}`} value={d} />)}
         </datalist>
       </div>
       <button onClick={clearFilters} className="btn btn-secondary btn-block" type="button">

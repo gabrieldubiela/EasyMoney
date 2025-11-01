@@ -5,13 +5,13 @@ import "../styles/cards.css";
 import "../styles/alerts.css";
 import "../styles/buttons.css";
 
-const APP_VERSION = "3.5.1";
+const APP_VERSION = "3.5.2";
 const APP_DATE = "25/10/2025";
 
 const changelog = [
     {
-        version: "3.5.1",
-        date: "29/10/2025",
+        version: "3.5.2",
+        date: "31/10/2025",
         highlights: [
             "- Página inicial em funcionamento",
             "- Aumento da largura de tabelas em computadores",
@@ -23,7 +23,9 @@ const changelog = [
             "- Exclusão de icones do sidebar",
             "- Padronização do tamanho das fontes",
             "- Permitido a criação de novas famílias",
-            "- Conserto de bug ao digitar no campo valor em adicionar e editar transação"
+            "- Conserto de bug ao digitar no campo valor em adicionar e editar transação",
+            "- Conserto para mostrar o último dia do mes na lista de transações",
+            "- Filtro em lista de transação para buscar por fornecedor e descrição"
         ]
     },
 ];

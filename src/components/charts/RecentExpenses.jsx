@@ -10,6 +10,8 @@ export default function RecentExpenses({
   types = [],
 }) {
 
+  console.log("RecentExpenses (ordem):", transactions.map(tx => tx.date));
+
   const categoryMap = React.useMemo(
     () => Object.fromEntries(categories.map(c => [c.id, c.name ?? c.categoryName ?? c.nome ?? ""])),
     [categories]
