@@ -398,3 +398,26 @@ export const deleteInstallmentGroup = async (householdId, transactionGroupId, pl
   });
   await batch.commit();
 };
+
+/**
+ * Busca e retorna o valor total do grupo de parcelas (somando todos os amount do grupo).
+ * @param {string} householdId - O ID da família.
+ * @param {string} transactionGroupId - O ID do grupo de parcelas.
+ * @param {boolean} [planned=false] - Se true, busca em plannedTransactions.
+ * @returns {Promise<number>} Valor total do grupo
+ */
+export const getInstallmentGroupTotal = async (householdId, transactionGroupId, planned = false) => {
+  const path = planned
+    ? `households/${householdId}/plannedTransactions`
+    : `households/${householdId}/transactions`;
+  const colRef = collection(db, path);
+  const q = query(colRef, where("transactionGroupId", "==", transactionGroupId));
+  const snap = await getDocs(q);
+  let total = 0;
+  snap.forEach(doc => {
+    const data = doc.data();
+    // Usa Math.abs caso seus valores estejam negativos para despesas
+    total += Math.abs(data.amount || 0);
+  });
+  return total;
+};

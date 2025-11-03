@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/useAppContext';
-import { createTransaction, updateTransaction } from '../../services/transactionService';
+import { createTransaction, updateTransaction, getInstallmentGroupTotal } from '../../services/transactionService';
 import useAllCategories from '../../hooks/useAllCategories';
 import useAllTypes from '../../hooks/useAllTypes';
 import formatCurrencyInput from "../../utils/formatCurrencyInput";
@@ -55,27 +55,61 @@ const TransactionForm = ({
       setOriginalInstallments(totalInstallments);
       setCategory(initialData.category_id || '');
       setType(initialData.type_id || '');
-      setDate(
-        initialData.date?.toDate
-          ? initialData.date.toDate().toISOString().substr(0, 10)
-          : (initialData.date ? initialData.date.substr(0, 10) : today)
-      );
+      setDate(() => {
+        if (initialData.date?.toDate) {
+          // é um Timestamp do Firebase, converte pra string ISO
+          return initialData.date.toDate().toISOString().substring(0, 10);
+        } else if (initialData.date instanceof Date) {
+          // já é um Date
+          return initialData.date.toISOString().substring(0, 10);
+        } else if (typeof initialData.date === 'string') {
+          // uma string
+          return initialData.date.substr(0, 10);
+        } else {
+          // padrão
+          return today;
+        }
+      });
       setInstallments(totalInstallments);
     }
   }, [initialData, today]);
 
   // Atualiza o valor quando muda a opção de editar todas
   useEffect(() => {
-    if (isInstallment && originalAmount > 0) {
-      if (editAllInstallments) {
-        // Mostra valor total (valor unitário × número de parcelas)
-        setAmount(originalAmount * originalInstallments);
-      } else {
-        // Mostra valor unitário
-        setAmount(originalAmount);
+    let isMounted = true;
+
+    async function updateAmount() {
+      // Garante que é edição de grupo e tem transactionGroupId
+      if (isInstallment && initialData?.transactionGroupId) {
+        if (editAllInstallments) {
+          // Busca do banco o total real das parcelas do grupo
+          const total = await getInstallmentGroupTotal(
+            householdId,
+            initialData.transactionGroupId,
+            isPlanned
+          );
+          if (isMounted) {
+            setAmount(total.toFixed(2));
+            const { masked } = formatCurrencyInput((total * 100).toFixed(0));
+            setAmountInput(masked);
+          }
+        } else {
+          // Volta a exibir apenas o valor unitário da parcela
+          setAmount(originalAmount);
+          const { masked } = formatCurrencyInput((originalAmount * 100).toFixed(0));
+          setAmountInput(masked);
+        }
       }
     }
-  }, [editAllInstallments, originalAmount, originalInstallments, isInstallment]);
+
+    updateAmount();
+
+    return () => {
+      isMounted = false;
+    };
+    // Recalcula quando editar todas, ou categoria inicial muda, ou grupo/parcela muda
+  }, [editAllInstallments, originalAmount, isInstallment, initialData?.transactionGroupId, householdId, isPlanned]);
+
 
   const isIncomeType = (selectedTypeId) => {
     const transactionType = types.find((t) => t.id === selectedTypeId);

@@ -5,12 +5,12 @@ import "../styles/cards.css";
 import "../styles/alerts.css";
 import "../styles/buttons.css";
 
-const APP_VERSION = "3.5.2";
+const APP_VERSION = "3.5.3";
 const APP_DATE = "25/10/2025";
 
 const changelog = [
     {
-        version: "3.5.2",
+        version: "3.5.3",
         date: "31/10/2025",
         highlights: [
             "- Página inicial em funcionamento",
@@ -25,7 +25,8 @@ const changelog = [
             "- Permitido a criação de novas famílias",
             "- Conserto de bug ao digitar no campo valor em adicionar e editar transação",
             "- Conserto para mostrar o último dia do mes na lista de transações",
-            "- Filtro em lista de transação para buscar por fornecedor e descrição"
+            "- Filtro em lista de transação para buscar por fornecedor e descrição",
+            "- Ajuste na edição de despesa, aparecendo corretamente a data e o valor total de transações parceladas"
         ]
     },
 ];
