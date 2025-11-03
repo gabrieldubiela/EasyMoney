@@ -8,7 +8,7 @@ import { useAppContext } from '../context/useAppContext';
 /**
  * Hook responsável por verificar o status de fechamento do mês anterior.
  * 
- * - Verifica se o documento de orçamento (`monthlyBudgets/{yearMonth}`) do mês anterior
+ * - Verifica se o documento de orçamento (`households/${householdId}/monthlyClosings/{yearMonth}`) do mês anterior
  *   existe e contém a flag `isClosed: true`.
  * - Caso contrário, sinaliza que o fechamento é necessário.
  * 
@@ -42,15 +42,15 @@ export default function useMonthClosingStatus() {
         });
 
         // Referência direta ao documento do mês anterior
-        const budgetRef = doc(db, `households/${householdId}/monthlyBudgets`, yearMonth);
-        const docSnap = await getDoc(budgetRef);
+        const closingRef = doc(db, `households/${householdId}/monthlyClosings`, yearMonth);
+        const closingSnap = await getDoc(closingRef);
 
-        // Se não houver doc ou não estiver fechado, precisa de fechamento
-        if (!docSnap.exists() || docSnap.data().isClosed !== true) {
-          setNeedsClosing({ yearMonth, monthName, hasData: docSnap.exists() });
+        if (!closingSnap.exists() || closingSnap.data().isClosed !== true) {
+          setNeedsClosing({ yearMonth, monthName, hasData: closingSnap.exists() });
         } else {
           setNeedsClosing(false);
         }
+
       } catch (error) {
         console.error('Erro ao verificar status de fechamento:', error);
         setNeedsClosing(false);
